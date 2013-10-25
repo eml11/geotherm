@@ -1,7 +1,7 @@
 SRC=$(PWD)/src
 OBJECTDIR=$(PWD)/f90
 BIN=$(PWD)/bin
-LDFLAGS=-L/distributions/netcdf-fortran-4.2/fortran -lnetcdff
+LDFLAGS=-L/distributions/netcdf-fortran-4.2/fortran/.libs -L/opt/local/lib -L/distributions/netcdf-fortran-4.2/f90 -lnetcdf -lnetcdff
 FDFLAGS=-I/distributions/netcdf-fortran-4.2/f90 -I$(OBJECTDIR)
 OUT=geotherm
 OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/model_helper.o

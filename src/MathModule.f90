@@ -40,7 +40,7 @@
 
       call array_diff2d(param_ar,param_dif,n,m)
       integral_term = data_ar*param_dif
-      call array_intagrel2d(integral_term,retrn_ar)
+      call array_integral2d(integral_term,retrn_ar)
 
       end subroutine
 
