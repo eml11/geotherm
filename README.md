@@ -21,4 +21,8 @@ Source code located in src/
 Modules and Objects located in f90/
 executible located in bin/
 
-Author:Elliot Lynch
+Supported Netcdf formats:
+  - xyz  where x is time, y is depth, z is dependent variable
+
+
+Author: Elliot Lynch
