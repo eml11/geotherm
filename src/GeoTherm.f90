@@ -10,11 +10,12 @@
       type (model_constants) model_constants_inst
       type (modelfile) modelfile_inst
       character (len = 256) :: filename
-      integer :: n = 1
-      integer :: m = 1!temp until file reading is complete
+
+      call GETARG(1,filename)
 
       call READMDLF(modelfile_inst,filename)
-      call compute_geotherm(modelfile_inst,n,m)
+      call compute_geotherm &
+      &(modelfile_inst,modelfile_inst%ydim,modelfile_inst%tdim)
 
       end program
 
@@ -68,6 +69,9 @@
       &(inerintegral_ar,exintegral_ar,iner_dbl,outerintegral_ar,n,m)
       call compute_outerintegralconstant &
       &(outerintegral_ar,tdata_ar,outr_dbl,n,m)
+
+      call write_netcdf &
+      &(modelfile_inst%outfile,outerintegral_ar+outr_dbl,n,m)
 
       end subroutine
 

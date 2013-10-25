@@ -9,10 +9,11 @@
         character (len = 256) :: heatcapcnetcdf
         character (len = 256) :: gtempfile
         character (len = 256) :: gqfluxfile
+        character (len = 256) :: outfile
         integer :: ydim, tdim 
       end type
 
-      contains
+      contains 
 
       subroutine READMDLF(this,filename)
       character (len = *) ::filename
@@ -40,6 +41,8 @@
           this%gtempfile = modelfinput
         else if (typinput.EQ."Q") then
           this%gqfluxfile = modelfinput
+        else if (typinput.EQ."O") then
+          this%outfile = modelfinput
         end if
       enddo
 
