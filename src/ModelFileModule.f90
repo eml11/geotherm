@@ -9,6 +9,7 @@
         character (len = 256) :: heatcapcnetcdf
         character (len = 256) :: gtempfile
         character (len = 256) :: gqfluxfile
+        character (len = 256) :: thermlconductnetcdf
         character (len = 256) :: outfile
         integer :: ydim, tdim 
       end type
@@ -33,6 +34,8 @@
           this%velocitynetcdf = modelfinput
         else if (typinput.EQ."K") then
           this%kappanetcdf = modelfinput
+        else if (typinput.EQ."k") then
+          this%thermlconductnetcdf = modelfinput
         else if (typinput.EQ."H") then
           this%heatproductnetcdf = modelfinput
         else if (typinput.EQ."C") then

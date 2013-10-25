@@ -4,10 +4,7 @@
       use module_modelfile
       use model_helper
       implicit none
-!234567
-!read out n and m first then pass to a subroutine to read in the arrays
-      type (physical_constants) physical_constants_inst
-      type (model_constants) model_constants_inst
+
       type (modelfile) modelfile_inst
       character (len = 256) :: filename
 
@@ -26,7 +23,6 @@
       use mathmodule
       use helpermodule
       type (modelfile), intent(in) :: modelfile_inst
-      type (physical_constants) :: physical_constants_inst
       double precision :: input_tdata_ar(m)
       double precision :: input_qdata_ar(m)
       double precision :: tdata_artrs(m,n), tdata_ar(n,m)
@@ -34,6 +30,7 @@
       double precision :: bdash_ar(n,m)
       double precision :: velocity_ar(n,m)
       double precision :: kappa_ar(n,m)
+      double precision :: thermlconduct_ar(n,m)
       double precision :: heatproduct_ar(n,m)
       double precision :: heatcapc_ar(n,m)
       double precision :: exintegral_ar(n,m)
@@ -48,6 +45,8 @@
       call get_netcdf(modelfile_inst%kappanetcdf,kappa_ar)
       call get_netcdf(modelfile_inst%heatproductnetcdf,heatproduct_ar)
       call get_netcdf(modelfile_inst%heatcapcnetcdf,heatcapc_ar)
+      call get_netcdf &
+      &(modelfile_inst%thermlconductnetcdf,thermlconduct_ar)
 
       call extend_ardimension(input_tdata_ar,tdata_artrs,n)
       call extend_ardimension(input_qdata_ar,qdata_artrs,n)
@@ -55,7 +54,7 @@
       qdata_ar = RESHAPE(qdata_artrs,(/n,m/))
 
       call compute_bdashval &
-      &(tdata_ar,qdata_ar,physical_constants_inst%kconstant, &
+      &(tdata_ar,qdata_ar,thermlconduct_ar, &
       &bdash_ar,n,m)
       call compute_exponentintegral &
       &(bdash_ar,velocity_ar,kappa_ar,exintegral_ar,n,m)
@@ -64,7 +63,7 @@
       &inerintegral_ar,n,m)
       call compute_inerintegralconstant &
       &(inerintegral_ar,exintegral_ar,qdata_ar, &
-      &physical_constants_inst%kconstant,iner_dbl,n,m)
+      &thermlconduct_ar,iner_dbl,n,m)
       call compute_init_outerintegral &
       &(inerintegral_ar,exintegral_ar,iner_dbl,outerintegral_ar,n,m)
       call compute_outerintegralconstant &
@@ -80,7 +79,7 @@
       use mathmodule
       double precision :: tdata_ar(n,m)
       double precision :: qdata_ar(n,m)
-      double precision :: kconstant
+      double precision :: kconstant(n,m)
       double precision :: retrn_ar(n,m)
       integer :: n, m
       double precision, dimension(m,n) :: difftdata_ar
@@ -141,11 +140,11 @@
       double precision :: inerintegral_ar(n,m)
       double precision :: exintegral_ar(n,m)
       double precision :: qdata_ar(n,m)
-      double precision :: kconstant
+      double precision :: kconstant(n,m)
       double precision :: retrn_dbl
 
       retrn_dbl = &
-      &((-1*qdata_ar(1,1)*qdata_ar(1,1))/kconstant) * &
+      &((-1*qdata_ar(1,1)*qdata_ar(1,1))/kconstant(1,1)) * &
       &EXP(exintegral_ar(1,1)) - inerintegral_ar(1,1)
 
       end subroutine
