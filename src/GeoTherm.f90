@@ -13,16 +13,6 @@
       integer :: n = 1
       integer :: m = 1!temp until file reading is complete
 
-      
-      !modelfile_inst%gtempfile = "n"
-      !modelfile_inst%gqfluxfile = "n"
-      !modelfile_inst%velocitynetcdf = "n"
-      !modelfile_inst%kappanetcdf = "n"
-      !modelfile_inst%heatproductnetcdf = "n"
-      !modelfile_inst%heatcapcnetcdf = "n"
-      !modelfile_inst%ydim = 1
-      !modelfile_inst%tdim = 1
-
       call READMDLF(modelfile_inst,filename)
       call compute_geotherm(modelfile_inst,n,m)
 
@@ -32,6 +22,8 @@
       &(modelfile_inst,n,m)
       use module_modelfile
       use model_helper
+      use mathmodule
+      use helpermodule
       type (modelfile), intent(in) :: modelfile_inst
       type (physical_constants) :: physical_constants_inst
       double precision :: input_tdata_ar(m)
@@ -81,6 +73,7 @@
 
       subroutine compute_bdashval &
       &(tdata_ar,qdata_ar,kconstant,retrn_ar,n,m)
+      use mathmodule
       double precision :: tdata_ar(n,m)
       double precision :: qdata_ar(n,m)
       double precision :: kconstant
@@ -89,7 +82,7 @@
       double precision, dimension(m,n) :: difftdata_ar
 
       
-      call array_diff2d(RESHAPE(tdata_ar,(/m,n/)),difftdata_ar)
+      call array_diff2d(RESHAPE(tdata_ar,(/m,n/)),difftdata_ar,n,m)
       retrn_ar = kconstant * &
       &(RESHAPE(difftdata_ar,(/n,m/))/qdata_ar)
 
@@ -97,6 +90,7 @@
 
       subroutine compute_exponentintegral &
       &(bdash_ar,velocity_ar,kappa_ar,retrn_ar,n,m)
+      use mathmodule
       double precision :: bdash_ar(n,m)
       double precision :: velocity_ar(n,m)
       double precision :: kappa_ar(n,m)
@@ -120,6 +114,7 @@
 
       subroutine compute_init_inerintegral &
       &(exintegral_ar,bdash_ar,theta_ar,kappa_ar,retrn_ar,n,m)
+      use mathmodule
       double precision :: exintegral_ar(n,m)
       double precision :: bdash_ar(n,m)
       double precision :: retrn_ar(n,m)
@@ -153,6 +148,7 @@
 
       subroutine compute_init_outerintegral &
       &(inerintegral_ar,exintegral_ar,iner_dbl,retrn_ar,n,m)
+      use mathmodule
       double precision :: inerintegral_ar(n,m)
       double precision :: exintegral_ar(n,m)
       double precision :: retrn_ar(n,m)

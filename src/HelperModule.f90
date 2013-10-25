@@ -6,7 +6,7 @@
 
       subroutine get_netcdf(filename,data_ar)
       character (len = *) :: filename
-      integer :: data_ar(:, :)
+      double precision :: data_ar(:, :)
       
       integer :: ncid, varid
 
@@ -23,7 +23,7 @@
 
       subroutine get_file(filename,data_ar)
       character (len = *) :: filename
-      integer :: data_ar(:, :)
+      double precision :: data_ar(:)
 
       OPEN(1, file = filename)
       READ(1) data_ar
