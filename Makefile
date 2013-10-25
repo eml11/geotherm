@@ -9,6 +9,7 @@ OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/model
 all: geotherm
 
 geotherm: $(SRC)/GeoTherm.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/model_helper.mod
+	#mkdir -p bin
 	gfortran $(LDFLAGS) $(FDFLAGS) -o $(OUT) $(SRC)/GeoTherm.f90 $(OBJECTS)
 	mv $(OUT) $(BIN)
 
@@ -27,3 +28,11 @@ $(OBJECTDIR)/module_modelfile.mod: $(SRC)/ModelFileModule.f90
 $(OBJECTDIR)/model_helper.mod: $(SRC)/model_helper.f90
 	gfortran -c $(SRC)/model_helper.f90
 	mv model_helper.mod model_helper.o $(OBJECTDIR)
+
+#$(BIN)/: $(SRC)/MathModule.f90 $(SRC)/HelperModule.f90 $(SRC)/ModelFileModule.f90 $(SRC)/model_helper.f90
+	#mkdir -p $(OBJECTDIR)
+
+clean:
+	rm -f $(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/model_helper.o
+	rm -f $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/model_helper.mod
+	rm -f $(BIN)/geotherm
