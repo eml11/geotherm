@@ -37,6 +37,35 @@
 
       end subroutine
 
+      subroutine get_netcdf_wincrmnt(filename,data_ar,incriment,n,m)
+  
+      character (len = *) :: filename
+      double precision :: data_ar(:, :)
+      double precision :: incriment(2)
+      double precision, dimension(n) :: ydata
+      double precision, dimension(m) :: tdata
+
+      integer :: n,m
+      integer :: ncid, zvarid, xvarid, yvarid
+
+      integer :: retval
+
+      retval = nf90_open(filename, NF90_NOWRITE, ncid)
+      retval = nf90_inq_varid(ncid, "z", zvarid)
+      retval = nf90_inq_varid(ncid, "x", xvarid)
+      retval = nf90_inq_varid(ncid, "y", yvarid)
+      retval = nf90_get_var(ncid, zvarid, data_ar)
+
+      retval = nf90_get_var(ncid, yvarid, ydata)
+      retval = nf90_get_var(ncid, xvarid, tdata)
+
+      incriment(1) = tdata(2) - tdata(1)
+      incriment(2) = ydata(2) - ydata(1)
+
+      retval = nf90_close(ncid)
+
+      end subroutine
+
       subroutine get_file(filename,data_ar)
       character (len = *) :: filename
       double precision :: data_ar(:)
