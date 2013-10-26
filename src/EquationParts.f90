@@ -1,6 +1,40 @@
       program reg_tests
       implicit none
       use equationpartsmodule
+      use mathmodule 
+
+      integer, parameter :: n = 100, m = 120
+      double precision, dimension(n,m) :: t_ar,y_tar
+      integer i,j
+      double precision, dimension(n,m) :: wrk_ar1,wrk_ar2,wrk_ar3 &
+      &wrk_ar4,wrk_ar5,wrk_ar6
+      double precision :: incriment(2) = (/1,1/)
+
+      do i=1,n
+        do j=1,m
+          t_ar(i,j) = j
+          y_ar(i,j) = i
+        end do
+      end do
+
+      wrk_ar1 = gaussian_nnorm(t_ar,y_ar*0,2,n,m)
+      wrk_ar2 = gaussian_nnorm(t_ar,y_ar*0,3,n,m)
+      wrk_ar3 = gaussian_nnorm(t_ar,y_ar*0,5,n,m)
+      wrk_ar4 = (t_ar*wrk_ar1*wrk_ar3)/(wrk_ar2*2)
+    
+      call compute_bdashval &
+      &(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
+
+      wrk_ar2 = gaussian_nnorm(t_ar,y_ar,3,n,m)
+      wrk_ar3 = gaussian_nnorm(t_ar,y_ar,5,n,m)
+      wrk_ar4 = (1/(t_ar*(-0.5-1/3.0+0.2)))*(wrk_ar1*wrk_ar2)/wrk_ar3 +&
+      &(1/(y_ar*(-1/3.0+0.2)))*(wrk_ar2/wrk_ar3) + &
+      & (1/(t_ar*(-1+0.2)))*(wrk_ar2*wrk_ar2)/wrk_ar3 + &
+      &(1/(y_ar*(0.2)))*wrk_ar2/wrk_ar3
+ 
+      call compute_exponentintegral &
+      &(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
+
       
 
       end program

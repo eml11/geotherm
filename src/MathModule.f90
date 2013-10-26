@@ -78,4 +78,15 @@
 
       end subroutine
 
+      function gaussian_nnorm(t_ar,y_ar,sigma,n,m)
+      double precision :: t_ar(n,m)
+      double precision :: y_ar(n,m)
+      double precision :: gaussian_nnorm(n,m)
+      double precision :: sigma
+      integer n,m
+
+      gaussian = DEXP((t_ar*t_ar+y_ar*y_ar)/(2*sigma))      
+
+      end function
+
       end module
