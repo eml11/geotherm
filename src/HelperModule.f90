@@ -10,7 +10,24 @@
       
       integer :: ncid, varid
 
-      integer :: x, y, retval
+      integer :: retval
+
+      !retval is an error checking variable, should be nf_noerr (presumably 0)
+      retval = nf90_open(filename, NF90_NOWRITE, ncid)
+      retval = nf90_inq_varid(ncid, "z", varid) !change data, use z or something standard
+      retval = nf90_get_var(ncid, varid, data_ar)
+
+      retval = nf90_close(ncid)
+
+      end subroutine
+
+      subroutine get_netcdf1d(filename,data_ar)
+      character (len = *) :: filename
+      double precision :: data_ar(:)
+
+      integer :: ncid, varid
+
+      integer :: retval
 
       !retval is an error checking variable, should be nf_noerr (presumably 0)
       retval = nf90_open(filename, NF90_NOWRITE, ncid)

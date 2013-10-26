@@ -39,8 +39,8 @@
       double precision :: iner_dbl
       double precision :: outr_dbl
 
-      call get_file(modelfile_inst%gtempfile,input_tdata_ar)
-      call get_file(modelfile_inst%gqfluxfile,input_qdata_ar)
+      call get_netcdf1d(modelfile_inst%gtempfile,input_tdata_ar)
+      call get_netcdf1d(modelfile_inst%gqfluxfile,input_qdata_ar)
       call get_netcdf(modelfile_inst%velocitynetcdf,velocity_ar)
       call get_netcdf(modelfile_inst%densitynetcdf,density_ar)
       call get_netcdf(modelfile_inst%heatproductnetcdf,heatproduct_ar)
