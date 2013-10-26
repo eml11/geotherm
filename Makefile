@@ -6,13 +6,20 @@ FC=gfortran
 LDFLAGS=-L/usr/local/lib -lnetcdff -L/opt/local/lib -lnetcdf
 FDFLAGS=-I/usr/local/include -I$(OBJECTDIR)
 OUT=geotherm
-OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o equationpartsmodule.o
+OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o
+MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod
 
-all: geotherm
+all: geotherm unittests
 
-geotherm: $(SRC)/GeoTherm.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/equationpartsmodule.mod
+geotherm: $(SRC)/GeoTherm.f90 $(MODULES)
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o $(OUT) $(SRC)/GeoTherm.f90 $(OBJECTS)
 	mkdir -p $(BIN); mv $(OUT) $(BIN)
+
+unittests: $(SRC)/unit_tests.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/equationpartsmodule.mod
+	$(FC) -o unittests -I$(OBJECTDIR) $(SRC)/unit_tests.f90 $(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/EquationParts.o
+	mkdir -p $(TESTS)/bin; mv unittests $(TESTS)/bin
+
+
 
 $(OBJECTDIR)/mathmodule.mod: $(SRC)/MathModule.f90
 	$(FC) -c $(SRC)/MathModule.f90
@@ -26,18 +33,17 @@ $(OBJECTDIR)/module_modelfile.mod: $(SRC)/ModelFileModule.f90
 	$(FC) -c $(SRC)/ModelFileModule.f90
 	mkdir -p $(OBJECTDIR); mv module_modelfile.mod modelfilemodule.o $(OBJECTDIR)
 
-$(OBJECTDIR)/equationpartsmodule.mod: $(SRC)/EquationParts.f90 
-	$(FC) -o reg_test $(SRC)/EquationParts.f90
-	mkdir -p $(OBJECTDIR); mv equationpartsmodule.mod equationpartsmodule.o $(OBJECTDIR)
-	mkdir -p $(TESTS)/bin; mv reg_test $(TESTS)/bin
+$(OBJECTDIR)/equationpartsmodule.mod: $(SRC)/EquationParts.f90 $(OBJECTDIR)/mathmodule.mod 
+	$(FC) -c -I$(OBJECTDIR) $(SRC)/EquationParts.f90 $(OBJECTDIR)/mathmodule.o
+	mkdir -p $(OBJECTDIR); mv equationpartsmodule.mod EquationParts.o $(OBJECTDIR)
 
 test: clean geotherm
 	cd $(TESTS); make clean
 	cd $(TESTS); make test
 
 clean:
-	rm -f $(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/model_helper.o
-	rm -f $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/model_helper.mod
+	rm -f $(OBJECTS)
+	rm -f $(MODULES)
 	rm -f $(BIN)/geotherm
 	rmdir $(OBJECTDIR)
 	rmdir $(BIN)
