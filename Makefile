@@ -26,6 +26,11 @@ $(OBJECTDIR)/module_modelfile.mod: $(SRC)/ModelFileModule.f90
 	$(FC) -c $(SRC)/ModelFileModule.f90
 	mkdir -p $(OBJECTDIR); mv module_modelfile.mod modelfilemodule.o $(OBJECTDIR)
 
+$(OBJECTDIR)/: $(SRC)/EquationParts.f90 
+	$(FC) -o reg_test $(SRC)/EquationParts.f90
+	mkdir -p $(OBJECTDIR); mv equationpartsmodule.mod equationpartsmodule.o $(OBJECTDIR)
+	mkdir -p $(TESTS)/bin; mv reg_test $(TESTS)/bin
+
 test: clean geotherm
 	cd $(TESTS); make clean
 	cd $(TESTS); make test
