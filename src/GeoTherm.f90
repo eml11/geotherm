@@ -2,7 +2,6 @@
       use helpermodule
       use mathmodule
       use module_modelfile
-      use model_helper
       implicit none
 
       type (modelfile) modelfile_inst
@@ -19,7 +18,6 @@
       subroutine compute_geotherm &
       &(modelfile_inst,n,m)
       use module_modelfile
-      use model_helper
       use mathmodule
       use helpermodule
       type (modelfile), intent(in) :: modelfile_inst
