@@ -85,7 +85,7 @@
       double precision :: sigma
       integer n,m
 
-      gaussian = DEXP((t_ar*t_ar+y_ar*y_ar)/(2*sigma))      
+      gaussian_nnorm = DEXP((t_ar*t_ar+y_ar*y_ar)/(2*sigma))      
 
       end function
 

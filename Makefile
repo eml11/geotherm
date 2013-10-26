@@ -6,11 +6,11 @@ FC=gfortran
 LDFLAGS=-L/usr/local/lib -lnetcdff -L/opt/local/lib -lnetcdf
 FDFLAGS=-I/usr/local/include -I$(OBJECTDIR)
 OUT=geotherm
-OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o
+OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o equationpartsmodule.o
 
 all: geotherm
 
-geotherm: $(SRC)/GeoTherm.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod
+geotherm: $(SRC)/GeoTherm.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/equationpartsmodule.mod
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o $(OUT) $(SRC)/GeoTherm.f90 $(OBJECTS)
 	mkdir -p $(BIN); mv $(OUT) $(BIN)
 
@@ -26,7 +26,7 @@ $(OBJECTDIR)/module_modelfile.mod: $(SRC)/ModelFileModule.f90
 	$(FC) -c $(SRC)/ModelFileModule.f90
 	mkdir -p $(OBJECTDIR); mv module_modelfile.mod modelfilemodule.o $(OBJECTDIR)
 
-$(OBJECTDIR)/: $(SRC)/EquationParts.f90 
+$(OBJECTDIR)/equationpartsmodule.mod: $(SRC)/EquationParts.f90 
 	$(FC) -o reg_test $(SRC)/EquationParts.f90
 	mkdir -p $(OBJECTDIR); mv equationpartsmodule.mod equationpartsmodule.o $(OBJECTDIR)
 	mkdir -p $(TESTS)/bin; mv reg_test $(TESTS)/bin
