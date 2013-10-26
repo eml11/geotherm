@@ -3,10 +3,10 @@
 !234567
       contains
 
-      subroutine array_integral2d(data_ar,retrn_ar) 
+      subroutine array_integral2d(data_ar,retrn_ar,n,m) 
       double precision :: data_ar(:,:)
       double precision :: retrn_ar(:,:)
-      integer :: i,n
+      integer :: i,n,m
 
       do i=1,n
         retrn_ar(i,:) = SUM(data_ar(:i,:),1)!may be 0  
@@ -40,7 +40,7 @@
 
       call array_diff2d(param_ar,param_dif,n,m)
       integral_term = data_ar*param_dif
-      call array_integral2d(integral_term,retrn_ar)
+      call array_integral2d(integral_term,retrn_ar,n,m)
 
       end subroutine
 

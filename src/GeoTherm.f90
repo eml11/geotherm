@@ -103,11 +103,12 @@
       double precision, dimension(n,m) :: v_yintegral, b_yintegral
 
       call array_integral2d & 
-      &(RESHAPE((bdash_ar*velocity_ar)/kappa_ar,(/m,n/)),v_tintegral)
+      &(RESHAPE((bdash_ar*velocity_ar)/kappa_ar,(/m,n/)), &
+      &v_tintegral,n,m)
       call array_integral2d &
-      (RESHAPE((bdash_ar*bdash_ar)/kappa_ar,(/m,n/)),b_tintegral)
-      call array_integral2d(velocity_ar/kappa_ar,v_yintegral)
-      call array_integral2d(1/kappa_ar,b_yintegral)
+      (RESHAPE((bdash_ar*bdash_ar)/kappa_ar,(/m,n/)),b_tintegral,n,m)
+      call array_integral2d(velocity_ar/kappa_ar,v_yintegral,n,m)
+      call array_integral2d(1/kappa_ar,b_yintegral,n,m)
  
       retrn_ar = RESHAPE(v_tintegral,(/n,m/)) + &
       &RESHAPE(b_tintegral,(/n,m/)) + &
@@ -127,9 +128,9 @@
       double precision, dimension(m,n) :: t_integral
      
       integral_term = theta_ar*kappa_ar*DEXP(-1*exintegral_ar)
-      call array_integral2d(integral_term,y_integral)
+      call array_integral2d(integral_term,y_integral,n,m)
       call array_integral2d &
-      &(RESHAPE(integral_term*bdash_ar,(/m,n/)),t_integral)
+      &(RESHAPE(integral_term*bdash_ar,(/m,n/)),t_integral,n,m)
 
       retrn_ar = y_integral + RESHAPE(t_integral,(/n,m/))
 
@@ -160,9 +161,9 @@
       double precision, dimension(m,n) :: t_integral
 
       integral_term = EXP(exintegral_ar)*(inerintegral_ar + iner_dbl)
-      call array_integral2d(integral_term,y_integral)
+      call array_integral2d(integral_term,y_integral,n,m)
       call array_integral2d &
-      &(RESHAPE(integral_term*bdash_ar,(/m,n/)),t_integral)
+      &(RESHAPE(integral_term*bdash_ar,(/m,n/)),t_integral,n,m)
 
       retrn_ar = y_integral + RESHAPE(t_integral,(/n,m/))
 
