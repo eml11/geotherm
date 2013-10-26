@@ -13,9 +13,12 @@ Dependecies
 Tested on mac os x 10.9
 
 To intall:
-  - edit LDFLAGS in Makefile to include directory for netcdff libary
-  - edit FDFLAGS in Makefile to include directory for netcdf.mod 
+  - edit LDFLAGS in Makefile to include directory for netcdff and
+    netcdf libaries if these are in a non-standard location
+  - edit FDFLAGS in Makefile to include directory for netcdf.mod
+    if this is in a non-standard location 
   - type make
+
 
 Source code located in src/
 Modules and Objects located in f90/
