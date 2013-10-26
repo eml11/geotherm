@@ -3,8 +3,8 @@ OBJECTDIR=$(PWD)/f90
 BIN=$(PWD)/bin
 TESTS=$(PWD)/tests
 FC=gfortran
-LDFLAGS=-L/distributions/netcdf-fortran-4.2/fortran/.libs -L/opt/local/lib -lnetcdf -lnetcdff
-FDFLAGS=-I/distributions/netcdf-fortran-4.2/f90 -I$(OBJECTDIR)
+LDFLAGS=-L/usr/local/lib -lnetcdff -L/opt/local/lib -lnetcdf
+FDFLAGS=-I/usr/local/include -I$(OBJECTDIR)
 OUT=geotherm
 OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o
 
