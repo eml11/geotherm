@@ -27,6 +27,7 @@ $(OBJECTDIR)/module_modelfile.mod: $(SRC)/ModelFileModule.f90
 	mkdir -p $(OBJECTDIR); mv module_modelfile.mod modelfilemodule.o $(OBJECTDIR)
 
 test: clean geotherm
+	cd $(TESTS); make clean
 	cd $(TESTS); make test
 
 clean:
