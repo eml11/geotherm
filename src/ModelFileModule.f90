@@ -4,7 +4,7 @@
 !234567
       type modelfile
         character (len = 256) :: velocitynetcdf
-        character (len = 256) :: kappanetcdf
+        character (len = 256) :: densitynetcdf
         character (len = 256) :: heatproductnetcdf
         character (len = 256) :: heatcapcnetcdf
         character (len = 256) :: gtempfile
@@ -32,9 +32,9 @@
           bool = 0
         else if (typinput.EQ."V") then
           this%velocitynetcdf = modelfinput
+        else if (typinput.EQ."D") then
+          this%densitynetcdf = modelfinput
         else if (typinput.EQ."K") then
-          this%kappanetcdf = modelfinput
-        else if (typinput.EQ."k") then
           this%thermlconductnetcdf = modelfinput
         else if (typinput.EQ."H") then
           this%heatproductnetcdf = modelfinput

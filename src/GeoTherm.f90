@@ -29,7 +29,7 @@
       double precision :: qdata_artrs(m,n), qdata_ar(n,m)
       double precision :: bdash_ar(n,m)
       double precision :: velocity_ar(n,m)
-      double precision :: kappa_ar(n,m)
+      double precision :: density_ar(n,m)
       double precision :: thermlconduct_ar(n,m)
       double precision :: heatproduct_ar(n,m)
       double precision :: heatcapc_ar(n,m)
@@ -42,7 +42,7 @@
       call get_file(modelfile_inst%gtempfile,input_tdata_ar)
       call get_file(modelfile_inst%gqfluxfile,input_qdata_ar)
       call get_netcdf(modelfile_inst%velocitynetcdf,velocity_ar)
-      call get_netcdf(modelfile_inst%kappanetcdf,kappa_ar)
+      call get_netcdf(modelfile_inst%densitynetcdf,density_ar)
       call get_netcdf(modelfile_inst%heatproductnetcdf,heatproduct_ar)
       call get_netcdf(modelfile_inst%heatcapcnetcdf,heatcapc_ar)
       call get_netcdf &
@@ -57,9 +57,11 @@
       &(tdata_ar,qdata_ar,thermlconduct_ar, &
       &bdash_ar,n,m)
       call compute_exponentintegral &
-      &(bdash_ar,velocity_ar,kappa_ar,exintegral_ar,n,m)
+      &(bdash_ar,velocity_ar,thermlconduct_ar/(density_ar*heatcapc_ar),&
+      &exintegral_ar,n,m)
       call compute_init_inerintegral &
-      &(exintegral_ar,bdash_ar,heatproduct_ar/heatcapc_ar,kappa_ar, &
+      &(exintegral_ar,bdash_ar,(density_ar*heatproduct_ar)/heatcapc_ar,&
+      &thermlconduct_ar/(density_ar*heatcapc_ar), &
       &inerintegral_ar,n,m)
       call compute_inerintegralconstant &
       &(inerintegral_ar,exintegral_ar,qdata_ar, &
