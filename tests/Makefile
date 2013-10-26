@@ -9,5 +9,5 @@ test1: $(GEOTHERM) constant_heatproduct_tindipendent.txt
 	$(GEOTHERM) constant_heatproduct_tindipendent.txt 
 
 clean:
-	rm $(RESULTS)/*.nc
+	rm -f $(RESULTS)/*.nc
 	#rmdir results
