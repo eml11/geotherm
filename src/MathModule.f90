@@ -6,14 +6,31 @@
       subroutine array_integral2d(data_ar,retrn_ar,incriment,n,m) 
       double precision :: data_ar(:,:)
       double precision :: retrn_ar(:,:)
+      double precision :: trap(n,m)
+      double precision :: midpnt(n,m) 
+      double precision, dimension(n,m) :: fowrd_ar
+      double precision, dimension(n,m) :: back_ar
       double precision :: incriment
       integer :: i,n,m
 
-      do i=1,n
-        retrn_ar(i,:) = SUM(data_ar(:i,:),1)!may be 0  
-      end do
+      !using simsons!
+
+      fowrd_ar(n,:) = data_ar(n,:)
+      fowrd_ar(:n,:) = data_ar(2:,:)
+  
+      back_ar(1,:) = data_ar(1,:)
+      back_ar(2:,:) = data_ar(:n,:)
+
+      midpnt = data_ar*incriment
+      trap = incriment*(fowrd_ar-back_ar)/2
+
       
-      retrn_ar = retrn_ar/incriment
+
+      !do i=1,n
+      !  retrn_ar(i,:) = SUM(data_ar(:i,:),1)!may be 0  
+      !end do
+      
+      retrn_ar = (2d0/3d0)*midpnt + (1/3d0)*trap
 
       end subroutine
 
@@ -25,13 +42,16 @@
       double precision, dimension(n,m) :: fowrd_ar
       double precision, dimension(n,m) :: back_ar
 
-      fowrd_ar(1,:) = data_ar(1,:)
-      fowrd_ar(1:,:) = data_ar(:n,:)
+      fowrd_ar(n,:) = data_ar(n,:)
+      fowrd_ar(:n,:) = data_ar(2:,:)
 
-      back_ar(n,:) = data_ar(n,:)!may not work
-      back_ar(:-1,:) = data_ar(1:,:)
+      back_ar(1,:) = data_ar(1,:)
+      back_ar(2:,:) = data_ar(:n,:)
 
-      retrn_ar = (fowrd_ar-back_ar)/(2.0*incriment)
+      !is sign correct? seems strange
+      retrn_ar = (back_ar-fowrd_ar)/(2.0*incriment)
+      retrn_ar(1,:) = retrn_ar(2,:)
+      retrn_ar(n,:) = retrn_ar(n-1,:)
 
       end subroutine
 
