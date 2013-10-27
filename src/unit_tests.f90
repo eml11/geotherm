@@ -32,7 +32,9 @@
 
       print *,
       print *,
-      print *, wrk_ar4-wrk_ar5
+      print *, wrk_ar5(1,1)," ", wrk_ar4(1,1)
+      print *, MAXVAL(ABS((wrk_ar4-wrk_ar5)/wrk_ar4))
+      print *, MINVAL(ABS((wrk_ar4-wrk_ar5)/wrk_ar4))
 
       wrk_ar2 = gaussian_nnorm(t_ar,y_ar,3d0,n,m)
       wrk_ar3 = gaussian_nnorm(t_ar,y_ar,5d0,n,m)
@@ -46,7 +48,9 @@
 
       print *,
       print *,
-      print *, wrk_ar4-wrk_ar5
+      print *, wrk_ar5(1,1)," ", wrk_ar4(1,1)
+      print *, MAXVAL(ABS((wrk_ar4-wrk_ar5)/wrk_ar4))
+      print *, MINVAL(ABS((wrk_ar4-wrk_ar5)/wrk_ar4))
 
       wrk_ar4 = gaussian_nnorm(t_ar,y_ar,7d0,n,m)
       wrk_ar5 = (wrk_ar2*wrk_ar3*wrk_ar4)/(y_ar*(-1/3.0-0.2-1/7.0)) + &
@@ -57,6 +61,8 @@
 
       print *,
       print *,
-      print *, wrk_ar5-wrk_ar6
+      print *, wrk_ar6(1,1)," ", wrk_ar5(1,1)
+      print *, MAXVAL(ABS((wrk_ar5-wrk_ar6)/wrk_ar5))
+      print *, MINVAL(ABS((wrk_ar5-wrk_ar6)/wrk_ar5))
 
       end program
