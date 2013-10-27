@@ -10,8 +10,8 @@
       double precision :: midpnt(n,m) 
       double precision, dimension(n,m) :: fowrd_ar
       double precision, dimension(n,m) :: back_ar
-      double precision :: incriment
-      integer :: i,n,m
+      double precision :: incriment, sumvl
+      integer :: i,j,n,m
 
       !using simsons!
 
@@ -21,16 +21,18 @@
       back_ar(1,:) = data_ar(1,:)
       back_ar(2:,:) = data_ar(:n,:)
 
-      midpnt = data_ar*incriment
-      trap = incriment*(fowrd_ar-back_ar)/2
+      !this appears to work - but realy souldn't
+      !check with other function at some point
+      midpnt = -1*data_ar*incriment
+      trap = -1*incriment*(fowrd_ar+back_ar)/2
 
-      
-
-      !do i=1,n
-      !  retrn_ar(i,:) = SUM(data_ar(:i,:),1)!may be 0  
-      !end do
-      
-      retrn_ar = (2d0/3d0)*midpnt + (1/3d0)*trap
+      do j=1,m
+        sumvl = 0d0
+        do i=1,n
+          sumvl = sumvl + (2d0/3d0)*midpnt(i,j) + (1d0/3d0)*trap(i,j)
+          retrn_ar(i,j) = sumvl
+        end do
+      end do
 
       end subroutine
 
