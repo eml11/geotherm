@@ -22,6 +22,27 @@
         end do
       end do
 
+      wrk_ar1 = gaussian_nnorm(t_ar,y_ar,2d0,n,m)
+      wrk_ar2 = t_ar*wrk_ar1/2
+
+      call array_integral2d(wrk_ar1,wrk_ar3,incriment(1),n,m)
+
+      print *,
+      print *,
+      print *, wrk_ar3(1,1)," ", wrk_ar2(1,1)
+      print *, MAXVAL(ABS((wrk_ar2-wrk_ar3)/wrk_ar2))
+      print *, MINVAL(ABS((wrk_ar2-wrk_ar3)/wrk_ar2))
+
+      wrk_ar2 = 2*wrk_ar1/t_ar
+
+      call array_diff2d(wrk_ar1,wrk_ar3,incriment(1),n,m)
+
+      print *,
+      print *,
+      print *, wrk_ar3(1,1)," ", wrk_ar2(1,1)
+      print *, MAXVAL(ABS((wrk_ar2-wrk_ar3)/wrk_ar2))
+      print *, MINVAL(ABS((wrk_ar2-wrk_ar3)/wrk_ar2))
+
       wrk_ar1 = gaussian_nnorm(t_ar,y_ar*0,2d0,n,m)
       wrk_ar2 = gaussian_nnorm(t_ar,y_ar*0,3d0,n,m)
       wrk_ar3 = gaussian_nnorm(t_ar,y_ar*0,5d0,n,m)
