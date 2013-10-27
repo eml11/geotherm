@@ -15,7 +15,7 @@
 
 
       call array_diff2d(RESHAPE(tdata_ar,(/m,n/)), &
-      &difftdata_ar,incriment(1),n,m)
+      &difftdata_ar,incriment(1),m,n)
       retrn_ar = kconstant * &
       &(RESHAPE(difftdata_ar,(/n,m/))/qdata_ar)
 
@@ -30,22 +30,35 @@
       double precision :: retrn_ar(n,m)
       double precision :: incriment(2)
       integer n,m
-      double precision, dimension(m,n) :: v_tintegral, b_tintegral
-      double precision, dimension(n,m) :: v_yintegral, b_yintegral
+      double precision, dimension(n,m) :: v_tintegral, b_tintegral
+      double precision, dimension(m,n) :: v_yintegral, b_yintegral
+
+      !call array_integral2d &
+      !&(RESHAPE((bdash_ar*velocity_ar)/kappa_ar,(/m,n/)), &
+      !&v_tintegral,incriment(1),m,n)
+      !call array_integral2d &
+      !(RESHAPE((bdash_ar*bdash_ar)/kappa_ar,(/m,n/)), &
+      !&b_tintegral,incriment(1),m,n)
+      !call array_integral2d(velocity_ar/kappa_ar, &
+      !&v_yintegral,incriment(2),n,m)
+      !call array_integral2d(1/kappa_ar,b_yintegral,incriment(2),n,m)
 
       call array_integral2d &
-      &(RESHAPE((bdash_ar*velocity_ar)/kappa_ar,(/m,n/)), &
+      &((bdash_ar*velocity_ar)/kappa_ar, &
       &v_tintegral,incriment(1),n,m)
       call array_integral2d &
-      (RESHAPE((bdash_ar*bdash_ar)/kappa_ar,(/m,n/)), &
+      ((bdash_ar*bdash_ar)/kappa_ar, &
       &b_tintegral,incriment(1),n,m)
-      call array_integral2d(velocity_ar/kappa_ar, &
-      &v_yintegral,incriment(2),n,m)
-      call array_integral2d(1/kappa_ar,b_yintegral,incriment(2),n,m)
+      call array_integral2d(RESHAPE(velocity_ar/kappa_ar,(/m,n/)), &
+      &v_yintegral,incriment(2),m,n)
+      call array_integral2d( &
+      &RESHAPE(1/kappa_ar,(/m,n/)),b_yintegral,incriment(2),m,n)
 
-      retrn_ar = RESHAPE(v_tintegral,(/n,m/)) + &
-      &RESHAPE(b_tintegral,(/n,m/)) + &
-      &v_yintegral - bdash_ar*b_yintegral
+
+      retrn_ar = -v_tintegral+ &
+      &b_tintegral + &
+      &RESHAPE(v_yintegral,(/n,m/)) -  &
+      &RESHAPE(bdash_ar*b_yintegral,(/n,m/))
 
       end subroutine
 
@@ -65,7 +78,7 @@
       call array_integral2d(integral_term,y_integral,incriment(2),n,m)
       call array_integral2d &
       &(RESHAPE(integral_term*bdash_ar,(/m,n/)), &
-      &t_integral,incriment(1),n,m)
+      &t_integral,incriment(1),m,n)
 
       retrn_ar = y_integral + RESHAPE(t_integral,(/n,m/))
 
@@ -100,7 +113,7 @@
       call array_integral2d(integral_term,y_integral,incriment(2),n,m)
       call array_integral2d &
       &(RESHAPE(integral_term*bdash_ar,(/m,n/)), &
-      &t_integral,incriment(1),n,m)
+      &t_integral,incriment(1),m,n)
 
       retrn_ar = y_integral + RESHAPE(t_integral,(/n,m/))
 
