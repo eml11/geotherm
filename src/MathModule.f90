@@ -21,10 +21,8 @@
       back_ar(1,:) = data_ar(1,:)
       back_ar(2:,:) = data_ar(:n,:)
 
-      !this appears to work - but realy souldn't
-      !check with other function at some point
-      midpnt = -1*data_ar*incriment
-      trap = -1*incriment*(fowrd_ar+back_ar)/2
+      midpnt = data_ar*incriment
+      trap = incriment*(fowrd_ar+back_ar)/2
 
       do j=1,m
         sumvl = 0d0
@@ -51,7 +49,7 @@
       back_ar(2:,:) = data_ar(:n,:)
 
       !is sign correct? seems strange
-      retrn_ar = (back_ar-fowrd_ar)/(2.0*incriment)
+      retrn_ar = (fowrd_ar-back_ar)/(2.0*incriment)
       retrn_ar(1,:) = retrn_ar(2,:)
       retrn_ar(n,:) = retrn_ar(n-1,:)
 
@@ -107,7 +105,7 @@
       double precision :: sigma
       integer n,m
 
-      gaussian_nnorm = DEXP((t_ar*t_ar+y_ar*y_ar)/(2*sigma))      
+      gaussian_nnorm = DEXP(-1d0*((t_ar*t_ar+y_ar*y_ar)/(2*sigma)))    
 
       end function
 

@@ -28,42 +28,25 @@
 
       call array_diff2d(wrk_ar1,wrk_ar3,incriment(1),n,m)
 
-      print *,
-      print *,
-      print *, wrk_ar3(3,1)," ", wrk_ar2(3,1)
-      print *, MAXVAL( &
-      &ABS((wrk_ar2(2:n,:)-wrk_ar3(2:n,:))/wrk_ar2(2:n,:)))
-      print *, MINVAL( &
-      &ABS((wrk_ar2(2:n,:)-wrk_ar3(2:n,:))/wrk_ar2(2:n,:)))
+      call test_output(wrk_ar2,wrk_ar3,n,m)
 
       call array_integral2d(wrk_ar1,wrk_ar2,incriment(1),n,m)
       call array_diff2d(wrk_ar2,wrk_ar3,incriment(1),n,m)
 
-      print *,
-      print *,
-      print *, wrk_ar3(3,1)," ", wrk_ar1(3,1)
-      print *, MAXVAL( &
-      &ABS((wrk_ar1(2:n,:)-(wrk_ar3(2:n,:)))/ &
-      &wrk_ar1(2:n,:)))
-      print *, MINVAL( &
-      &ABS((wrk_ar1(2:n,:)-(wrk_ar3(2:n,:)))/ &
-      &wrk_ar1(2:n,:))) 
+      call test_output(wrk_ar1,wrk_ar3,n,m)
 
       wrk_ar1 = gaussian_nnorm(t_ar,y_ar*0,2d0,n,m)
       wrk_ar2 = gaussian_nnorm(t_ar,y_ar*0,3d0,n,m)
       wrk_ar3 = gaussian_nnorm(t_ar,y_ar*0,5d0,n,m)
-      wrk_ar4 = (t_ar*wrk_ar1*wrk_ar3)/(wrk_ar2*2)
+      wrk_ar4 = (-t_ar*wrk_ar1*wrk_ar3)/(wrk_ar2*2)
 
       call compute_bdashval &
       &(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
 
-      print *,
-      print *,
-      print *, wrk_ar5(1,1)," ", wrk_ar4(1,1)
-      print *, MAXVAL( &
-      &ABS((wrk_ar4(2:n,:)-wrk_ar5(2:n,:))/wrk_ar4(2:n,:)))
-      print *, MINVAL( &
-      &ABS((wrk_ar4(2:n,:)-wrk_ar5(2:n,:))/wrk_ar4(2:n,:)))
+      !assume fine for now issue with periodic section of ones
+      !which must be explained
+
+      call test_output(wrk_ar4,wrk_ar5,n,m)
 
       wrk_ar2 = gaussian_nnorm(t_ar,y_ar,3d0,n,m)
       wrk_ar3 = gaussian_nnorm(t_ar,y_ar,5d0,n,m)
@@ -75,13 +58,7 @@
       call compute_exponentintegral &
       &(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
 
-      print *,
-      print *,
-      print *, wrk_ar5(1,1)," ", wrk_ar4(1,1)
-      print *, MAXVAL( &
-      &ABS((wrk_ar4(2:n,:)-wrk_ar5(2:n,:))/wrk_ar4(2:n,:)))
-      print *, MINVAL( &
-      &ABS((wrk_ar4(2:n,:)-wrk_ar5(2:n,:))/wrk_ar4(2:n,:)))
+      call test_output(wrk_ar4,wrk_ar5,n,m)
  
       wrk_ar4 = gaussian_nnorm(t_ar,y_ar,7d0,n,m)
       wrk_ar5 = (wrk_ar2*wrk_ar3*wrk_ar4)/(y_ar*(-1/3.0-0.2-1/7.0)) + &
@@ -90,12 +67,21 @@
       call compute_init_inerintegral &
       &(wrk_ar2,wrk_ar1,wrk_ar3,wrk_ar4,wrk_ar6,incriment,n,m)
 
-      print *,
-      print *,
-      print *, wrk_ar6(1,1)," ", wrk_ar5(1,1)
-      print *, MAXVAL( &
-      &ABS((wrk_ar5(2:n,:)-wrk_ar6(2:n,:))/wrk_ar5(2:n,:)))
-      print *, MINVAL( &
-      &ABS((wrk_ar5(2:n,:)-wrk_ar6(2:n,:))/wrk_ar5(2:n,:)))
+      call test_output(wrk_ar5,wrk_ar6,n,m)
 
       end program
+
+      subroutine test_output(ideal_ar,computed_ar,n,m)
+      integer :: n,m
+      double precision :: ideal_ar(n,m)
+      double precision :: computed_ar(n,m)
+
+      print *,
+      print *,
+      print *, computed_ar(3,1)," ", ideal_ar(3,1)
+      print *, MAXVAL( &
+      &ABS((ideal_ar(2:n,:)-computed_ar(2:n,:))/ideal_ar(2:n,:)))
+      print *, MINVAL( &
+      &ABS((ideal_ar(2:n,:)-computed_ar(2:n,:))/ideal_ar(2:n,:)))
+
+      end subroutine
