@@ -40,13 +40,18 @@
       double precision :: retrn_ar(n,m)
       double precision :: incriment(2)
       integer :: n, m
-      double precision, dimension(m,n) :: difftdata_ar
+      double precision, dimension(n,m) :: difftdata_ar
 
 
-      call array_diff2d(RESHAPE(tdata_ar,(/m,n/)), &
-      &difftdata_ar,incriment(1),m,n)
+      !call array_diff2d(RESHAPE(tdata_ar,(/m,n/)), &
+      !&difftdata_ar,incriment(1),m,n)
+      !retrn_ar = kconstant * &
+      !&(RESHAPE(difftdata_ar,(/n,m/))/qdata_ar)
+
+      call array_diff2d(tdata_ar, &
+      &difftdata_ar,incriment(1),n,m)
       retrn_ar = kconstant * &
-      &(RESHAPE(difftdata_ar,(/n,m/))/qdata_ar)
+      &(difftdata_ar/qdata_ar)
 
       end subroutine
 
@@ -62,15 +67,7 @@
       double precision, dimension(n,m) :: v_tintegral, b_tintegral
       double precision, dimension(m,n) :: v_yintegral, b_yintegral
 
-      !call array_integral2d &
-      !&(RESHAPE((bdash_ar*velocity_ar)/kappa_ar,(/m,n/)), &
-      !&v_tintegral,incriment(1),m,n)
-      !call array_integral2d &
-      !(RESHAPE((bdash_ar*bdash_ar)/kappa_ar,(/m,n/)), &
-      !&b_tintegral,incriment(1),m,n)
-      !call array_integral2d(velocity_ar/kappa_ar, &
-      !&v_yintegral,incriment(2),n,m)
-      !call array_integral2d(1/kappa_ar,b_yintegral,incriment(2),n,m)
+      !this is correct reshape for y
 
       call array_integral2d &
       &((bdash_ar*velocity_ar)/kappa_ar, &

@@ -91,8 +91,8 @@
 
       call test_output(wrk_ar4,wrk_ar6,n,m)
 
-      print *, ABS( &
-      &(wrk_ar4(2:n,:)-wrk_ar6(2:n,:)+ingrl_cnst)/wrk_ar4(2:n,:))
+      !print *, ABS( &
+      !&(wrk_ar4(2:n,:)-wrk_ar6(2:n,:)+ingrl_cnst)/wrk_ar4(2:n,:))
  
       wrk_ar4 = gaussian_nnorm(t_ar,y_ar,7d0,n,m)
       wrk_ar5 = (wrk_ar2*wrk_ar3*wrk_ar4)/(y_ar*(-1/3.0-0.2-1/7.0)) + &

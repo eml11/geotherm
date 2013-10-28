@@ -38,7 +38,8 @@
       double precision :: midpnt(n,m) 
       double precision, dimension(n,m) :: fowrd_ar
       double precision, dimension(n,m) :: back_ar
-      double precision :: incriment, sumvl
+      double precision :: incriment
+      double precision :: sumvl(m)
       integer :: i,j,n,m
 
       !using simsons!
@@ -52,12 +53,10 @@
       midpnt = data_ar*incriment
       trap = incriment*(fowrd_ar+back_ar)/2
 
-      do j=1,m
-        sumvl = 0d0
-        do i=1,n
-          sumvl = sumvl + (2d0/3d0)*midpnt(i,j) + (1d0/3d0)*trap(i,j)
-          retrn_ar(i,j) = sumvl
-        end do
+      sumvl = 0d0*midpnt(1,:)
+      do i=1,n
+        sumvl = sumvl + (2d0/3d0)*midpnt(i,:) + (1d0/3d0)*trap(i,:)
+        retrn_ar(i,:) = sumvl
       end do
 
       end subroutine
@@ -76,7 +75,6 @@
       back_ar(1,:) = data_ar(1,:)
       back_ar(2:,:) = data_ar(:n,:)
 
-      !is sign correct? seems strange
       retrn_ar = (fowrd_ar-back_ar)/(2.0*incriment)
       retrn_ar(1,:) = retrn_ar(2,:)
       retrn_ar(n,:) = retrn_ar(n-1,:)
