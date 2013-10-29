@@ -61,6 +61,14 @@
       call test_output(wrk_ar2,wrk_ar3,n,m)
 
       wrk_ar1 = gaussian_nnorm(t_ar,y_ar,2d0,n,m)
+      wrk_ar2 = -y_ar*wrk_ar1/2
+
+      call array_diff2dydim(wrk_ar1,wrk_ar3,incriment(1),n,m)
+
+      call test_output(wrk_ar2,wrk_ar3,n,m)
+
+
+      wrk_ar1 = gaussian_nnorm(t_ar,y_ar,2d0,n,m)
       wrk_ar2 = DEXP(-(y_ar*y_ar)/4d0) * &
       & DSQRT(PI)*DERF(t_ar/2d0)
 

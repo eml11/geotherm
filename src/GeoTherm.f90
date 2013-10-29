@@ -77,6 +77,10 @@
       call get_netcdf &
       &(modelfile_inst%thermlconductnetcdf,thermlconduct_ar)
 
+      !print *, incriment
+
+      incriment(2) = -incriment(2)
+
       call extend_ardimension(input_tdata_ar,tdata_artrs,n)
       call extend_ardimension(input_qdata_ar,qdata_artrs,n)
       tdata_ar = RESHAPE(tdata_artrs,(/n,m/))
@@ -89,9 +93,8 @@
       &(bdash_ar,velocity_ar,thermlconduct_ar/(density_ar*heatcapc_ar),&
       &exintegral_ar,incriment,n,m)
       call compute_init_inerintegral &
-      &(exintegral_ar,bdash_ar,(density_ar*heatproduct_ar)/heatcapc_ar,&
-      &thermlconduct_ar/(density_ar*heatcapc_ar), &
-      &inerintegral_ar,incriment,n,m)
+      &(exintegral_ar,bdash_ar,density_ar*heatproduct_ar,&
+      &thermlconduct_ar,inerintegral_ar,incriment,n,m)
       call compute_inerintegralconstant &
       &(inerintegral_ar,exintegral_ar,qdata_ar, &
       &thermlconduct_ar,iner_dbl,n,m)

@@ -60,17 +60,8 @@
       integer n,m
       double precision, dimension(n,m) :: v_tintegral, b_tintegral
       double precision, dimension(n,m) :: v_yintegral, b_yintegral
-      double precision :: temp_ar(n,m), wrk_ar(n,m)
-      double precision, dimension(n,m) :: t_ar,y_ar
-      integer :: i,j
-      !this is correct reshape for y
 
-      do i=1,n
-        do j=1,m
-          t_ar(i,j) = i/1000.
-          y_ar(i,j) = j/1000.
-        end do
-      end do
+      !this is correct reshape for y
 
       call array_integral2d &
       &((bdash_ar*velocity_ar)/kappa_ar, &
@@ -80,47 +71,57 @@
       &b_tintegral,incriment(1),n,m)
       call array_integral2dydim(velocity_ar/kappa_ar, &
       &v_yintegral,incriment(2),n,m)
-      call array_integral2d(1/kappa_ar,b_yintegral,incriment(2),n,m)
+      call array_integral2dydim(bdash_ar/kappa_ar, &
+      &b_yintegral,incriment(2),n,m)
 
-      temp_ar = DEXP(t_ar+5*y_ar)
-      call array_diff2d(b_tintegral,wrk_ar,incriment(1),n,m) 
-
-      print *,
-      print *,
-      print *, MAXVAL( &
-      &ABS((temp_ar(2:n,2:m)- &
-      &wrk_ar(2:n,2:m))/temp_ar(2:n,2:m)))
-      print *, MINVAL( &
-      &ABS((temp_ar(2:n,2:m)- &
-      &wrk_ar(2:n,2:m))/temp_ar(2:n,2:m)))
-
-      retrn_ar = -v_tintegral+ &
-      &b_tintegral + &
-      &v_yintegral -  &
-      &bdash_ar*b_yintegral
+      retrn_ar = -v_tintegral + b_tintegral + &
+      &v_yintegral - b_yintegral
 
       end subroutine
 
       subroutine compute_init_inerintegral &
-      &(exintegral_ar,bdash_ar,theta_ar,kappa_ar,retrn_ar,incriment,n,m)
+      &(exintegral_ar,bdash_ar,A_ar,thermal_ar,retrn_ar,incriment,n,m)
       use mathmodule
       double precision :: exintegral_ar(n,m)
       double precision :: bdash_ar(n,m)
       double precision :: retrn_ar(n,m)
-      double precision :: theta_ar(n,m)
-      double precision :: kappa_ar(n,m)
+      double precision :: A_ar(n,m)
+      double precision :: thermal_ar(n,m)
       double precision :: incriment(2)
       double precision, dimension(n,m) :: integral_term, t_integral
-      double precision, dimension(m,n) :: y_integral
+      double precision, dimension(n,m) :: y_integral
+      !double precision :: temp_ar(n,m), wrk_ar(n,m)
+      !double precision, dimension(n,m) :: t_ar,y_ar
+      !integer :: i,j
+      !this is correct reshape for y
 
-      integral_term = theta_ar*kappa_ar*DEXP(-1*exintegral_ar)
-      call array_integral2d &
-      &(RESHAPE(integral_term,(/m,n/)),y_integral,incriment(2),m,n)
+      !do i=1,n
+      !  do j=1,m
+      !    t_ar(i,j) = i/1000.
+      !    y_ar(i,j) = j/1000.
+      !  end do
+      !end do
+
+      integral_term = -A_ar*DEXP(-1*exintegral_ar)/thermal_ar
+      call array_integral2dydim &
+      &(integral_term,y_integral,incriment(2),n,m)
       call array_integral2d &
       &(integral_term*bdash_ar, &
       &t_integral,incriment(1),n,m)
 
-      retrn_ar = RESHAPE(y_integral,(/n,m/)) + t_integral
+      !temp_ar = DEXP(3*t_ar+5*y_ar)
+      !call array_diff2dydim(y_integral,wrk_ar,incriment(1),n,m) 
+
+      !print *,
+      !print *,
+      !print *, MAXVAL( &
+      !&ABS((temp_ar(2:n,2:m)- &
+      !&wrk_ar(2:n,2:m))/temp_ar(2:n,2:m)))
+      !print *, MINVAL( &
+      !&ABS((temp_ar(2:n,2:m)- &
+      !&wrk_ar(2:n,2:m))/temp_ar(2:n,2:m)))
+
+      retrn_ar = y_integral + t_integral
 
       end subroutine
 
@@ -130,11 +131,15 @@
       double precision :: exintegral_ar(n,m)
       double precision :: qdata_ar(n,m)
       double precision :: kconstant(n,m)
-      double precision :: retrn_dbl
+      double precision :: retrn_dbl      
+
+      print *, inerintegral_ar(3,3)
+      print *, (-1*qdata_ar(3,3)*qdata_ar(3,3))/kconstant(3,3) * &
+      &EXP(exintegral_ar(3,3))
 
       retrn_dbl = &
-      &((-1*qdata_ar(3,3)*qdata_ar(3,3))/kconstant(3,3)) * &
-      &EXP(exintegral_ar(3,3)) - inerintegral_ar(3,3)
+      &((-2*qdata_ar(3,3))/kconstant(3,3)) * &
+      &EXP(-exintegral_ar(3,3)) - inerintegral_ar(3,3)
 
       end subroutine
 
@@ -150,12 +155,12 @@
       double precision, dimension(m,n) :: y_integral
 
       integral_term = EXP(exintegral_ar)*(inerintegral_ar + iner_dbl)
-      call array_integral2d &
-      &(RESHAPE(integral_term,(/m,n/)),y_integral,incriment(2),m,n)
+      call array_integral2dydim &
+      &(integral_term,y_integral,incriment(2),n,m)
       call array_integral2d(integral_term*bdash_ar, &
-      &t_integral,incriment(1),m,n)
+      &t_integral,incriment(1),n,m)
 
-      retrn_ar = RESHAPE(y_integral,(/n,m/)) + t_integral
+      retrn_ar = y_integral + t_integral
 
       end subroutine
 
@@ -165,7 +170,7 @@
       double precision :: tdata_ar(n,m)
       double precision retrn_dbl
 
-      retrn_dbl = tdata_ar(3,3) - outerintegral_ar(3,3)
+      retrn_dbl = tdata_ar(1,1) - outerintegral_ar(1,1)
 
       end subroutine
 

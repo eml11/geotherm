@@ -112,6 +112,26 @@
 
       end subroutine
 
+      subroutine array_diff2dydim(data_ar,retrn_ar,incriment,n,m)
+      double precision :: data_ar(:,:)
+      double precision :: retrn_ar(:,:)
+      double precision :: incriment
+      integer :: n,m
+      double precision, dimension(n,m) :: fowrd_ar
+      double precision, dimension(n,m) :: back_ar
+
+      fowrd_ar(:,m) = data_ar(:,m)
+      fowrd_ar(:,:m) = data_ar(:,2:)
+
+      back_ar(:,1) = data_ar(:,1)
+      back_ar(:,2:) = data_ar(:,:m)
+
+      retrn_ar = (fowrd_ar-back_ar)/(2.0*incriment)
+      retrn_ar(:,1) = retrn_ar(:,2)
+      retrn_ar(:,m) = retrn_ar(:,m-1)
+
+      end subroutine
+
       subroutine array_generalintegral2d &
       &(data_ar,param_ar,retrn_ar,incriment,n,m)
       double precision :: data_ar(:,:)
