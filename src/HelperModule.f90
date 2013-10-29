@@ -70,8 +70,8 @@
       character (len = *) :: filename
       double precision :: data_ar(:, :)
       double precision :: incriment(2)
-      double precision, dimension(n) :: ydata
-      double precision, dimension(m) :: tdata
+      double precision, dimension(m) :: ydata
+      double precision, dimension(n) :: tdata
 
       integer :: n,m
       integer :: ncid, zvarid, xvarid, yvarid
@@ -113,8 +113,8 @@
       
       retval = nf90_create(filename, NF90_CLOBBER, ncid)
 
-      retval = nf90_def_dim(ncid, "x", m, x_dimid)
-      retval = nf90_def_dim(ncid, "y", n, y_dimid)
+      retval = nf90_def_dim(ncid, "x", n, x_dimid)
+      retval = nf90_def_dim(ncid, "y", m, y_dimid)
       
       dimids =  (/ y_dimid, x_dimid /)
 

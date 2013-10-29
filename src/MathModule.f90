@@ -61,6 +61,37 @@
 
       end subroutine
 
+      subroutine array_integral2dydim(data_ar,retrn_ar,incriment,n,m)
+      double precision :: data_ar(:,:)
+      double precision :: retrn_ar(:,:)
+      double precision :: trap(n,m)
+      double precision :: midpnt(n,m)
+      double precision, dimension(n,m) :: fowrd_ar
+      double precision, dimension(n,m) :: back_ar
+      double precision :: incriment
+      double precision :: sumvl(n)
+      integer :: i,j,n,m
+
+      !using simsons!
+
+      fowrd_ar(:,m) = data_ar(:,m)
+      fowrd_ar(:,:m) = data_ar(:,2:)
+
+      back_ar(:,1) = data_ar(:,1)
+      back_ar(:,2:) = data_ar(:,:m)
+
+      midpnt = data_ar*incriment
+      trap = incriment*(fowrd_ar+back_ar)/2
+
+      sumvl = 0d0*midpnt(1,:)
+      do i=1,m
+        sumvl = sumvl + (2d0/3d0)*midpnt(:,i) + (1d0/3d0)*trap(:,i)
+        retrn_ar(:,i) = sumvl
+      end do
+
+      end subroutine
+
+
       subroutine array_diff2d(data_ar,retrn_ar,incriment,n,m)
       double precision :: data_ar(:,:)
       double precision :: retrn_ar(:,:)
@@ -132,6 +163,22 @@
       integer n,m
 
       gaussian_nnorm = DEXP(-1d0*((t_ar*t_ar+y_ar*y_ar)/(2*sigma)))    
+
+      end function
+
+      function gaussian_ideal_integral &
+      &(integratedvar_ar,normalvar_ar,alpha,n,m)
+      double precision :: t_ar(n,m)
+      double precision :: y_ar(n,m)
+      double precision :: integratedvar_ar(n,m)
+      double precision :: normalvar_ar(n,m)
+      double precision :: gaussian_ideal_integral(n,m)
+      double precision :: alpha
+      double precision :: PI = 4*DATAN(1d0)
+      integer n,m
+
+      gaussian_ideal_integral = DEXP(-alpha*normalvar_ar**2d0) * &
+      & DSQRT(PI/alpha)*DERF(DSQRT(alpha)*integratedvar_ar)/2d0
 
       end function
 
