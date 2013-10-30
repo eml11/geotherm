@@ -1,5 +1,4 @@
       
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -31,6 +30,11 @@
 
       contains
 
+      !> sets retrn_ar to an array corrisponding to the
+      !! time differential of b(t)
+      !! @param tdata_ar ground temperature array
+      !! @param qdata_ar ground heat flux array
+      !! @return retrn_ar time derivative of b(t)
       subroutine compute_bdashval &
       &(tdata_ar,qdata_ar,kconstant,retrn_ar,incriment,n,m)
       use mathmodule
@@ -49,6 +53,13 @@
 
       end subroutine
 
+      !> sets retrn_ar to the exponented function
+      !! in the solution to the homogeneous form
+      !! @param bdash_ar time derivative of b(t)
+      !! @param velocity_ar velocity of motion
+      !! perpendicular to y direction
+      !! @param kappa_ar thermal diffusivity
+      !! @return retrn_ar function in exponent
       subroutine compute_exponentintegral &
       &(bdash_ar,velocity_ar,kappa_ar,retrn_ar,incriment,n,m)
       use mathmodule
@@ -77,6 +88,13 @@
 
       end subroutine
 
+      !> sets retrn_ar to the first integral wrt
+      !! eta (without specific constant)
+      !! @param exintegral_ar function in exponent
+      !! @param bdash_ar time derivative of b(t)
+      !! @param A_ar 
+      !! @param thermal_ar thermal conductivity
+      !! @return retrn_ar first integration result
       subroutine compute_init_inerintegral &
       &(exintegral_ar,bdash_ar,A_ar,thermal_ar,retrn_ar,incriment,n,m)
       use mathmodule
@@ -100,9 +118,19 @@
 
       end subroutine
 
+      !> computes constant of integration for integral
+      !! returned by subroutine compute_init_inerintegral
+      !! sets ground flux to given boundry condition
+      !! @param inerintegral_ar first integration result
+      !! @param exintegral_ar function in exponent
+      !! @param tdata_ar ground temperature array
+      !! @param qdata_ar ground heat flux array
+      !! @param bdash_ar time derivative of b(t)
+      !! @param thermal_ar thermal conductivity
+      !! @return retrn_dbl first constant of integration
       subroutine compute_inerintegralconstant &
       &(inerintegral_ar,exintegral_ar,tdata_ar,qdata_ar,bdash_ar, &
-      &kconstant,retrn_dbl,incriment,n,m)
+      &thermal_ar,retrn_dbl,incriment,n,m)
       use mathmodule
       double precision :: inerintegral_ar(n,m)
       double precision :: exintegral_ar(n,m)
@@ -110,7 +138,7 @@
       double precision :: tdata_ar(n,m)
       double precision :: bdash_ar(n,m)
       double precision :: tdiff_ar(n,m)
-      double precision :: kconstant(n,m)
+      double precision :: thermal_ar(n,m)
       double precision :: retrn_dbl      
       double precision :: tdata_diff_ar(n,m)
       double precision :: incriment(2)
@@ -125,11 +153,17 @@
       end where
 
       retrn_dbl = &
-      &((-qdata_ar(3,3)-tdiff_ar(3,3))/kconstant(3,3)) * &
+      &((-qdata_ar(3,3)-tdiff_ar(3,3))/thermal_ar(3,3)) * &
       &EXP(-exintegral_ar(3,3)) - inerintegral_ar(3,3)
 
       end subroutine
 
+      !> sets retrn_ar to the second integral wrt
+      !! eta (without specific constant)
+      !! @param first integration result
+      !! @param exintegral_ar function in exponent
+      !! @param iner_dbl first constant of integration
+      !! @return second integration result
       subroutine compute_init_outerintegral &
       &(inerintegral_ar,exintegral_ar,iner_dbl,retrn_ar,incriment,n,m)
       use mathmodule
@@ -151,6 +185,13 @@
 
       end subroutine
 
+      !> computes constant of integration for integral
+      !! returned by subroutine compute_init_outerintegral
+      !! sets ground temperature to given boundry
+      !! condition
+      !! @param outerintegral_ar second integration result
+      !! @param tdata_ar ground temperature array
+      !! @return retrn_dbl second constant of integration
       subroutine compute_outerintegralconstant &
       &(outerintegral_ar,tdata_ar,retrn_dbl,n,m)
       double precision :: outerintegral_ar(n,m)
@@ -162,4 +203,3 @@
       end subroutine
 
       end module
-
