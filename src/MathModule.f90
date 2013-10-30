@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -31,6 +30,10 @@
 
       contains
 
+      !> integrates data_ar along dimension 1
+      !! using simsons method
+      !! @param data_ar 2d input array
+      !! @return retrn_ar integration of data_ar
       subroutine array_integral2d(data_ar,retrn_ar,incriment,n,m) 
       double precision :: data_ar(:,:)
       double precision :: retrn_ar(:,:)
@@ -41,8 +44,6 @@
       double precision :: incriment
       double precision :: sumvl(m)
       integer :: i,j,n,m
-
-      !using simsons!
 
       fowrd_ar(n,:) = data_ar(n,:)
       fowrd_ar(:n,:) = data_ar(2:,:)
@@ -61,6 +62,10 @@
 
       end subroutine
 
+      !> integrates data_ar along dimension 2
+      !! using simsons method
+      !! @param data_ar 2d input array
+      !! @return retrn_ar integration of data_ar
       subroutine array_integral2dydim(data_ar,retrn_ar,incriment,n,m)
       double precision :: data_ar(:,:)
       double precision :: retrn_ar(:,:)
@@ -91,7 +96,10 @@
 
       end subroutine
 
-
+      !> differentiates data_ar along dimension 1
+      !! use a center difference
+      !! @param data_ar 2d input array
+      !! @return retrn_ar integration of data_ar
       subroutine array_diff2d(data_ar,retrn_ar,incriment,n,m)
       double precision :: data_ar(:,:)
       double precision :: retrn_ar(:,:)
@@ -111,7 +119,11 @@
       retrn_ar(n,:) = retrn_ar(n-1,:)
 
       end subroutine
-
+      
+      !> differentiates data_ar along dimension 2
+      !! use a center difference
+      !! @param data_ar 2d input array
+      !! @return retrn_ar integration of data_ar
       subroutine array_diff2dydim(data_ar,retrn_ar,incriment,n,m)
       double precision :: data_ar(:,:)
       double precision :: retrn_ar(:,:)
@@ -132,6 +144,8 @@
 
       end subroutine
 
+      !> integral of an array wrt a second array
+      !! unused for accuracy reasons
       subroutine array_generalintegral2d &
       &(data_ar,param_ar,retrn_ar,incriment,n,m)
       double precision :: data_ar(:,:)
@@ -148,6 +162,8 @@
 
       end subroutine
 
+      !> differtial of an array wrt a second array
+      !! unused for accuracy reasons
       subroutine array_generaldiff2d &
       &(data_ar,param_ar,retrn_ar,incriment,n,m)
       double precision :: data_ar(:,:)
@@ -164,6 +180,10 @@
 
       end subroutine
 
+      !> extends 1d array along second dimesion by
+      !! copying it m times
+      !! @param data_ar 1d input array
+      !! @return retrn_ar 2d output array
       subroutine extend_ardimension(data_ar,retrn_ar,m)
       double precision :: data_ar(:)
       double precision :: retrn_ar(:,:)
@@ -175,6 +195,12 @@
 
       end subroutine
 
+      !> unormalised gaussian used for testing
+      !! @param t_ar array giving time variable
+      !! @param y_ar array giving depth variable
+      !! @param sigma constant specifying gaussian
+      !! shape
+      !! @return gaussian_nnorm gaussian array
       function gaussian_nnorm(t_ar,y_ar,sigma,n,m)
       double precision :: t_ar(n,m)
       double precision :: y_ar(n,m)
@@ -186,6 +212,14 @@
 
       end function
 
+      !> unormalised gaussian integral used for 
+      !! testing
+      !! @param integratedvar_ar coordinate integrated
+      !! over
+      !! @param normalvar_ar second coordinate
+      !! @param alpha constant specifying result
+      !! shape (note not the same as sigma in above)
+      !! @return gaussian_ideal_integral result array
       function gaussian_ideal_integral &
       &(integratedvar_ar,normalvar_ar,alpha,n,m)
       double precision :: t_ar(n,m)
