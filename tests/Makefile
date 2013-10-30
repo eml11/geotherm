@@ -4,13 +4,16 @@ RESULTS=$(PWD)/results
 GEOTHERM=$(PWD)/../bin/geotherm
 UNITTEST=$(PWD)/bin/unittests
 
-test: test1 unittest
+test: test1 test2 unittest
 
 unittest:
 	$(unittest)
 
 test1: $(GEOTHERM) constant_heatproduct_tindipendent.txt
 	$(GEOTHERM) constant_heatproduct_tindipendent.txt 
+
+test2: $(GEOTHERM) constant_heatproducthigh_tindipendent.txt
+	$(GEOTHERM) constant_heatproducthigh_tindipendent.txt
 
 clean:
 	rm -f $(RESULTS)/*.nc
