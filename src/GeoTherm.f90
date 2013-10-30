@@ -96,8 +96,8 @@
       &(exintegral_ar,bdash_ar,density_ar*heatproduct_ar,&
       &thermlconduct_ar,inerintegral_ar,incriment,n,m)
       call compute_inerintegralconstant &
-      &(inerintegral_ar,exintegral_ar,qdata_ar, &
-      &thermlconduct_ar,iner_dbl,n,m)
+      &(inerintegral_ar,exintegral_ar,tdata_ar,qdata_ar, &
+      &bdash_ar,thermlconduct_ar,iner_dbl,incriment,n,m)
       call compute_init_outerintegral &
       &(inerintegral_ar,exintegral_ar,iner_dbl, &
       &outerintegral_ar,incriment,n,m)

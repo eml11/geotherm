@@ -61,8 +61,6 @@
       double precision, dimension(n,m) :: v_tintegral, b_tintegral
       double precision, dimension(n,m) :: v_yintegral, b_yintegral
 
-      !this is correct reshape for y
-
       call array_integral2d &
       &((bdash_ar*velocity_ar)/kappa_ar, &
       &v_tintegral,incriment(1),n,m)
@@ -90,17 +88,6 @@
       double precision :: incriment(2)
       double precision, dimension(n,m) :: integral_term, t_integral
       double precision, dimension(n,m) :: y_integral
-      !double precision :: temp_ar(n,m), wrk_ar(n,m)
-      !double precision, dimension(n,m) :: t_ar,y_ar
-      !integer :: i,j
-      !this is correct reshape for y
-
-      !do i=1,n
-      !  do j=1,m
-      !    t_ar(i,j) = i/1000.
-      !    y_ar(i,j) = j/1000.
-      !  end do
-      !end do
 
       integral_term = -A_ar*DEXP(-1*exintegral_ar)/thermal_ar
       call array_integral2dydim &
@@ -109,36 +96,36 @@
       &(integral_term*bdash_ar, &
       &t_integral,incriment(1),n,m)
 
-      !temp_ar = DEXP(3*t_ar+5*y_ar)
-      !call array_diff2dydim(y_integral,wrk_ar,incriment(1),n,m) 
-
-      !print *,
-      !print *,
-      !print *, MAXVAL( &
-      !&ABS((temp_ar(2:n,2:m)- &
-      !&wrk_ar(2:n,2:m))/temp_ar(2:n,2:m)))
-      !print *, MINVAL( &
-      !&ABS((temp_ar(2:n,2:m)- &
-      !&wrk_ar(2:n,2:m))/temp_ar(2:n,2:m)))
-
       retrn_ar = y_integral + t_integral
 
       end subroutine
 
       subroutine compute_inerintegralconstant &
-      &(inerintegral_ar,exintegral_ar,qdata_ar,kconstant,retrn_dbl,n,m)
+      &(inerintegral_ar,exintegral_ar,tdata_ar,qdata_ar,bdash_ar, &
+      &kconstant,retrn_dbl,incriment,n,m)
+      use mathmodule
       double precision :: inerintegral_ar(n,m)
       double precision :: exintegral_ar(n,m)
       double precision :: qdata_ar(n,m)
+      double precision :: tdata_ar(n,m)
+      double precision :: bdash_ar(n,m)
+      double precision :: tdiff_ar(n,m)
       double precision :: kconstant(n,m)
       double precision :: retrn_dbl      
+      double precision :: tdata_diff_ar(n,m)
+      double precision :: incriment(2)
+      integer :: n,m
 
-      print *, inerintegral_ar(3,3)
-      print *, (-1*qdata_ar(3,3)*qdata_ar(3,3))/kconstant(3,3) * &
-      &EXP(exintegral_ar(3,3))
+      call array_diff2d(tdata_ar,tdata_diff_ar,incriment(1),n,m)
+
+      where (bdash_ar.EQ.0d0)
+        tdiff_ar = 0d0
+      elsewhere
+        tdiff_ar = tdata_diff_ar/bdash_ar
+      end where
 
       retrn_dbl = &
-      &((-2*qdata_ar(3,3))/kconstant(3,3)) * &
+      &((-qdata_ar(3,3)-tdiff_ar(3,3))/kconstant(3,3)) * &
       &EXP(-exintegral_ar(3,3)) - inerintegral_ar(3,3)
 
       end subroutine
