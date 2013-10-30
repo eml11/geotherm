@@ -71,7 +71,7 @@
       integer n,m
       double precision, dimension(n,m) :: v_tintegral, b_tintegral
       double precision, dimension(n,m) :: v_yintegral, b_yintegral
-
+      
       call array_integral2d &
       &((bdash_ar*velocity_ar)/kappa_ar, &
       &v_tintegral,incriment(1),n,m)
@@ -82,7 +82,7 @@
       &v_yintegral,incriment(2),n,m)
       call array_integral2dydim(bdash_ar/kappa_ar, &
       &b_yintegral,incriment(2),n,m)
-
+      
       retrn_ar = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
 
@@ -165,17 +165,20 @@
       !! @param iner_dbl first constant of integration
       !! @return second integration result
       subroutine compute_init_outerintegral &
-      &(inerintegral_ar,exintegral_ar,iner_dbl,retrn_ar,incriment,n,m)
+      &(inerintegral_ar,exintegral_ar,bdash_ar,iner_dbl, &
+      &retrn_ar,incriment,n,m)
       use mathmodule
       double precision :: inerintegral_ar(n,m)
       double precision :: exintegral_ar(n,m)
+      double precision :: bdash_ar(n,m)
       double precision :: retrn_ar(n,m)
       double precision :: iner_dbl
       double precision :: incriment(2)
       double precision, dimension(n,m) :: integral_term, t_integral
-      double precision, dimension(m,n) :: y_integral
+      double precision, dimension(n,m) :: y_integral
 
       integral_term = EXP(exintegral_ar)*(inerintegral_ar + iner_dbl)
+      
       call array_integral2dydim &
       &(integral_term,y_integral,incriment(2),n,m)
       call array_integral2d(integral_term*bdash_ar, &

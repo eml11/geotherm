@@ -88,7 +88,7 @@
       midpnt = data_ar*incriment
       trap = incriment*(fowrd_ar+back_ar)/2
 
-      sumvl = 0d0*midpnt(1,:)
+      sumvl = 0d0*midpnt(:,1)
       do i=1,m
         sumvl = sumvl + (2d0/3d0)*midpnt(:,i) + (1d0/3d0)*trap(:,i)
         retrn_ar(:,i) = sumvl

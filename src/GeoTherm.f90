@@ -45,7 +45,7 @@
       
       !main work subroutine
       call compute_geotherm &
-      &(modelfile_inst,modelfile_inst%ydim,modelfile_inst%tdim)
+      &(modelfile_inst,modelfile_inst%tdim,modelfile_inst%ydim)
 
       end program
 
@@ -56,8 +56,8 @@
       use mathmodule
       use helpermodule
       type (modelfile), intent(in) :: modelfile_inst
-      double precision :: input_tdata_ar(m)
-      double precision :: input_qdata_ar(m)
+      double precision :: input_tdata_ar(n)
+      double precision :: input_qdata_ar(n)
       double precision :: tdata_artrs(m,n), tdata_ar(n,m)
       double precision :: qdata_artrs(m,n), qdata_ar(n,m)
       double precision :: bdash_ar(n,m)
@@ -66,6 +66,7 @@
       double precision :: thermlconduct_ar(n,m)
       double precision :: heatproduct_ar(n,m)
       double precision :: heatcapc_ar(n,m)
+      double precision :: kappa_ar(n,m)
       double precision :: exintegral_ar(n,m)
       double precision :: inerintegral_ar(n,m)
       double precision :: outerintegral_ar(n,m)
@@ -88,41 +89,40 @@
       incriment(2) = -incriment(2)
 
       !extend 1d netcdfs into 2d by copying along 2d dimension
-      call extend_ardimension(input_tdata_ar,tdata_artrs,n)
-      call extend_ardimension(input_qdata_ar,qdata_artrs,n)
-      tdata_ar = RESHAPE(tdata_artrs,(/n,m/))
-      qdata_ar = RESHAPE(qdata_artrs,(/n,m/))
+      call extend_ardimension(input_tdata_ar,tdata_ar,m)
+      call extend_ardimension(input_qdata_ar,qdata_ar,m)
 
       !creates array corrisponding to b(t)'s time differential
       call compute_bdashval &
       &(tdata_ar,qdata_ar,thermlconduct_ar, &
       &bdash_ar,incriment,n,m)
       
+      kappa_ar = thermlconduct_ar/(density_ar*heatcapc_ar) 
+
       !creates array corrisponding to the function which appears
       !in the exponent
       call compute_exponentintegral &
-      &(bdash_ar,velocity_ar,thermlconduct_ar/(density_ar*heatcapc_ar),&
-      &exintegral_ar,incriment,n,m)
-      
+      &(bdash_ar,velocity_ar,kappa_ar,exintegral_ar,incriment,n,m)
+     
       !creates array corrisponding to the first integral with respect
       !to eta
       call compute_init_inerintegral &
       &(exintegral_ar,bdash_ar,density_ar*heatproduct_ar,&
       &thermlconduct_ar,inerintegral_ar,incriment,n,m)
-      
+ 
       !creates a double which is the integration constant of the
       !integral calculated in the above subroutine required to set
       !the surface heatflux equal to the qdata_ar
       call compute_inerintegralconstant &
       &(inerintegral_ar,exintegral_ar,tdata_ar,qdata_ar, &
       &bdash_ar,thermlconduct_ar,iner_dbl,incriment,n,m)
-      
+
       !creates array corrisponding to the second integral with respect
       !to eta
       call compute_init_outerintegral &
-      &(inerintegral_ar,exintegral_ar,iner_dbl, &
+      &(inerintegral_ar,exintegral_ar,bdash_ar,iner_dbl, &
       &outerintegral_ar,incriment,n,m)
-      
+
       !creates double which is the integration constant of the
       !integral calcultaed in the above subroutine required to set
       !the surface Temperature to tdata_ar

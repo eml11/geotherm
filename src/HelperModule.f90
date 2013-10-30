@@ -37,16 +37,16 @@
       subroutine get_netcdf(filename,data_ar)
       character (len = *) :: filename
       double precision :: data_ar(:, :)
-      
+            
       integer :: ncid, varid
 
       integer :: retval
-
+      
       call check( nf90_open(filename, NF90_NOWRITE, ncid) )
       call check( nf90_inq_varid(ncid, "z", varid) )
       call check( nf90_get_var(ncid, varid, data_ar) )
       
-      call check( nf90_close(ncid) 
+      call check( nf90_close(ncid) )
 
       end subroutine
 
@@ -87,7 +87,7 @@
       integer :: ncid, zvarid, xvarid, yvarid
 
       integer :: retval
-
+      
       call check( nf90_open(filename, NF90_NOWRITE, ncid) )
       call check( nf90_inq_varid(ncid, "z", zvarid) )
       call check( nf90_inq_varid(ncid, "x", xvarid) )
@@ -132,9 +132,8 @@
       call check( nf90_def_dim(ncid, "x", n, x_dimid) )
       call check( nf90_def_dim(ncid, "y", m, y_dimid) )
       
-      dimids =  (/ y_dimid, x_dimid /)
+      dimids =  (/ x_dimid, y_dimid /)
 
-      !this wont be nf90_int
       call check( nf90_def_var(ncid, "z", NF90_DOUBLE, dimids, varid) )
       call check( nf90_enddef(ncid) )
 

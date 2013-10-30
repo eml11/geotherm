@@ -1,4 +1,4 @@
-100,100
+200,100
 Q,"./src_boundryfiles/cst_gflux_test1.nc"
 V,"./src_netcdf/zro_velocity_test1.nc"
 D,"./src_netcdf/cst_density_test1.nc"
