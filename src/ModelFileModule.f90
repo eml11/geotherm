@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -44,6 +43,12 @@
 
       contains 
 
+      !> subroutine to read file specifying
+      !! model parameters
+      !! @param this derived type storing
+      !! file output
+      !! @param filename name of file 
+      !! specifying model parameters
       subroutine READMDLF(this,filename)
       character (len = *) ::filename
       type (modelfile) this
@@ -79,10 +84,10 @@
 
       end subroutine
 
-      subroutine set_model_input(this)
-      type (modelfile) this
+      !subroutine set_model_input(this)
+      !type (modelfile) this
 
-      end subroutine      
+      !end subroutine      
 
 
       end module
