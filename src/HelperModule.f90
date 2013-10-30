@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -32,6 +31,9 @@
 
       contains
 
+      !> basic netcdf reading subrutine
+      !! @param filename name of netcdf file
+      !! @return data_ar z data of netcdf
       subroutine get_netcdf(filename,data_ar)
       character (len = *) :: filename
       double precision :: data_ar(:, :)
@@ -39,15 +41,19 @@
       integer :: ncid, varid
 
       integer :: retval
-      !retval is an error checking variable, should be nf_noerr (presumably 0)
-      retval = nf90_open(filename, NF90_NOWRITE, ncid)
-      retval = nf90_inq_varid(ncid, "z", varid) !change data, use z or something standard
-      retval = nf90_get_var(ncid, varid, data_ar)
+
+      call check( nf90_open(filename, NF90_NOWRITE, ncid) )
+      call check( nf90_inq_varid(ncid, "z", varid) )
+      call check( nf90_get_var(ncid, varid, data_ar) )
       
-      retval = nf90_close(ncid) 
+      call check( nf90_close(ncid) 
 
       end subroutine
 
+      !> 1d netcdf reading subroutine used for
+      !! boundry conditions
+      !! @param filename name of netcdf file
+      !! @return data_ar z data of netcdf      
       subroutine get_netcdf1d(filename,data_ar)
       character (len = *) :: filename
       double precision :: data_ar(:)
@@ -56,15 +62,19 @@
 
       integer :: retval
 
-      !retval is an error checking variable, should be nf_noerr (presumably 0)
-      retval = nf90_open(filename, NF90_NOWRITE, ncid)
-      retval = nf90_inq_varid(ncid, "z", varid) !change data, use z or something standard
-      retval = nf90_get_var(ncid, varid, data_ar)
+      call check( nf90_open(filename, NF90_NOWRITE, ncid) )
+      call check( nf90_inq_varid(ncid, "z", varid) )
+      call check( nf90_get_var(ncid, varid, data_ar) )
 
-      retval = nf90_close(ncid)
+      call check( nf90_close(ncid) )
 
       end subroutine
 
+      !> netcdf reading subroutine called initially
+      !! in order to get incriment of y/t
+      !! @param filename name of netcdf file
+      !! @return data_ar z data of netcdf 
+      !! @return incriment spacing of y/t variables
       subroutine get_netcdf_wincrmnt(filename,data_ar,incriment,n,m)
   
       character (len = *) :: filename
@@ -78,22 +88,25 @@
 
       integer :: retval
 
-      retval = nf90_open(filename, NF90_NOWRITE, ncid)
-      retval = nf90_inq_varid(ncid, "z", zvarid)
-      retval = nf90_inq_varid(ncid, "x", xvarid)
-      retval = nf90_inq_varid(ncid, "y", yvarid)
-      retval = nf90_get_var(ncid, zvarid, data_ar)
+      call check( nf90_open(filename, NF90_NOWRITE, ncid) )
+      call check( nf90_inq_varid(ncid, "z", zvarid) )
+      call check( nf90_inq_varid(ncid, "x", xvarid) )
+      call check( nf90_inq_varid(ncid, "y", yvarid) )
+      call check( nf90_get_var(ncid, zvarid, data_ar) )
 
-      retval = nf90_get_var(ncid, yvarid, ydata)
-      retval = nf90_get_var(ncid, xvarid, tdata)
+      call check( nf90_get_var(ncid, yvarid, ydata) )
+      call check( nf90_get_var(ncid, xvarid, tdata) )
 
       incriment(1) = tdata(2) - tdata(1)
       incriment(2) = ydata(2) - ydata(1)
 
-      retval = nf90_close(ncid)
+      call check( nf90_close(ncid) )
 
       end subroutine
 
+      !> obsolete boundry condition file
+      !! @param filename name of boundry file
+      !! @return data_ar data from file    
       subroutine get_file(filename,data_ar)
       character (len = *) :: filename
       double precision :: data_ar(:)
@@ -103,6 +116,9 @@
 
       end subroutine     
 
+      !> netcdf writing subroutine
+      !! @param filename name of netcdf file
+      !! @param data_ar z data of netcdf 
       subroutine write_netcdf(filename,data_ar,n,m)
       character (len = *) :: filename
       double precision :: data_ar(n,m)
@@ -111,20 +127,32 @@
       integer :: x_dimid, y_dimid
       integer :: n,m,retval
       
-      retval = nf90_create(filename, NF90_CLOBBER, ncid)
+      call check( nf90_create(filename, NF90_CLOBBER, ncid) )
 
-      retval = nf90_def_dim(ncid, "x", n, x_dimid)
-      retval = nf90_def_dim(ncid, "y", m, y_dimid)
+      call check( nf90_def_dim(ncid, "x", n, x_dimid) )
+      call check( nf90_def_dim(ncid, "y", m, y_dimid) )
       
       dimids =  (/ y_dimid, x_dimid /)
 
       !this wont be nf90_int
-      retval = nf90_def_var(ncid, "z", NF90_DOUBLE, dimids, varid)
-      retval = nf90_enddef(ncid)
+      call check( nf90_def_var(ncid, "z", NF90_DOUBLE, dimids, varid) )
+      call check( nf90_enddef(ncid) )
 
-      retval = nf90_put_var(ncid, varid, data_ar)
-      retval = nf90_close(ncid)
+      call check( nf90_put_var(ncid, varid, data_ar) )
+      call check( nf90_close(ncid) )
 
+      end subroutine
+      
+      !> netcdf error checking subroutine
+      !! @param status return value of function
+      !! from netcdf-fortran
+      subroutine check(status)
+      integer, intent ( in) :: status
+    
+      if(status.NE.nf90_noerr) then 
+        print *, trim(nf90_strerror(status))
+        stop "Stopped"
+      end if
       end subroutine
 
       end module
