@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -27,6 +26,9 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       program unit_tests
+      !current program to test each subroutine
+      !incomplete - only testing calculus operations
+      
       use equationpartsmodule
       use mathmodule
       implicit none
@@ -135,6 +137,9 @@
 
       end program
 
+      !> compares computed to theoretical value
+      !! @param ideal_ar theoretical value
+      !! @param computed_ar computed value
       subroutine test_output(ideal_ar,computed_ar,n,m)
       integer :: n,m
       double precision :: ideal_ar(n,m)
