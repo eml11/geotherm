@@ -1,0 +1,10 @@
+200,100
+Q,"./src_boundryfiles/cst_gflux_test1.nc"
+V,"./src_netcdf/zro_velocity_test1.nc"
+D,"./src_netcdf/cst_density_test1.nc"
+K,"./src_netcdf/cst_kval_test1.nc"
+H,"./src_netcdf/cst_heatprdct_test1.nc"
+C,"./src_netcdf/onesfile.nc"
+T,"./src_boundryfiles/cst_temp_test1.nc"
+O,"./results/constant_heatproduct_tindipendent_rslt.nc"
+E,E
