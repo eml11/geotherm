@@ -119,9 +119,12 @@
       !> netcdf writing subroutine
       !! @param filename name of netcdf file
       !! @param data_ar z data of netcdf 
-      subroutine write_netcdf(filename,data_ar,n,m)
+      subroutine write_netcdf &
+      &(filename,temp_ar,density_ar,pressure_ar,n,m)
       character (len = *) :: filename
-      double precision :: data_ar(n,m)
+      double precision :: temp_ar(n,m)
+      double precision :: density_ar(n,m)
+      double precision :: pressure_ar(n,m)
 
       integer :: ncid, varid, dimids(2)
       integer :: x_dimid, y_dimid
@@ -134,10 +137,26 @@
       
       dimids =  (/ x_dimid, y_dimid /)
 
-      call check( nf90_def_var(ncid, "z", NF90_DOUBLE, dimids, varid) )
+      !change this to pass in derived type at some point
+
+      call check( nf90_def_var &
+      &(ncid, "Temperature", NF90_DOUBLE, dimids, varid) )
       call check( nf90_enddef(ncid) )
 
-      call check( nf90_put_var(ncid, varid, data_ar) )
+      call check( nf90_put_var(ncid, varid, temp_ar) )
+
+      call check( nf90_def_var &
+      &(ncid, "Pressure", NF90_DOUBLE, dimids, varid) )
+      call check( nf90_enddef(ncid) )
+
+      call check( nf90_put_var(ncid, varid, density_ar) )
+
+      call check( nf90_def_var &
+      &(ncid, "Density", NF90_DOUBLE, dimids, varid) )
+      call check( nf90_enddef(ncid) )
+
+      call check( nf90_put_var(ncid, varid, pressure_ar) )
+
       call check( nf90_close(ncid) )
 
       end subroutine

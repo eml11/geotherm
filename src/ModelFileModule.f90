@@ -38,6 +38,7 @@
         character (len = 256) :: gqfluxfile
         character (len = 256) :: thermlconductnetcdf
         character (len = 256) :: outfile
+        character (len = 256) :: incompresibilitynetcdf
         integer :: ydim, tdim 
       end type
 
@@ -79,6 +80,8 @@
           this%gqfluxfile = modelfinput
         else if (typinput.EQ."O") then
           this%outfile = modelfinput
+        else if (typinput.EQ."B") then
+          this%incompresibilitynetcdf = modelfinput
         end if
       enddo
 

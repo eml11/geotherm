@@ -7,4 +7,5 @@ H,"./src_netcdf/cst_heatprdct_test1.nc"
 C,"./src_netcdf/onesfile.nc"
 T,"./src_boundryfiles/cst_temp_test1.nc"
 O,"./results/constant_heatproduct_tindipendent_rslt.nc"
+B,"./src_netcdf/olivine_bulk_mod.nc"
 E,E

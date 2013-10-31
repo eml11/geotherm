@@ -55,6 +55,7 @@
       use module_modelfile
       use mathmodule
       use helpermodule
+      use pressuresolver
       type (modelfile), intent(in) :: modelfile_inst
       double precision :: input_tdata_ar(n)
       double precision :: input_qdata_ar(n)
@@ -67,9 +68,12 @@
       double precision :: heatproduct_ar(n,m)
       double precision :: heatcapc_ar(n,m)
       double precision :: kappa_ar(n,m)
+      double precision :: pddensity(n,m)
+      double precision :: pressure(n,m)
       double precision :: exintegral_ar(n,m)
       double precision :: inerintegral_ar(n,m)
       double precision :: outerintegral_ar(n,m)
+      double precision :: incompresibility_ar(n,m)
       double precision :: incriment(2)
       double precision :: iner_dbl
       double precision :: outr_dbl
@@ -84,6 +88,8 @@
       call get_netcdf(modelfile_inst%heatcapcnetcdf,heatcapc_ar)
       call get_netcdf &
       &(modelfile_inst%thermlconductnetcdf,thermlconduct_ar)
+      call get_netcdf &
+      &(modelfile_inst%incompresibilitynetcdf,incompresibility_ar)
 
       !this is a hack to fix issue with netcdfs created by gmt 
       incriment(2) = -incriment(2)
@@ -97,7 +103,12 @@
       &(tdata_ar,qdata_ar,thermlconduct_ar, &
       &bdash_ar,incriment,n,m)
       
-      kappa_ar = thermlconduct_ar/(density_ar*heatcapc_ar) 
+      call compute_pressure &
+      &(density_ar,incompresibility_ar,pressure,incriment,n,m)
+      call compute_pddensity &
+      &(density_ar,incompresibility_ar,pddensity,incriment,n,m)
+
+      kappa_ar = thermlconduct_ar/(pddensity*heatcapc_ar) 
 
       !creates array corrisponding to the function which appears
       !in the exponent
@@ -131,6 +142,7 @@
 
       !writes output netcdf
       call write_netcdf &
-      &(modelfile_inst%outfile,outerintegral_ar+outr_dbl,n,m)
+      &(modelfile_inst%outfile,outerintegral_ar+outr_dbl, &
+      &pddensity,pressure,n,m)
 
       end subroutine
