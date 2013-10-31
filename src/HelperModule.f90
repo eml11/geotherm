@@ -120,14 +120,15 @@
       !! @param filename name of netcdf file
       !! @param data_ar z data of netcdf 
       subroutine write_netcdf &
-      &(filename,temp_ar,density_ar,pressure_ar,n,m)
+      &(filename,temp_ar,density_ar,pressure_ar,negativedown,n,m)
       character (len = *) :: filename
       double precision :: temp_ar(n,m)
       double precision :: density_ar(n,m)
       double precision :: pressure_ar(n,m)
 
-      integer :: ncid, varid, dimids(2)
+      integer :: ncid, tvarid, pvarid, dvarid, dimids(2)
       integer :: x_dimid, y_dimid
+      integer :: negativedown
       integer :: n,m,retval
       
       call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -140,24 +141,25 @@
       !change this to pass in derived type at some point
 
       call check( nf90_def_var &
-      &(ncid, "Temperature", NF90_DOUBLE, dimids, varid) )
-      call check( nf90_enddef(ncid) )
-
-      call check( nf90_put_var(ncid, varid, temp_ar) )
+      &(ncid, "Temperature", NF90_DOUBLE, dimids, tvarid) )
 
       call check( nf90_def_var &
-      &(ncid, "Pressure", NF90_DOUBLE, dimids, varid) )
-      call check( nf90_enddef(ncid) )
-
-      call check( nf90_put_var(ncid, varid, density_ar) )
+      &(ncid, "Pressure", NF90_DOUBLE, dimids, pvarid) )
 
       call check( nf90_def_var &
-      &(ncid, "Density", NF90_DOUBLE, dimids, varid) )
+      &(ncid, "Density", NF90_DOUBLE, dimids, dvarid) )
+
       call check( nf90_enddef(ncid) )
 
-      call check( nf90_put_var(ncid, varid, pressure_ar) )
-
-      call check( nf90_close(ncid) )
+      if (negativedown.EQ.0) then
+        call check( nf90_put_var(ncid, dvarid, density_ar) )
+        call check( nf90_put_var(ncid, tvarid, temp_ar) )
+        call check( nf90_put_var(ncid, pvarid, pressure_ar) )
+      else
+        call check( nf90_put_var(ncid, dvarid, density_ar(:,m:1:-1)) )
+        call check( nf90_put_var(ncid, tvarid, temp_ar(:,m:1:-1)) )
+        call check( nf90_put_var(ncid, pvarid, pressure_ar(:,m:1:-1)) )
+      end if
 
       end subroutine
       

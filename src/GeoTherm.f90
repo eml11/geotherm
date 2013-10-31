@@ -143,6 +143,6 @@
       !writes output netcdf
       call write_netcdf &
       &(modelfile_inst%outfile,outerintegral_ar+outr_dbl, &
-      &pddensity,pressure,n,m)
+      &pddensity,pressure,modelfile_inst%negativedown,n,m)
 
       end subroutine

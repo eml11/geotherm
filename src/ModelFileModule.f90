@@ -39,6 +39,7 @@
         character (len = 256) :: thermlconductnetcdf
         character (len = 256) :: outfile
         character (len = 256) :: incompresibilitynetcdf
+        integer :: negativedown
         integer :: ydim, tdim 
       end type
 
@@ -59,6 +60,7 @@
 
       OPEN(1, file = filename)
       READ(1,*) this%ydim, this%tdim
+      this%negativedown = 0
 
       do while (bool .EQ. 1)
         READ(1,*) typinput, modelfinput
@@ -82,15 +84,11 @@
           this%outfile = modelfinput
         else if (typinput.EQ."B") then
           this%incompresibilitynetcdf = modelfinput
+        else if (typinput.EQ."R") then
+          this%negativedown = 1
         end if
       enddo
 
       end subroutine
-
-      !subroutine set_model_input(this)
-      !type (modelfile) this
-
-      !end subroutine      
-
 
       end module
