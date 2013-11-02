@@ -105,6 +105,7 @@
       
       call compute_pressure &
       &(density_ar,incompresibility_ar,pressure,incriment,n,m)
+      print *, pressure
       call compute_pddensity &
       &(density_ar,incompresibility_ar,pddensity,incriment,n,m)
 

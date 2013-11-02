@@ -9,7 +9,7 @@ OUT=geotherm
 OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o
 MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod
 
-all: geotherm unittests
+all: geotherm unittests domaingen
 
 geotherm: $(SRC)/GeoTherm.f90 $(MODULES)
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o $(OUT) $(SRC)/GeoTherm.f90 $(OBJECTS)
@@ -18,6 +18,10 @@ geotherm: $(SRC)/GeoTherm.f90 $(MODULES)
 unittests: $(SRC)/unit_tests.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/equationpartsmodule.mod
 	$(FC) -o unittests -I$(OBJECTDIR) $(SRC)/unit_tests.f90 $(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/EquationParts.o
 	mkdir -p $(TESTS)/bin; mv unittests $(TESTS)/bin
+
+domaingen: $(SRC)/generate_domain.f90
+	$(FC) $(LDFLAGS) $(FDFLAGS) -o domaingen $(SRC)/generate_domain.f90
+	mkdir -p $(BIN); mv domaingen $(BIN)
 
 $(OBJECTDIR)/mathmodule.mod: $(SRC)/MathModule.f90
 	$(FC) -c $(SRC)/MathModule.f90
