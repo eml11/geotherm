@@ -105,7 +105,7 @@
       
       call compute_pressure &
       &(density_ar,incompresibility_ar,pressure,incriment,n,m)
-      print *, pressure
+      
       call compute_pddensity &
       &(density_ar,incompresibility_ar,pddensity,incriment,n,m)
 
@@ -115,7 +115,7 @@
       !in the exponent
       call compute_exponentintegral &
       &(bdash_ar,velocity_ar,kappa_ar,exintegral_ar,incriment,n,m)
-     
+      
       !creates array corrisponding to the first integral with respect
       !to eta
       call compute_init_inerintegral &
@@ -140,7 +140,7 @@
       !the surface Temperature to tdata_ar
       call compute_outerintegralconstant &
       &(outerintegral_ar,tdata_ar,outr_dbl,n,m)
-
+      
       !writes output netcdf
       call write_netcdf &
       &(modelfile_inst%outfile,outerintegral_ar+outr_dbl, &
