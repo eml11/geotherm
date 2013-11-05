@@ -60,4 +60,28 @@
 
       end subroutine
 
+      subroutine compute_eclogite_content &
+      &(t_ar,temperature,pressure,diffusion_coeficient, &
+      &grain_size,free_energy,retrn_ar,n,m)
+      double precision :: temperature(n,m)
+      double precision :: pressure(n,m)
+      double precision :: diffusion_coeficient(n,m)
+      double precision :: grain_size(n,m)
+      double precision :: free_energy(n,m)
+      double precision :: retrn_ar(n,m)
+      double precision :: t_ar(n,m)
+      double precision :: caracteristic_time_ar(n,m)
+      double precision, parameter :: gas_const
+      integer n,m
+
+      call compute_reactionprogress &
+      &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
+      &retrn_ar,n,m)
+
+      where (temperature.GE.eclogitephase(pressure,n,m))
+        retrn_ar = retrn_ar
+      elsewhere
+        retrn_ar = 0d0
+      end where
+
       end module
