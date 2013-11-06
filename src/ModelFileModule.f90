@@ -36,9 +36,11 @@
         character (len = 256) :: heatcapcnetcdf
         character (len = 256) :: gtempfile
         character (len = 256) :: gqfluxfile
+        character (len = 256) :: gqxfluxfile
         character (len = 256) :: thermlconductnetcdf
         character (len = 256) :: outfile
         character (len = 256) :: incompresibilitynetcdf
+        character (len = 256) :: grainsizenetcdf
         integer :: negativedown
         integer :: ydim, tdim 
       end type
@@ -86,6 +88,12 @@
           this%incompresibilitynetcdf = modelfinput
         else if (typinput.EQ."R") then
           this%negativedown = 1
+        else if (typinput.EQ."G") then
+          this%grainsizenetcdf = modelfinput
+        else if (typinput.EQ."!") then
+          continue
+        else if (typinput.EQ."X") then
+          this%gqxfluxfile = modelfinput
         end if
       enddo
 

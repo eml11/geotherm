@@ -120,13 +120,15 @@
       !! @param filename name of netcdf file
       !! @param data_ar z data of netcdf 
       subroutine write_netcdf &
-      &(filename,temp_ar,density_ar,pressure_ar,negativedown,n,m)
+      &(filename,temp_ar,density_ar,pressure_ar,ecologite_ar, &
+      &negativedown,n,m)
       character (len = *) :: filename
       double precision :: temp_ar(n,m)
       double precision :: density_ar(n,m)
       double precision :: pressure_ar(n,m)
+      double precision :: ecologite_ar(n,m)
 
-      integer :: ncid, tvarid, pvarid, dvarid, dimids(2)
+      integer :: ncid, tvarid, pvarid, dvarid, evarid, dimids(2)
       integer :: x_dimid, y_dimid
       integer :: negativedown
       integer :: n,m,retval
@@ -149,16 +151,21 @@
       call check( nf90_def_var &
       &(ncid, "Density", NF90_DOUBLE, dimids, dvarid) )
 
+      call check ( nf90_def_var &
+      &(ncid, "EclogitePart", NF90_DOUBLE, dimids, evarid) )
+
       call check( nf90_enddef(ncid) )
 
       if (negativedown.EQ.0) then
         call check( nf90_put_var(ncid, dvarid, density_ar) )
         call check( nf90_put_var(ncid, tvarid, temp_ar) )
         call check( nf90_put_var(ncid, pvarid, pressure_ar) )
+        call check( nf90_put_var(ncid, evarid, ecologite_ar) )
       else
         call check( nf90_put_var(ncid, dvarid, density_ar(:,m:1:-1)) )
         call check( nf90_put_var(ncid, tvarid, temp_ar(:,m:1:-1)) )
         call check( nf90_put_var(ncid, pvarid, pressure_ar(:,m:1:-1)) )
+        call check( nf90_put_var(ncid, evarid, ecologite_ar(:,m:1:-1)) )
       end if
 
       end subroutine

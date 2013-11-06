@@ -46,7 +46,7 @@
       double precision :: temperature(n,m)
       double precision :: diffusion_coeficient(n,m)
       double precision :: grain_size(n,m)
-      double precision :: free_energy(n,m)
+      double precision :: free_energy
       double precision :: retrn_ar(n,m)
       double precision :: t_ar(n,m)
       double precision :: caracteristic_time_ar(n,m)
@@ -62,17 +62,19 @@
 
       subroutine compute_eclogite_content &
       &(t_ar,temperature,pressure,diffusion_coeficient, &
-      &grain_size,free_energy,retrn_ar,n,m)
+      &grain_size,retrn_ar,n,m)
       double precision :: temperature(n,m)
       double precision :: pressure(n,m)
       double precision :: diffusion_coeficient(n,m)
       double precision :: grain_size(n,m)
-      double precision :: free_energy(n,m)
+      double precision :: free_energy
       double precision :: retrn_ar(n,m)
       double precision :: t_ar(n,m)
       double precision :: caracteristic_time_ar(n,m)
       double precision, parameter :: gas_const
       integer n,m
+
+      free_energy = 1
 
       call compute_reactionprogress &
       &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
@@ -83,5 +85,7 @@
       elsewhere
         retrn_ar = 0d0
       end where
+
+      end subroutine 
 
       end module

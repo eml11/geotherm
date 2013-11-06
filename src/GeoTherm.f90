@@ -56,11 +56,13 @@
       use mathmodule
       use helpermodule
       use pressuresolver
+      use geochem
       type (modelfile), intent(in) :: modelfile_inst
       double precision :: input_tdata_ar(n)
       double precision :: input_qdata_ar(n)
-      double precision :: tdata_artrs(m,n), tdata_ar(n,m)
-      double precision :: qdata_artrs(m,n), qdata_ar(n,m)
+      double precision :: input_qxdata(n)
+      double precision :: tdata_ar(n,m)
+      double precision :: qdata_ar(n,m), qxdata_ar(n,m)
       double precision :: bdash_ar(n,m)
       double precision :: velocity_ar(n,m)
       double precision :: density_ar(n,m)
@@ -74,6 +76,10 @@
       double precision :: inerintegral_ar(n,m)
       double precision :: outerintegral_ar(n,m)
       double precision :: incompresibility_ar(n,m)
+      double precision :: eclogite_content
+      double precision :: temperature(n,m)
+      double precision :: diffusion_coeficient(n,m)
+      double precision :: grain_size(n,m)
       double precision :: incriment(2)
       double precision :: iner_dbl
       double precision :: outr_dbl
@@ -81,6 +87,7 @@
       !reading netcdfs from files sepcified in the modelfile
       call get_netcdf1d(modelfile_inst%gtempfile,input_tdata_ar)
       call get_netcdf1d(modelfile_inst%gqfluxfile,input_qdata_ar)
+      call get_netcdf1d(modelfile_inst%gqxfluxfile,input_qxdata)
       call get_netcdf_wincrmnt &
       &(modelfile_inst%velocitynetcdf,velocity_ar,incriment,n,m)
       call get_netcdf(modelfile_inst%densitynetcdf,density_ar)
@@ -90,6 +97,7 @@
       &(modelfile_inst%thermlconductnetcdf,thermlconduct_ar)
       call get_netcdf &
       &(modelfile_inst%incompresibilitynetcdf,incompresibility_ar)
+      call get_netcdf(modelfile_inst%grainsizenetcdf,grain_size)
 
       !this is a hack to fix issue with netcdfs created by gmt 
       incriment(2) = -incriment(2)
@@ -98,10 +106,14 @@
       call extend_ardimension(input_tdata_ar,tdata_ar,m)
       call extend_ardimension(input_qdata_ar,qdata_ar,m)
 
-      !creates array corrisponding to b(t)'s time differential
-      call compute_bdashval &
-      &(tdata_ar,qdata_ar,thermlconduct_ar, &
+      call compute_bdashval_fromqx &
+      &(tdata_ar,qdata_ar,qxdata_ar,thermlconduct_ar, &
       &bdash_ar,incriment,n,m)
+
+      !creates array corrisponding to b(t)'s time differential
+      !call compute_bdashval &
+      !&(tdata_ar,qdata_ar,thermlconduct_ar, &
+      !&bdash_ar,incriment,n,m)
       
       call compute_pressure &
       &(density_ar,incompresibility_ar,pressure,incriment,n,m)
@@ -141,9 +153,18 @@
       call compute_outerintegralconstant &
       &(outerintegral_ar,tdata_ar,outr_dbl,n,m)
       
+      temperature = outerintegral_ar+outr_dbl
+
+      !diffusion_coeficient?
+
+      call compute_eclogite_content &
+      &(t_ar,temperature,pressure,diffusion_coeficient, &
+      &grain_size,eclogite_content,n,m)
+
       !writes output netcdf
       call write_netcdf &
-      &(modelfile_inst%outfile,outerintegral_ar+outr_dbl, &
-      &pddensity,pressure,modelfile_inst%negativedown,n,m)
+      &(modelfile_inst%outfile,temperature, &
+      &pddensity,pressure,eclogite_content, &
+      &modelfile_inst%negativedown,n,m)
 
       end subroutine

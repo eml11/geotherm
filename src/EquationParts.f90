@@ -53,6 +53,27 @@
 
       end subroutine
 
+      subroutine compute_bdashval_fromqx &
+      &(tdata_ar,qdata_ar,qxdata_ar,kconstant,retrn_ar,incriment,n,m)
+      use mathmodule
+      double precision :: tdata_ar(n,m)
+      double precision :: tfromqx_ar(n,m)
+      double precision :: qdata_ar(n,m)
+      double precision :: qxdata_ar(n,m)
+      double precision :: kconstant(n,m)
+      double precision :: retrn_ar(n,m)
+      double precision :: incriment(2)
+      integer :: n, m
+      double precision, dimension(n,m) :: difftdata_ar
+
+      call array_integral(qxdata_ar/kconstant,tfromqx_ar, &
+      &incriment(2),n,m)
+      call array_diff2d(-tfromqx_ar,difftdata_ar,incriment(1),n,m) 
+      retrn_ar = kconstant * &
+      &(difftdata_ar/qdata_ar)
+
+      end subroutine
+
       !> sets retrn_ar to the exponented function
       !! in the solution to the homogeneous form
       !! @param bdash_ar time derivative of b(t)
