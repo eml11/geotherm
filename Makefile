@@ -6,8 +6,8 @@ FC=gfortran
 LDFLAGS=-L/usr/local/lib -lnetcdff -L/opt/local/lib -lnetcdf
 FDFLAGS=-I/usr/local/include -I$(OBJECTDIR)
 OUT=geotherm
-OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o
-MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod
+OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/GeoChemSupprt.o
+MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/geochem.mod
 
 all: geotherm unittests domaingen
 
@@ -45,7 +45,7 @@ $(OBJECTDIR)/pressuresolver.mod: $(SRC)/PressureSolver.f90
 
 $(OBJECTDIR)/geochem.mod: $(SRC)/GeoChemSupprt.f90
 	$(FC) -c $(FDFLAGS) $(SRC)/GeoChemSupprt.f90
-	mkdir -p $(OBJECTDIR); mv geochem.mod geochem.o $(OBJECTDIR)
+	mkdir -p $(OBJECTDIR); mv geochem.mod GeoChemSupprt.o $(OBJECTDIR)
 
 test: clean geotherm
 	cd $(TESTS); make clean
@@ -54,6 +54,6 @@ test: clean geotherm
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(MODULES)
-	rm -f $(BIN)/geotherm
+	rm -f $(BIN)/geotherm $(BIN)/domaingen
 	rmdir $(OBJECTDIR)
 	rmdir $(BIN)

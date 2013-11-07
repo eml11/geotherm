@@ -50,7 +50,7 @@
       double precision :: retrn_ar(n,m)
       double precision :: t_ar(n,m)
       double precision :: caracteristic_time_ar(n,m)
-      double precision, parameter :: gas_const 
+      double precision, parameter :: gas_const = 1 
       integer n,m
 
       caracteristic_time_ar = (grain_size(n,m)**2) * &
@@ -71,7 +71,7 @@
       double precision :: retrn_ar(n,m)
       double precision :: t_ar(n,m)
       double precision :: caracteristic_time_ar(n,m)
-      double precision, parameter :: gas_const
+      double precision, parameter :: gas_const = 1 !tempory
       integer n,m
 
       free_energy = 1

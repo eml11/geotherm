@@ -76,13 +76,16 @@
       double precision :: inerintegral_ar(n,m)
       double precision :: outerintegral_ar(n,m)
       double precision :: incompresibility_ar(n,m)
-      double precision :: eclogite_content
+      double precision :: eclogite_content(n,m)
       double precision :: temperature(n,m)
       double precision :: diffusion_coeficient(n,m)
       double precision :: grain_size(n,m)
       double precision :: incriment(2)
       double precision :: iner_dbl
       double precision :: outr_dbl
+      double precision :: t_ar(n,m)
+      integer n,m,i,j
+
 
       !reading netcdfs from files sepcified in the modelfile
       call get_netcdf1d(modelfile_inst%gtempfile,input_tdata_ar)
@@ -156,6 +159,11 @@
       temperature = outerintegral_ar+outr_dbl
 
       !diffusion_coeficient?
+      do i=1,n
+        do j=1,m
+          t_ar = i*incriment(1)
+        enddo
+      enddo
 
       call compute_eclogite_content &
       &(t_ar,temperature,pressure,diffusion_coeficient, &

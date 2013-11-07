@@ -66,7 +66,7 @@
       integer :: n, m
       double precision, dimension(n,m) :: difftdata_ar
 
-      call array_integral(qxdata_ar/kconstant,tfromqx_ar, &
+      call array_integral2d(qxdata_ar/kconstant,tfromqx_ar, &
       &incriment(2),n,m)
       call array_diff2d(-tfromqx_ar,difftdata_ar,incriment(1),n,m) 
       retrn_ar = kconstant * &
