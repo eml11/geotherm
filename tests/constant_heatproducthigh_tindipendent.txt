@@ -8,5 +8,7 @@ C,"./src_netcdf/onesfile.nc"
 T,"./src_boundryfiles/cst_temp_test1.nc"
 O,"./results/constant_heatproducthigh_tindipendent_rslt.nc"
 B,"./src_netcdf/olivine_bulk_mod.nc"
+G,"./src_netcdf/cst_grainsize.nc"
+X,"./src_netcdf/surfaceheatflux_alongx.nc"
 R,R
 E,E

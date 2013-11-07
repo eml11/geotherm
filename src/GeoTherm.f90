@@ -166,7 +166,7 @@
       enddo
 
       call compute_eclogite_content &
-      &(t_ar,temperature,pressure,diffusion_coeficient, &
+      &(t_ar,temperature,pressure, &
       &grain_size,eclogite_content,n,m)
 
       !writes output netcdf

@@ -44,37 +44,37 @@
       &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
       &retrn_ar,n,m)
       double precision :: temperature(n,m)
-      double precision :: diffusion_coeficient(n,m)
+      double precision :: diffusion_coeficient
       double precision :: grain_size(n,m)
       double precision :: free_energy
       double precision :: retrn_ar(n,m)
       double precision :: t_ar(n,m)
       double precision :: caracteristic_time_ar(n,m)
-      double precision, parameter :: gas_const = 1 
+      double precision, parameter :: gas_const = 8.3144621 
       integer n,m
 
       caracteristic_time_ar = (grain_size(n,m)**2) * &
       &DEXP(free_energy/(gas_const*temperature))/diffusion_coeficient
 
-      retrn_ar = 1d0 - DEXP(t_ar/caracteristic_time_ar)
+      retrn_ar = 1d0 - DEXP(-t_ar/caracteristic_time_ar)
 
       end subroutine
 
       subroutine compute_eclogite_content &
-      &(t_ar,temperature,pressure,diffusion_coeficient, &
-      &grain_size,retrn_ar,n,m)
+      &(t_ar,temperature,pressure,grain_size,retrn_ar,n,m)
       double precision :: temperature(n,m)
       double precision :: pressure(n,m)
-      double precision :: diffusion_coeficient(n,m)
+      double precision :: diffusion_coeficient
       double precision :: grain_size(n,m)
       double precision :: free_energy
       double precision :: retrn_ar(n,m)
       double precision :: t_ar(n,m)
       double precision :: caracteristic_time_ar(n,m)
-      double precision, parameter :: gas_const = 1 !tempory
+      double precision, parameter :: gas_const = 8.3144621 !tempory
       integer n,m
 
-      free_energy = 1
+      free_energy = 326352.0
+      diffusion_coeficient = 0.00002
 
       call compute_reactionprogress &
       &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
