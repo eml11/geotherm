@@ -160,17 +160,14 @@
       call extend_ardimension(outr_dbl,outr_dbl_ar,m)
 
       temperature = outerintegral_ar+outr_dbl_ar
-      !major preformance issue
-      !diffusion_coeficient?
-      !do i=1,n
-      !  do j=1,m
-      !    t_ar = i*incriment(1)
-      !  enddo
-      !enddo
+
+      do j=1,m
+        t_ar(:,j) = (/(i,i=1,n)/)*incriment(1)
+      enddo
       
-      !call compute_eclogite_content &
-      !&(t_ar,temperature,pressure, &
-      !&grain_size,eclogite_content,n,m)
+      call compute_eclogite_content &
+      &(t_ar,temperature,pressure, &
+      &grain_size,eclogite_content,n,m)
       
       !writes output netcdf
       call write_netcdf &
