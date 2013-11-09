@@ -92,7 +92,9 @@
       integer n,m
       double precision, dimension(n,m) :: v_tintegral, b_tintegral
       double precision, dimension(n,m) :: v_yintegral, b_yintegral
-      
+     
+      velocity_ar = velocity_ar/1.0
+ 
       call array_integral2d &
       &((bdash_ar*velocity_ar)/kappa_ar, &
       &v_tintegral,incriment(1),n,m)
@@ -107,7 +109,7 @@
       retrn_ar = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
 
-      !print *, retrn_ar(100,:)
+      print *, retrn_ar(100,:)
 
       end subroutine
 
@@ -129,7 +131,7 @@
       double precision :: incriment(2)
       double precision, dimension(n,m) :: integral_term, t_integral
       double precision, dimension(n,m) :: y_integral
-      !A_ar and thermal_ar incorrect, hacked for now
+      
       integral_term = -A_ar*DEXP(-1*exintegral_ar)/thermal_ar
       call array_integral2dydim &
       &(integral_term,y_integral,incriment(2),n,m)

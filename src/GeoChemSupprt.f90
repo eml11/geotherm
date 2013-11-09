@@ -80,7 +80,7 @@
       &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
       &retrn_ar,n,m)
 
-      where (temperature.GE.eclogitephase(pressure,n,m))
+      where (temperature.LE.eclogitephase(pressure,n,m))
         retrn_ar = retrn_ar
       elsewhere
         retrn_ar = 0d0

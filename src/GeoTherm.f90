@@ -102,7 +102,7 @@
       call get_netcdf(modelfile_inst%grainsizenetcdf,grain_size)
 
       !tempory
-      velocity_ar = velocity_ar*0
+      !velocity_ar = velocity_ar*0
 
       !this is a hack to fix issue with netcdfs created by gmt 
       incriment(2) = -incriment(2)
