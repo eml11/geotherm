@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -31,6 +30,10 @@
 
       contains
   
+      !> Returns Temperature of eclogite Clapeyron
+      !! slope for a given pressure
+      !! @param pressure input pressure array
+      !! @return eclogitephase temperature of Slope
       function eclogitephase(pressure,n,m)
       double precision :: pressure(n,m)
       double precision :: eclogitephase(n,m)
@@ -40,6 +43,19 @@
 
       end function 
 
+      !> Gives fraction of eclogite produced
+      !! @param temperature computed temperature
+      !! array
+      !! @param diffusion_coeficient diffusion
+      !! coefficient of limiting chemical species
+      !! @param grain_size grain size of parent rock
+      !! @param free_energy Gibbs free energy of
+      !! reaction
+      !! @param t_ar time variable
+      !! @param caracteristic_time_ar caracteristic
+      !! time for reaction to complete
+      !! @return retrn_ar fraction of eclogite against
+      !! total rock
       subroutine compute_reactionprogress &
       &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
       &retrn_ar,n,m)
@@ -60,6 +76,15 @@
 
       end subroutine
 
+      !> combines reaction progress with
+      !! clapeyron slope
+      !! @param temperature computed temperature
+      !! array
+      !! @param pressure input pressure array
+      !! @param grain_size grain size of parent rock
+      !! @param t_ar time variable
+      !! @return retrn_ar fraction of eclogite against
+      !! total rock
       subroutine compute_eclogite_content &
       &(t_ar,temperature,pressure,grain_size,retrn_ar,n,m)
       double precision :: temperature(n,m)
