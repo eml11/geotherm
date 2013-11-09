@@ -81,16 +81,15 @@
       double precision :: diffusion_coeficient(n,m)
       double precision :: grain_size(n,m)
       double precision :: incriment(2)
-      double precision :: iner_dbl
-      double precision :: outr_dbl
+      double precision :: iner_dbl(n),iner_dbl_ar(n,m)
+      double precision :: outr_dbl(n),outr_dbl_ar(n,m)
       double precision :: t_ar(n,m)
       integer n,m,i,j
-
 
       !reading netcdfs from files sepcified in the modelfile
       call get_netcdf1d(modelfile_inst%gtempfile,input_tdata_ar)
       call get_netcdf1d(modelfile_inst%gqfluxfile,input_qdata_ar)
-      call get_netcdf1d(modelfile_inst%gqxfluxfile,input_qxdata)
+      !call get_netcdf1d(modelfile_inst%gqxfluxfile,input_qxdata)
       call get_netcdf_wincrmnt &
       &(modelfile_inst%velocitynetcdf,velocity_ar,incriment,n,m)
       call get_netcdf(modelfile_inst%densitynetcdf,density_ar)
@@ -109,14 +108,14 @@
       call extend_ardimension(input_tdata_ar,tdata_ar,m)
       call extend_ardimension(input_qdata_ar,qdata_ar,m)
 
-      call compute_bdashval_fromqx &
-      &(tdata_ar,qdata_ar,qxdata_ar,thermlconduct_ar, &
-      &bdash_ar,incriment,n,m)
+      !call compute_bdashval_fromqx &
+      !&(tdata_ar,qdata_ar,qxdata_ar,thermlconduct_ar, &
+      !&bdash_ar,incriment,n,m)
 
       !creates array corrisponding to b(t)'s time differential
-      !call compute_bdashval &
-      !&(tdata_ar,qdata_ar,thermlconduct_ar, &
-      !&bdash_ar,incriment,n,m)
+      call compute_bdashval &
+      &(tdata_ar,qdata_ar,thermlconduct_ar, &
+      &bdash_ar,incriment,n,m)
       
       call compute_pressure &
       &(density_ar,incompresibility_ar,pressure,incriment,n,m)
@@ -130,13 +129,13 @@
       !in the exponent
       call compute_exponentintegral &
       &(bdash_ar,velocity_ar,kappa_ar,exintegral_ar,incriment,n,m)
-      
+
       !creates array corrisponding to the first integral with respect
       !to eta
       call compute_init_inerintegral &
-      &(exintegral_ar,bdash_ar,density_ar*heatproduct_ar,&
+      &(exintegral_ar,bdash_ar,pddensity*heatproduct_ar,&
       &thermlconduct_ar,inerintegral_ar,incriment,n,m)
- 
+      
       !creates a double which is the integration constant of the
       !integral calculated in the above subroutine required to set
       !the surface heatflux equal to the qdata_ar
@@ -144,10 +143,12 @@
       &(inerintegral_ar,exintegral_ar,tdata_ar,qdata_ar, &
       &bdash_ar,thermlconduct_ar,iner_dbl,incriment,n,m)
 
+      call extend_ardimension(iner_dbl,iner_dbl_ar,m)
+
       !creates array corrisponding to the second integral with respect
       !to eta
       call compute_init_outerintegral &
-      &(inerintegral_ar,exintegral_ar,bdash_ar,iner_dbl, &
+      &(inerintegral_ar,exintegral_ar,bdash_ar,iner_dbl_ar, &
       &outerintegral_ar,incriment,n,m)
 
       !creates double which is the integration constant of the
@@ -156,19 +157,21 @@
       call compute_outerintegralconstant &
       &(outerintegral_ar,tdata_ar,outr_dbl,n,m)
       
-      temperature = outerintegral_ar+outr_dbl
+      call extend_ardimension(outr_dbl,outr_dbl_ar,m)
 
+      temperature = outerintegral_ar+outr_dbl_ar
+      !major preformance issue
       !diffusion_coeficient?
-      do i=1,n
-        do j=1,m
-          t_ar = i*incriment(1)
-        enddo
-      enddo
-
-      call compute_eclogite_content &
-      &(t_ar,temperature,pressure, &
-      &grain_size,eclogite_content,n,m)
-
+      !do i=1,n
+      !  do j=1,m
+      !    t_ar = i*incriment(1)
+      !  enddo
+      !enddo
+      
+      !call compute_eclogite_content &
+      !&(t_ar,temperature,pressure, &
+      !&grain_size,eclogite_content,n,m)
+      
       !writes output netcdf
       call write_netcdf &
       &(modelfile_inst%outfile,temperature, &

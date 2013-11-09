@@ -102,8 +102,8 @@
       call array_integral2dydim(velocity_ar/kappa_ar, &
       &v_yintegral,incriment(2),n,m)
       call array_integral2dydim(bdash_ar/kappa_ar, &
-      &b_yintegral,incriment(2),n,m)
-      
+      &b_yintegral,incriment(2),n,m) 
+
       retrn_ar = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
 
@@ -127,13 +127,15 @@
       double precision :: incriment(2)
       double precision, dimension(n,m) :: integral_term, t_integral
       double precision, dimension(n,m) :: y_integral
-
+      !A_ar and thermal_ar incorrect, hacked for now
       integral_term = -A_ar*DEXP(-1*exintegral_ar)/thermal_ar
       call array_integral2dydim &
       &(integral_term,y_integral,incriment(2),n,m)
       call array_integral2d &
       &(integral_term*bdash_ar, &
       &t_integral,incriment(1),n,m)
+
+      !print *, y_integral
 
       retrn_ar = y_integral + t_integral
 
@@ -160,7 +162,7 @@
       double precision :: bdash_ar(n,m)
       double precision :: tdiff_ar(n,m)
       double precision :: thermal_ar(n,m)
-      double precision :: retrn_dbl      
+      double precision :: retrn_dbl(n)      
       double precision :: tdata_diff_ar(n,m)
       double precision :: incriment(2)
       integer :: n,m
@@ -174,8 +176,11 @@
       end where
 
       retrn_dbl = &
-      &((-qdata_ar(3,3)-tdiff_ar(3,3))/thermal_ar(3,3)) * &
-      &EXP(-exintegral_ar(3,3)) - inerintegral_ar(3,3)
+      &((-qdata_ar(:,3)-tdiff_ar(:,3))/thermal_ar(:,3)) * &
+      &EXP(-exintegral_ar(:,3)) - inerintegral_ar(:,3)
+
+      !print *, thermal_ar(:,100)*EXP(exintegral_ar(:,100)) * &
+      !&(inerintegral_ar(:,100) + retrn_dbl)
 
       end subroutine
 
@@ -193,7 +198,7 @@
       double precision :: exintegral_ar(n,m)
       double precision :: bdash_ar(n,m)
       double precision :: retrn_ar(n,m)
-      double precision :: iner_dbl
+      double precision :: iner_dbl(n,m)
       double precision :: incriment(2)
       double precision, dimension(n,m) :: integral_term, t_integral
       double precision, dimension(n,m) :: y_integral
@@ -206,6 +211,8 @@
       &t_integral,incriment(1),n,m)
 
       retrn_ar = y_integral + t_integral
+
+      !print *, y_integral
 
       end subroutine
 
@@ -220,9 +227,11 @@
       &(outerintegral_ar,tdata_ar,retrn_dbl,n,m)
       double precision :: outerintegral_ar(n,m)
       double precision :: tdata_ar(n,m)
-      double precision retrn_dbl
+      double precision retrn_dbl(n)
 
-      retrn_dbl = tdata_ar(1,1) - outerintegral_ar(1,1)
+      retrn_dbl = tdata_ar(:,1) - outerintegral_ar(:,1)
+
+      !print *, outerintegral_ar(500,1) + retrn_dbl
 
       end subroutine
 
