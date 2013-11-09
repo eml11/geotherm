@@ -93,7 +93,7 @@
       double precision, dimension(n,m) :: v_tintegral, b_tintegral
       double precision, dimension(n,m) :: v_yintegral, b_yintegral
      
-      velocity_ar = velocity_ar/1.0
+      !velocity_ar = velocity_ar/1.0
  
       call array_integral2d &
       &((bdash_ar*velocity_ar)/kappa_ar, &
@@ -109,7 +109,7 @@
       retrn_ar = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
 
-      print *, retrn_ar(100,:)
+      !print *, retrn_ar(100,:)
 
       end subroutine
 
