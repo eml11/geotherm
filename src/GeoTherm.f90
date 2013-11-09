@@ -101,8 +101,12 @@
       &(modelfile_inst%incompresibilitynetcdf,incompresibility_ar)
       call get_netcdf(modelfile_inst%grainsizenetcdf,grain_size)
 
+      !tempory
+      velocity_ar = velocity_ar*0
+
       !this is a hack to fix issue with netcdfs created by gmt 
       incriment(2) = -incriment(2)
+      !incriment(1) = incriment(1)/1000.0
 
       !extend 1d netcdfs into 2d by copying along 2d dimension
       call extend_ardimension(input_tdata_ar,tdata_ar,m)
@@ -156,7 +160,7 @@
       !the surface Temperature to tdata_ar
       call compute_outerintegralconstant &
       &(outerintegral_ar,tdata_ar,outr_dbl,n,m)
-      
+
       call extend_ardimension(outr_dbl,outr_dbl_ar,m)
 
       temperature = outerintegral_ar+outr_dbl_ar

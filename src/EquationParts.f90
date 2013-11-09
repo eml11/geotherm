@@ -107,6 +107,8 @@
       retrn_ar = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
 
+      !print *, retrn_ar(100,:)
+
       end subroutine
 
       !> sets retrn_ar to the first integral wrt
@@ -135,9 +137,9 @@
       &(integral_term*bdash_ar, &
       &t_integral,incriment(1),n,m)
 
-      !print *, y_integral
+      !print *, y_integral(100,:)
 
-      retrn_ar = y_integral + t_integral
+      retrn_ar = y_integral - t_integral
 
       end subroutine
 
@@ -176,11 +178,11 @@
       end where
 
       retrn_dbl = &
-      &((-qdata_ar(:,3)-tdiff_ar(:,3))/thermal_ar(:,3)) * &
+      &(-(qdata_ar(:,3)/thermal_ar(:,3))+tdiff_ar(:,3)) * &
       &EXP(-exintegral_ar(:,3)) - inerintegral_ar(:,3)
 
-      !print *, thermal_ar(:,100)*EXP(exintegral_ar(:,100)) * &
-      !&(inerintegral_ar(:,100) + retrn_dbl)
+      !print *, thermal_ar(100,:)*EXP(exintegral_ar(100,:)) * &
+      !&(inerintegral_ar(100,:) + retrn_dbl(100))
 
       end subroutine
 
@@ -205,14 +207,16 @@
 
       integral_term = EXP(exintegral_ar)*(inerintegral_ar + iner_dbl)
       
+      !print *, iner_dbl(100,:)
+
       call array_integral2dydim &
       &(integral_term,y_integral,incriment(2),n,m)
       call array_integral2d(integral_term*bdash_ar, &
       &t_integral,incriment(1),n,m)
 
-      retrn_ar = y_integral + t_integral
+      retrn_ar = y_integral - t_integral
 
-      !print *, y_integral
+      !print *, y_integral(100,:)
 
       end subroutine
 
