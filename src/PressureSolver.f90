@@ -31,6 +31,12 @@
       implicit none
       contains
 
+      !> computes depth dependent Pressure 
+      !! @param density_ar Pressure indipendent
+      !! density from input
+      !! @param incompresibility_ar bulk modulus
+      !! of substance
+      !! @return retrn_ar depth dependent Pressure
       subroutine compute_pressure &
       &(density_ar,incompresibility_ar,retrn_ar,incriment,n,m)
       double precision :: density_ar(n,m)
@@ -50,6 +56,12 @@
 
       end subroutine
 
+      !> computes pressure dependent density 
+      !! @param density_ar Pressure indipendent
+      !! density from input
+      !! @param incompresibility_ar bulk modulus
+      !! of substance
+      !! @return retrn_ar pressure dependent density
       subroutine compute_pddensity &
       &(density_ar,incompresibility_ar,retrn_ar,incriment,n,m)
       double precision :: density_ar(n,m)
