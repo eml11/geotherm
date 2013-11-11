@@ -42,7 +42,17 @@
         character (len = 256) :: incompresibilitynetcdf
         character (len = 256) :: grainsizenetcdf
         integer :: negativedown
-        integer :: ydim, tdim 
+        integer :: ydim, tdim
+        double precision :: incriment(2)
+        double precision, allocatable :: velocity(:,:)
+        double precision, allocatable :: density(:,:)
+        double precision, allocatable :: heatproduction(:,:)
+        double precision, allocatable :: heatcapcity(:,:)
+        double precision, allocatable :: gtemp(:,:)
+        double precision, allocatable :: gqflux(:,:)
+        double precision, allocatable :: thermalconductivity(:,:)
+        double precision, allocatable :: bulkmodulus(:,:)
+        double precision, allocatable :: grainsize(:,:) 
       end type
 
       contains 
@@ -96,6 +106,16 @@
           this%gqxfluxfile = modelfinput
         end if
       enddo
+
+      allocate ( this%velocity(this%tdim, this%ydim) )
+      allocate ( this%density(this%tdim, this%ydim) )
+      allocate ( this%heatproduction(this%tdim, this%ydim) )
+      allocate ( this%heatcapcity(this%tdim, this%ydim) )
+      allocate ( this%gtemp(this%tdim, this%ydim) )
+      allocate ( this%gqflux(this%tdim, this%ydim) )
+      allocate ( this%thermalconductivity(this%tdim, this%ydim) )
+      allocate ( this%bulkmodulus(this%tdim, this%ydim) )
+      allocate ( this%grainsize(this%tdim, this%ydim) )
 
       end subroutine
 

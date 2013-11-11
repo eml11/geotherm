@@ -29,7 +29,26 @@
       module pressuresolver
       use mathmodule
       implicit none
+
+      type pressurefield
+        integer n,m
+        double precision, allocatable :: pressure(:,:)
+        double precision, allocatable :: density(:,:)
+      endtype
+
+
       contains
+
+      subroutine new(this,n,m)
+      type (pressurefield) this
+      integer n,m
+
+      this%n = n
+      this%m = m
+      allocate ( this%pressure(n,m) )
+      allocate ( this%density(n,m) )
+
+      end subroutine
 
       !> computes depth dependent Pressure 
       !! @param density_ar Pressure indipendent
@@ -37,22 +56,18 @@
       !! @param incompresibility_ar bulk modulus
       !! of substance
       !! @return retrn_ar depth dependent Pressure
-      subroutine compute_pressure &
-      &(density_ar,incompresibility_ar,retrn_ar,incriment,n,m)
-      double precision :: density_ar(n,m)
-      double precision :: incompresibility_ar(n,m)
-      double precision :: retrn_ar(n,m)
-      double precision :: gravity_const
-      double precision :: y_integral(n,m)
-      double precision :: incriment(2)
-      integer n,m
-      gravity_const = 9.81
+      subroutine compute_pressure(this,model)
+      use module_modelfile
+      type (pressurefield) this
+      type (modelfile) model
+      double precision, parameter :: gravity_const = 9.81
+      double precision :: y_integral(this%n,this%m)
 
-      call array_integral2dydim(density_ar*gravity_const, & 
-      &y_integral,incriment(2),n,m)
+      call array_integral2dydim(model%density*gravity_const, & 
+      &y_integral,model%incriment(2),this%n,this%m)
 
-      retrn_ar = -incompresibility_ar * &
-      &DLOG(1+y_integral/incompresibility_ar)
+      this%pressure = -model%bulkmodulus * &
+      &DLOG(1+y_integral/model%bulkmodulus)
 
       end subroutine
 
@@ -62,21 +77,17 @@
       !! @param incompresibility_ar bulk modulus
       !! of substance
       !! @return retrn_ar pressure dependent density
-      subroutine compute_pddensity &
-      &(density_ar,incompresibility_ar,retrn_ar,incriment,n,m)
-      double precision :: density_ar(n,m)
-      double precision :: incompresibility_ar(n,m)
-      double precision :: retrn_ar(n,m)
-      double precision :: gravity_const
-      double precision :: y_integral(n,m)
-      double precision :: incriment(2)
-      integer n,m
-      gravity_const = 9.81
+      subroutine compute_pddensity(this,model)
+      use module_modelfile
+      type (pressurefield) this
+      type (modelfile) model
+      double precision, parameter :: gravity_const = 9.81
+      double precision :: y_integral(this%n,this%m)
 
-      call array_integral2dydim(density_ar*gravity_const, & 
-      &y_integral,incriment(2),n,m)
+      call array_integral2dydim(model%density*gravity_const, & 
+      &y_integral,model%incriment(2),this%n,this%m)
 
-      retrn_ar = (density_ar)/(1+y_integral/incompresibility_ar)
+      this%density = (model%density)/(1+y_integral/model%bulkmodulus)
 
       end subroutine
 

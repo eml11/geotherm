@@ -54,12 +54,14 @@
       !! boundry conditions
       !! @param filename name of netcdf file
       !! @return data_ar z data of netcdf      
-      subroutine get_netcdf1d(filename,data_ar)
+      subroutine get_netcdf1d(filename,retrn_ar,n,m)
+      use mathmodule
       character (len = *) :: filename
-      double precision :: data_ar(:)
-
+      double precision :: data_ar(n)
+      double precision :: retrn_ar(:,:)
+      
       integer :: ncid, varid
-
+      integer :: n,m
       integer :: retval
 
       call check( nf90_open(filename, NF90_NOWRITE, ncid) )
@@ -67,6 +69,8 @@
       call check( nf90_get_var(ncid, varid, data_ar) )
 
       call check( nf90_close(ncid) )
+
+      call extend_ardimension(data_ar,retrn_ar,m)
 
       end subroutine
 
@@ -99,6 +103,9 @@
 
       incriment(1) = tdata(2) - tdata(1)
       incriment(2) = ydata(2) - ydata(1)
+      
+      !hack to fix netcdfs from gmt
+      incriment(2) = -incriment(2)
 
       call check( nf90_close(ncid) )
 
