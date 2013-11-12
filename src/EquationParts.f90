@@ -262,7 +262,7 @@
 
       end subroutine
       
-      subroutine deleate(this)
+      subroutine delete(this)
       type (temperaturefield) this
       
       deallocate ( this%expterm )
