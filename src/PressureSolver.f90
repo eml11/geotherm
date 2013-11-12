@@ -90,5 +90,13 @@
       this%density = (model%density)/(1+y_integral/model%bulkmodulus)
 
       end subroutine
+      
+      subroutine delete(this)
+      type (pressurefield) this
+      
+      deallocate ( this%pressure )
+      deallocate ( this%density )
+
+      end subroutine
 
       end module
