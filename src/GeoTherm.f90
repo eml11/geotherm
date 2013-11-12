@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -48,6 +47,8 @@
       call compute_geotherm &
       &(modelfile_inst,modelfile_inst%tdim,modelfile_inst%ydim)
 
+      call DELETE(modelfile_inst)
+
       end program
 
       subroutine compute_geotherm(modelfile_inst,n,m)
@@ -55,7 +56,8 @@
       use module_modelfile
       use mathmodule
       use helpermodule
-      use pressuresolver, PRESSUREFIELDNEW => NEW
+      use pressuresolver, PRESSUREFIELDNEW => NEW, &
+      &PRESSUREFIELDDELETE => DELETE
       use geochem
       type (modelfile), intent(in) :: modelfile_inst
       type (pressurefield) :: pressurefield_inst
@@ -142,5 +144,8 @@
       &(modelfile_inst%outfile,temperaturefield_inst%temperature, &
       &pressurefield_inst%density,pressurefield_inst%pressure, &
       & eclogite_content,modelfile_inst%negativedown,n,m)
+
+      DELETE(temperaturefield_inst)
+      PRESSUREFIELDDELETE(pressurefield_inst)
 
       end subroutine
