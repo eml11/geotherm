@@ -34,7 +34,6 @@
       integer n,m
       double precision, allocatable :: temperature(:,:)
 
-      !private
       double precision, private, allocatable :: bderivative(:,:)
       double precision, private, allocatable :: expterm(:,:)
       double precision, private, allocatable :: innerintegral(:,:)
@@ -66,7 +65,6 @@
       !! @param qdata_ar ground heat flux array
       !! @return retrn_ar time derivative of b(t)
       subroutine compute_bdashval(this,model)
-!tdata_ar,qdata_ar,kconstant,retrn_ar,incriment,n,m)
       use mathmodule
       use module_modelfile
       type (modelfile) model
@@ -110,7 +108,6 @@
       !! @param kappa_ar thermal diffusivity
       !! @return retrn_ar function in exponent
       subroutine compute_exponentintegral(this,model,pfield)
-      !&(bdash_ar,velocity_ar,kappa_ar,retrn_ar,incriment,n,m)
       use mathmodule
       use module_modelfile
       use pressuresolver
@@ -142,8 +139,6 @@
       this%expterm = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
 
-      !print *, retrn_ar(100,:)
-
       end subroutine
 
       !> sets retrn_ar to the first integral wrt
@@ -154,7 +149,6 @@
       !! @param thermal_ar thermal conductivity
       !! @return retrn_ar first integration result
       subroutine compute_init_inerintegral(this,model)
-      !&(exintegral_ar,bdash_ar,A_ar,thermal_ar,retrn_ar,incriment,n,m)
       use mathmodule
       use module_modelfile
       type (modelfile) model
@@ -171,8 +165,6 @@
       &(integral_term*this%bderivative, &
       &t_integral,model%incriment(1),this%n,this%m)
 
-      !print *, y_integral(100,:)
-
       this%innerintegral = y_integral - t_integral
 
       end subroutine
@@ -188,8 +180,6 @@
       !! @param thermal_ar thermal conductivity
       !! @return retrn_dbl first constant of integration
       subroutine compute_inerintegralconstant(this,model)
-      !&(inerintegral_ar,exintegral_ar,tdata_ar,qdata_ar,bdash_ar, &
-      !&thermal_ar,retrn_dbl,incriment,n,m)
       use mathmodule
       use module_modelfile
       type (modelfile) model
@@ -214,9 +204,6 @@
 
       call extend_ardimension(innerconstant,this%innerconstant,this%m)
 
-      !print *, thermal_ar(100,:)*EXP(exintegral_ar(100,:)) * &
-      !&(inerintegral_ar(100,:) + retrn_dbl(100))
-
       end subroutine
 
       !> sets retrn_ar to the second integral wrt
@@ -226,8 +213,6 @@
       !! @param iner_dbl first constant of integration
       !! @return second integration result
       subroutine compute_init_outerintegral(this,model)
-      !&(inerintegral_ar,exintegral_ar,bdash_ar,iner_dbl, &
-      !&retrn_ar,incriment,n,m)
       use mathmodule
       use module_modelfile
       type (modelfile) model
@@ -238,8 +223,6 @@
 
       integral_term = &
       &EXP(this%expterm)*(this%innerintegral + this%innerconstant)
-      
-      !print *, iner_dbl(100,:)
 
       call array_integral2dydim &
       &(integral_term,y_integral,model%incriment(2),this%n,this%m)
@@ -247,8 +230,6 @@
       &t_integral,model%incriment(1),this%n,this%m)
 
       this%outerintegral = y_integral - t_integral
-
-      !print *, y_integral(100,:)
 
       end subroutine
 
@@ -260,7 +241,6 @@
       !! @param tdata_ar ground temperature array
       !! @return retrn_dbl second constant of integration
       subroutine compute_outerintegralconstant(this,model)
-      !&(outerintegral_ar,tdata_ar,retrn_dbl,n,m)
       use module_modelfile
       use mathmodule
       type (modelfile) model
@@ -272,7 +252,6 @@
       outerconstant = model%gtemp(:,1) - this%outerintegral(:,1)
 
       call extend_ardimension(outerconstant,this%outerconstant,this%m)
-      !print *, outerintegral_ar(500,1) + retrn_dbl
 
       end subroutine
 
