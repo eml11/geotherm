@@ -1,3 +1,4 @@
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -49,8 +50,7 @@
 
       end program
 
-      subroutine compute_geotherm &
-      &(modelfile_inst,n,m)
+      subroutine compute_geotherm(modelfile_inst,n,m)
       use equationpartsmodule
       use module_modelfile
       use mathmodule
@@ -60,20 +60,7 @@
       type (modelfile), intent(in) :: modelfile_inst
       type (pressurefield) :: pressurefield_inst
       type (temperaturefield) :: temperaturefield_inst
-      double precision :: bdash_ar(n,m)
-      double precision :: kappa_ar(n,m)
-      double precision :: pddensity(n,m)
-      double precision :: pressure(n,m)
-      double precision :: exintegral_ar(n,m)
-      double precision :: inerintegral_ar(n,m)
-      double precision :: outerintegral_ar(n,m)
-      double precision :: incompresibility_ar(n,m)
       double precision :: eclogite_content(n,m)
-      double precision :: temperature(n,m)
-      double precision :: diffusion_coeficient(n,m)
-      double precision :: incriment(2)
-      double precision :: iner_dbl(n),iner_dbl_ar(n,m)
-      double precision :: outr_dbl(n),outr_dbl_ar(n,m)
       double precision :: t_ar(n,m)
       integer n,m,i,j
 
@@ -85,7 +72,6 @@
       &modelfile_inst%gtemp,n,m)
       call get_netcdf1d(modelfile_inst%gqfluxfile, &
       &modelfile_inst%gqflux,n,m)
-      !call get_netcdf1d(modelfile_inst%gqxfluxfile,input_qxdata)
       call get_netcdf_wincrmnt(modelfile_inst%velocitynetcdf, &
       &modelfile_inst%velocity,modelfile_inst%incriment,n,m)
       call get_netcdf(modelfile_inst%densitynetcdf, &
@@ -106,27 +92,12 @@
       !tempory
       !velocity_ar = velocity_ar*0
 
-      !this is a hack to fix issue with netcdfs created by gmt 
-      !modelfile_inst%incriment(2) = -modelfile_inst%incriment(2)
-      !incriment(1) = incriment(1)/1000.0
-
-      !extend 1d netcdfs into 2d by copying along 2d dimension
-      !call extend_ardimension(input_tdata_ar,tdata_ar,m)
-      !call extend_ardimension(input_qdata_ar,qdata_ar,m)
-
-      !call compute_bdashval_fromqx &
-      !&(tdata_ar,qdata_ar,qxdata_ar,thermlconduct_ar, &
-      !&bdash_ar,incriment,n,m)
-
       !creates array corrisponding to b(t)'s time differential
-      call compute_bdashval &
-      &(temperaturefield_inst,modelfile_inst)
+      call compute_bdashval(temperaturefield_inst,modelfile_inst)
       
       call compute_pressure(pressurefield_inst,modelfile_inst)
       
       call compute_pddensity(pressurefield_inst,modelfile_inst)
-
-      !kappa_ar = thermlconduct_ar/(pddensity*heatcapc_ar) 
 
       !creates array corrisponding to the function which appears
       !in the exponent
@@ -144,8 +115,6 @@
       call compute_inerintegralconstant &
       &(temperaturefield_inst,modelfile_inst)
 
-      !call extend_ardimension(iner_dbl,iner_dbl_ar,m)
-
       !creates array corrisponding to the second integral with respect
       !to eta
       call compute_init_outerintegral &
@@ -157,14 +126,7 @@
       call compute_outerintegralconstant &
       &(temperaturefield_inst,modelfile_inst)
 
-      !call extend_ardimension(outr_dbl,outr_dbl_ar,m)
-
       call compute_temp(temperaturefield_inst)
-
-      !temperaturefield_inst%temperature = &
-      !&temperaturefield_inst%outerintegral + &
-      !&temperaturefield_inst%outerconstant
-      !temperature = outerintegral_ar+outr_dbl_ar
 
       do j=1,m
         t_ar(:,j) = (/(i,i=1,n)/)*modelfile_inst%incriment(1)
