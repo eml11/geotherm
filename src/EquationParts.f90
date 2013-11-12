@@ -255,8 +255,19 @@
 
       end subroutine
 
-      subroutine compute_temp(this)
+      subroutine compute_temp(this,model,pfield)
+      use module_modelfile
+      use pressuresolver
+      type (modelfile) model
       type (temperaturefield) this
+      type (pressurefield) pfield
+   
+      call compute_bdashval(this,model) 
+      call compute_exponentintegral(this,model,pfield)
+      call compute_init_inerintegral(this,model)
+      call compute_inerintegralconstant(this,model)
+      call compute_init_outerintegral(this,model)
+      call compute_outerintegralconstant(this,model)
 
       this%temperature = this%outerintegral + this%outerconstant
 
