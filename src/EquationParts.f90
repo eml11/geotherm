@@ -261,4 +261,17 @@
       this%temperature = this%outerintegral + this%outerconstant
 
       end subroutine
+      
+      subroutine deleate(this)
+      type (temperaturefield) this
+      
+      deallocate ( this%expterm )
+      deallocate ( this%innerintegral )
+      deallocate ( this%outerintegral )
+      deallocate ( this%innerconstant )
+      deallocate ( this%outerconstant )
+      deallocate ( this%bderivative )
+      
+      end subroutine
+      
       end module
