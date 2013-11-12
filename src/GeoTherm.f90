@@ -93,42 +93,12 @@
 
       !tempory
       !velocity_ar = velocity_ar*0
-
-      !creates array corrisponding to b(t)'s time differential
-      call compute_bdashval(temperaturefield_inst,modelfile_inst)
       
       call compute_pressure(pressurefield_inst,modelfile_inst)
       
       call compute_pddensity(pressurefield_inst,modelfile_inst)
 
-      !creates array corrisponding to the function which appears
-      !in the exponent
-      call compute_exponentintegral &
-      &(temperaturefield_inst,modelfile_inst,pressurefield_inst)
-
-      !creates array corrisponding to the first integral with respect
-      !to eta
-      call compute_init_inerintegral &
-      &(temperaturefield_inst,modelfile_inst)
-      
-      !creates a double which is the integration constant of the
-      !integral calculated in the above subroutine required to set
-      !the surface heatflux equal to the qdata_ar
-      call compute_inerintegralconstant &
-      &(temperaturefield_inst,modelfile_inst)
-
-      !creates array corrisponding to the second integral with respect
-      !to eta
-      call compute_init_outerintegral &
-      &(temperaturefield_inst,modelfile_inst)
-
-      !creates double which is the integration constant of the
-      !integral calcultaed in the above subroutine required to set
-      !the surface Temperature to tdata_ar
-      call compute_outerintegralconstant &
-      &(temperaturefield_inst,modelfile_inst)
-
-      call compute_temp(temperaturefield_inst)
+      call compute_temp(temperaturefield_inst,modelfile_inst,pressurefield_inst)
 
       do j=1,m
         t_ar(:,j) = (/(i,i=1,n)/)*modelfile_inst%incriment(1)
