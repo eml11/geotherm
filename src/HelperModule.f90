@@ -126,24 +126,33 @@
       !> netcdf writing subroutine
       !! @param filename name of netcdf file
       !! @param data_ar z data of netcdf 
-      subroutine write_netcdf &
-      &(filename,temp_ar,density_ar,pressure_ar,ecologite_ar, &
-      &negativedown,n,m)
-      character (len = *) :: filename
-      double precision :: temp_ar(n,m)
-      double precision :: density_ar(n,m)
-      double precision :: pressure_ar(n,m)
-      double precision :: ecologite_ar(n,m)
+      subroutine write_netcdf(model,tfield,pfield,minphase)
+      !&(filename,temp_ar,density_ar,pressure_ar,ecologite_ar, &
+      !&negativedown,n,m)
+      use equationpartsmodule
+      use module_modelfile
+      use pressuresolver
+      use geochem
+      type (modelfile) model
+      type (tempreturefield) tfield
+      type (pressurefield) pfield
+      type (mineralphase) minphase
+      
+      !character (len = *) :: filename
+      !double precision :: temp_ar(n,m)
+      !double precision :: density_ar(n,m)
+      !double precision :: pressure_ar(n,m)
+      !double precision :: ecologite_ar(n,m)
 
       integer :: ncid, tvarid, pvarid, dvarid, evarid, dimids(2)
       integer :: x_dimid, y_dimid
-      integer :: negativedown
-      integer :: n,m,retval
+      !integer :: negativedown
+      !integer :: n,m,retval
       
-      call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+      call check( nf90_create(model%outfile, NF90_CLOBBER, ncid) )
 
-      call check( nf90_def_dim(ncid, "x", n, x_dimid) )
-      call check( nf90_def_dim(ncid, "y", m, y_dimid) )
+      call check( nf90_def_dim(ncid, "x", tfield%n, x_dimid) )
+      call check( nf90_def_dim(ncid, "y", tfield%m, y_dimid) )
       
       dimids =  (/ x_dimid, y_dimid /)
 
@@ -164,15 +173,15 @@
       call check( nf90_enddef(ncid) )
 
       if (negativedown.EQ.0) then
-        call check( nf90_put_var(ncid, dvarid, density_ar) )
-        call check( nf90_put_var(ncid, tvarid, temp_ar) )
-        call check( nf90_put_var(ncid, pvarid, pressure_ar) )
-        call check( nf90_put_var(ncid, evarid, ecologite_ar) )
+        call check( nf90_put_var(ncid, dvarid, pfield%density) )
+        call check( nf90_put_var(ncid, tvarid, tfield%temperature) )
+        call check( nf90_put_var(ncid, pvarid, pfield%pressure) )
+        call check( nf90_put_var(ncid, evarid, minphase%mineralpart) )
       else
-        call check( nf90_put_var(ncid, dvarid, density_ar(:,m:1:-1)) )
-        call check( nf90_put_var(ncid, tvarid, temp_ar(:,m:1:-1)) )
-        call check( nf90_put_var(ncid, pvarid, pressure_ar(:,m:1:-1)) )
-        call check( nf90_put_var(ncid, evarid, ecologite_ar(:,m:1:-1)) )
+        call check( nf90_put_var(ncid, dvarid, pfield%density(:,m:1:-1)) )
+        call check( nf90_put_var(ncid, tvarid, tfield%tempurature(:,m:1:-1)) )
+        call check( nf90_put_var(ncid, pvarid, pfield%pressure(:,m:1:-1)) )
+        call check( nf90_put_var(ncid, evarid, minphase%mineralpart(:,m:1:-1)) )
       end if
 
       end subroutine
