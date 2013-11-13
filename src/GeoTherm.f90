@@ -28,7 +28,7 @@
       program GEOTHERM
       use helpermodule
       use mathmodule
-      use module_modelfile
+      use module_modelfile, MODULEDELETE => DELETE
       implicit none
 
       type (modelfile) modelfile_inst
@@ -47,13 +47,13 @@
       call compute_geotherm &
       &(modelfile_inst,modelfile_inst%tdim,modelfile_inst%ydim)
 
-      call DELETE(modelfile_inst)
+      call MODULEDELETE(modelfile_inst)
 
       end program
 
       subroutine compute_geotherm(modelfile_inst,n,m)
       use equationpartsmodule
-      use module_modelfile
+      use module_modelfile, MODULEDELETE => DELETE 
       use mathmodule
       use helpermodule
       use pressuresolver, PRESSUREFIELDNEW => NEW, &
@@ -115,7 +115,7 @@
       &pressurefield_inst%density,pressurefield_inst%pressure, &
       & eclogite_content,modelfile_inst%negativedown,n,m)
 
-      DELETE(temperaturefield_inst)
-      PRESSUREFIELDDELETE(pressurefield_inst)
+      call DELETE(temperaturefield_inst)
+      call PRESSUREFIELDDELETE(pressurefield_inst)
 
       end subroutine
