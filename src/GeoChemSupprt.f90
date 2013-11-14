@@ -31,10 +31,10 @@
       type mineralphase
       
       integer n,m
-      double precision, allocateable :: mineralpart
+      double precision, allocatable :: mineralpart(:,:)
       double precision :: free_energy
-      double precision :: diffusion_coefficient
-      
+      double precision :: diffusion_coefficient      
+
       end type
 
       contains
@@ -45,14 +45,14 @@
       
       this%n = n
       this%m = m
-      allocate( mineralpart(n,m) )
+      allocate( this%mineralpart(n,m) )
       
       end subroutine
   
       subroutine DELETE(this)
       type (mineralphase) this
       
-      deallocate( mineralpart )
+      deallocate( this%mineralpart )
       
       end subroutine
   
@@ -83,22 +83,31 @@
       !! @return retrn_ar fraction of eclogite against
       !! total rock
       subroutine compute_reactionprogress &
-      &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
-      &retrn_ar,n,m)
-      double precision :: temperature(n,m)
-      double precision :: diffusion_coeficient
-      double precision :: grain_size(n,m)
-      double precision :: free_energy
-      double precision :: retrn_ar(n,m)
-      double precision :: t_ar(n,m)
-      double precision :: caracteristic_time_ar(n,m)
+      &(this,t_ar,tfield,model)
+      !&(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
+      !&retrn_ar,n,m)
+      use equationpartsmodule
+      use module_modelfile
+
+      type (mineralphase) this
+      type (modelfile) model
+      type (temperaturefield) tfield
+
+      !double precision :: temperature(n,m)
+      !double precision :: diffusion_coeficient
+      !double precision :: grain_size(n,m)
+      !double precision :: free_energy
+      !double precision :: retrn_ar(n,m)
+      double precision :: t_ar(this%n,this%m)
+      double precision :: caracteristic_time_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 
-      integer n,m
+      !integer n,m
 
-      caracteristic_time_ar = (grain_size(n,m)**2) * &
-      &DEXP(free_energy/(gas_const*temperature))/diffusion_coeficient
+      caracteristic_time_ar = (model%grainsize**2) * &
+      &DEXP(this%free_energy/(gas_const*tfield%temperature)) / &
+      &this%diffusion_coefficient
 
-      retrn_ar = 1d0 - DEXP(-t_ar/caracteristic_time_ar)
+      this%mineralpart = 1d0 - DEXP(-t_ar/caracteristic_time_ar)
 
       end subroutine
 
@@ -112,29 +121,38 @@
       !! @return retrn_ar fraction of eclogite against
       !! total rock
       subroutine compute_eclogite_content &
-      &(t_ar,temperature,pressure,grain_size,retrn_ar,n,m)
-      double precision :: temperature(n,m)
-      double precision :: pressure(n,m)
-      double precision :: diffusion_coeficient
-      double precision :: grain_size(n,m)
-      double precision :: free_energy
-      double precision :: retrn_ar(n,m)
-      double precision :: t_ar(n,m)
-      double precision :: caracteristic_time_ar(n,m)
+      &(this,t_ar,tfield,pfield,model)
+      !&(t_ar,temperature,pressure,grain_size,retrn_ar,n,m)
+      use equationpartsmodule
+      use module_modelfile
+      use pressuresolver
+      
+      type (mineralphase) this
+      type (modelfile) model
+      type (pressurefield) pfield
+      type (temperaturefield) tfield
+
+      !double precision :: temperature(n,m)
+      !double precision :: pressure(n,m)
+      !double precision :: diffusion_coeficient
+      !double precision :: grain_size(n,m)
+      !double precision :: free_energy
+      !double precision :: retrn_ar(n,m)
+      double precision :: t_ar(this%n,this%m)
+      !double precision :: caracteristic_time_ar(n,m)
       double precision, parameter :: gas_const = 8.3144621 !tempory
-      integer n,m
+      !integer n,m
 
-      free_energy = 326352.0
-      diffusion_coeficient = 0.00002
+      !free_energy = 326352.0
+      !diffusion_coeficient = 0.00002
 
-      call compute_reactionprogress &
-      &(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
-      &retrn_ar,n,m)
+      call compute_reactionprogress(this,t_ar,tfield,model)
 
-      where (temperature.LE.eclogitephase(pressure,n,m))
-        retrn_ar = retrn_ar
+      where (tfield%temperature .LE. &
+      &eclogitephase(pfield%pressure,this%n,this%m))
+        this%mineralpart = this%mineralpart
       elsewhere
-        retrn_ar = 0d0
+        this%mineralpart = 0d0*this%mineralpart
       end where
 
       end subroutine 

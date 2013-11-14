@@ -23,12 +23,12 @@ domaingen: $(SRC)/generate_domain.f90
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o domaingen $(SRC)/generate_domain.f90
 	mkdir -p $(BIN); mv domaingen $(BIN)
 
-$(OBJECTDIR)/mathmodule.mod: $(SRC)/MathModule.f90
+$(OBJECTDIR)/mathmodule.mod: $(SRC)/MathModule.f90 
 	$(FC) -c $(SRC)/MathModule.f90
 	mkdir -p $(OBJECTDIR); mv mathmodule.mod mathmodule.o $(OBJECTDIR)
 
-$(OBJECTDIR)/helpermodule.mod: $(SRC)/HelperModule.f90
-	$(FC) -c $(FDFLAGS) $(SRC)/HelperModule.f90
+$(OBJECTDIR)/helpermodule.mod: $(SRC)/HelperModule.f90 $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/equationpartsmodule.mod
+	$(FC) -c $(FDFLAGS) $(SRC)/HelperModule.f90 $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/GeoChemSupprt.o
 	mkdir -p $(OBJECTDIR); mv helpermodule.mod helpermodule.o $(OBJECTDIR)
 
 $(OBJECTDIR)/module_modelfile.mod: $(SRC)/ModelFileModule.f90
@@ -39,12 +39,12 @@ $(OBJECTDIR)/equationpartsmodule.mod: $(SRC)/EquationParts.f90 $(OBJECTDIR)/math
 	$(FC) -c -I$(OBJECTDIR) -L$(OBJECTDIR) $(SRC)/EquationParts.f90 $(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/pressuresolver.o
 	mkdir -p $(OBJECTDIR); mv equationpartsmodule.mod EquationParts.o $(OBJECTDIR)
 
-$(OBJECTDIR)/pressuresolver.mod: $(SRC)/PressureSolver.f90
+$(OBJECTDIR)/pressuresolver.mod: $(SRC)/PressureSolver.f90 $(OBJECTDIR)/equationpartsmodule.mod
 	$(FC) -c $(FDFLAGS) $(SRC)/PressureSolver.f90 $(OBJECTDIR)/mathmodule.o
 	mkdir -p $(OBJECTDIR); mv pressuresolver.mod pressuresolver.o $(OBJECTDIR)
 
-$(OBJECTDIR)/geochem.mod: $(SRC)/GeoChemSupprt.f90
-	$(FC) -c $(FDFLAGS) $(SRC)/GeoChemSupprt.f90
+$(OBJECTDIR)/geochem.mod: $(SRC)/GeoChemSupprt.f90 $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/equationpartsmodule.mod
+	$(FC) -c $(FDFLAGS) $(SRC)/GeoChemSupprt.f90 $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o
 	mkdir -p $(OBJECTDIR); mv geochem.mod GeoChemSupprt.o $(OBJECTDIR)
 
 test: clean geotherm

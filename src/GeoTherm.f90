@@ -58,16 +58,22 @@
       use helpermodule
       use pressuresolver, PRESSUREFIELDNEW => NEW, &
       &PRESSUREFIELDDELETE => DELETE
-      use geochem
+      use geochem, MINERALDELETE => DELETE, &
+      & MINERALNEW => NEW
       type (modelfile), intent(in) :: modelfile_inst
       type (pressurefield) :: pressurefield_inst
       type (temperaturefield) :: temperaturefield_inst
-      double precision :: eclogite_content(n,m)
+      type (mineralphase) eclogite
+      !double precision :: eclogite_content(n,m)
       double precision :: t_ar(n,m)
       integer n,m,i,j
 
+      call MINERALNEW( eclogite,n,m )
       call PRESSUREFIELDNEW( pressurefield_inst,n,m )
       call NEW( temperaturefield_inst,n,m )
+
+      eclogite%free_energy = 326352.0
+      eclogite%diffusion_coefficient = 0.00002
 
       !reading netcdfs from files sepcified in the modelfile
       call get_netcdf1d(modelfile_inst%gtempfile, &
@@ -98,24 +104,23 @@
       
       call compute_pddensity(pressurefield_inst,modelfile_inst)
 
-      call compute_temp(temperaturefield_inst,modelfile_inst,pressurefield_inst)
+      call compute_temp(temperaturefield_inst,modelfile_inst, &
+      &pressurefield_inst)
 
       do j=1,m
         t_ar(:,j) = (/(i,i=1,n)/)*modelfile_inst%incriment(1)
       enddo
       
-      call compute_eclogite_content &
-      &(t_ar,temperaturefield_inst%temperature, &
-      &pressurefield_inst%pressure, &
-      &modelfile_inst%grainsize,eclogite_content,n,m)
+      call compute_eclogite_content(eclogite,t_ar, &
+      &temperaturefield_inst,pressurefield_inst,modelfile_inst)
       
       !writes output netcdf
       call write_netcdf &
-      &(modelfile_inst%outfile,temperaturefield_inst%temperature, &
-      &pressurefield_inst%density,pressurefield_inst%pressure, &
-      & eclogite_content,modelfile_inst%negativedown,n,m)
+      &(modelfile_inst,temperaturefield_inst, &
+      &pressurefield_inst,eclogite)
 
       call DELETE(temperaturefield_inst)
       call PRESSUREFIELDDELETE(pressurefield_inst)
+      call MINERALDELETE(eclogite)
 
       end subroutine

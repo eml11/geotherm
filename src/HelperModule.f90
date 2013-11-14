@@ -134,7 +134,7 @@
       use pressuresolver
       use geochem
       type (modelfile) model
-      type (tempreturefield) tfield
+      type (temperaturefield) tfield
       type (pressurefield) pfield
       type (mineralphase) minphase
       
@@ -172,16 +172,21 @@
 
       call check( nf90_enddef(ncid) )
 
-      if (negativedown.EQ.0) then
+      if (model%negativedown.EQ.0) then
         call check( nf90_put_var(ncid, dvarid, pfield%density) )
         call check( nf90_put_var(ncid, tvarid, tfield%temperature) )
         call check( nf90_put_var(ncid, pvarid, pfield%pressure) )
         call check( nf90_put_var(ncid, evarid, minphase%mineralpart) )
       else
-        call check( nf90_put_var(ncid, dvarid, pfield%density(:,m:1:-1)) )
-        call check( nf90_put_var(ncid, tvarid, tfield%tempurature(:,m:1:-1)) )
-        call check( nf90_put_var(ncid, pvarid, pfield%pressure(:,m:1:-1)) )
-        call check( nf90_put_var(ncid, evarid, minphase%mineralpart(:,m:1:-1)) )
+        call check( &
+        &nf90_put_var(ncid, dvarid, pfield%density(:,tfield%m:1:-1)) )
+        call check( &
+        &nf90_put_var(ncid, tvarid,tfield%temperature(:,tfield%m:1:-1)))
+        call check( &
+        &nf90_put_var(ncid, pvarid, pfield%pressure(:,tfield%m:1:-1)) )
+        call check( &
+        &nf90_put_var(ncid,evarid, &
+        &minphase%mineralpart(:,tfield%m:1:-1)))
       end if
 
       end subroutine
