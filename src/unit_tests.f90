@@ -30,6 +30,12 @@
       !incomplete - only testing calculus operations
       
       use equationpartsmodule
+      use pressuresolver, PRESSUREFIELDNEW => NEW, &
+      &PRESSUREFIELDDELETE => DELETE
+      use geochem, MINERALDELETE => DELETE, &
+      & MINERALNEW => NEW
+      use module_modelfile, MODULEDELETE => DELETE, &
+      & MODELNEW => NEW 
       use mathmodule
       implicit none
 
@@ -45,6 +51,9 @@
       double precision, dimension(m,n) :: reshaped_ar
       double precision :: ingrl_cnst
       double precision :: PI = 4*DATAN(1d0)
+      type (temperaturefield) tfield
+      type (modelfile) model
+      type (pressurefield) pfield
 
       double precision :: incriment(2) = (/0.001,0.001/)
 
@@ -58,6 +67,9 @@
       wrk_ar1 = gaussian_nnorm(t_ar,y_ar,2d0,n,m)
       wrk_ar2 = -t_ar*wrk_ar1/2
 
+      print *, "test"
+
+
       call array_diff2d(wrk_ar1,wrk_ar3,incriment(1),n,m)
 
       call test_output(wrk_ar2,wrk_ar3,n,m)
@@ -68,7 +80,6 @@
       call array_diff2dydim(wrk_ar1,wrk_ar3,incriment(1),n,m)
 
       call test_output(wrk_ar2,wrk_ar3,n,m)
-
 
       wrk_ar1 = gaussian_nnorm(t_ar,y_ar,2d0,n,m)
       wrk_ar2 = DEXP(-(y_ar*y_ar)/4d0) * &
@@ -83,7 +94,6 @@
 
       call test_output(wrk_ar2,wrk_ar3,n,m)
 
-
       wrk_ar1 = gaussian_nnorm(t_ar,y_ar,2d0,n,m)
       wrk_ar2 = DEXP(-(t_ar*t_ar)/4d0) * &
       & DSQRT(PI)*DERF(y_ar/2d0)
@@ -97,16 +107,25 @@
 
       call test_output(wrk_ar2,wrk_ar3,n,m)
 
+      print *, "test"
 
-      wrk_ar1 = gaussian_nnorm(t_ar,y_ar*0,2d0,n,m)
-      wrk_ar2 = gaussian_nnorm(t_ar,y_ar*0,3d0,n,m)
-      wrk_ar3 = gaussian_nnorm(t_ar,y_ar*0,5d0,n,m)
+      call NEW( tfield,n,m )
+      call MODELNEW( model,n,m )
+      call PRESSUREFIELDNEW( pfield,n,m ) 
+
+      model%gtemp = gaussian_nnorm(t_ar,y_ar*0,2d0,n,m)
+      model%gqflux = gaussian_nnorm(t_ar,y_ar*0,3d0,n,m)
+      model%thermalconductivity = gaussian_nnorm(t_ar,y_ar*0,5d0,n,m)
       wrk_ar4 = (-t_ar*wrk_ar1*wrk_ar3)/(wrk_ar2*2)
 
-      call compute_bdashval &
-      &(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
+      !call compute_bdashval(tfield,model)
+ 
+      !add test routine to each file
 
-      call test_output(wrk_ar4,wrk_ar5,n,m)
+      !call compute_bdashval &
+      !&(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
+
+      !call test_output(wrk_ar4,wrk_ar5,n,m)
 
       wrk_ar1 = DEXP(-2d0*t_ar)
       wrk_ar2 = DEXP(-3d0*t_ar-3d0*y_ar)
@@ -114,15 +133,15 @@
       wrk_ar4 = DEXP(2*(t_ar+y_ar))/2d0 - t_ar*DEXP(2*y_ar) - &
       &DEXP(3*t_ar+5*y_ar)/5d0 + DEXP(t_ar+5*y_ar)
 
-      call compute_exponentintegral &
-      &(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
+      !call compute_exponentintegral &
+      !&(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
 
       !do i=1,n
       !  wrk_ar4(i,:) = wrk_ar4(i,:)-wrk_ar4(3,:)
       !  wrk_ar5(i,:) = wrk_ar5(i,:)-wrk_ar5(3,:)
       !enddo
 
-      call test_output(wrk_ar4,wrk_ar5,n,m)
+      !call test_output(wrk_ar4,wrk_ar5,n,m)
 
       !print *, ABS((wrk_ar4-wrk_ar5)/wrk_ar4)
 
@@ -130,10 +149,13 @@
       wrk_ar5 = (wrk_ar2*wrk_ar3*wrk_ar4)/(y_ar*(-1/3.0-0.2-1/7.0)) + &
       &(wrk_ar1*wrk_ar2*wrk_ar3*wrk_ar4)/(t_ar*(-1/3.0-0.2-1/7.0-0.5))
 
-      call compute_init_inerintegral &
-      &(wrk_ar2,wrk_ar1,wrk_ar3,wrk_ar4,wrk_ar6,incriment,n,m)
+      !call compute_init_inerintegral &
+      !&(wrk_ar2,wrk_ar1,wrk_ar3,wrk_ar4,wrk_ar6,incriment,n,m)
 
-      call test_output(wrk_ar5,wrk_ar6,n,m)
+      !call test_output(wrk_ar5,wrk_ar6,n,m)
+      call DELETE( tfield )
+      call MODELDELETE( model )
+      call PRESSUREFIELDDELETE( pfield )
 
       end program
 

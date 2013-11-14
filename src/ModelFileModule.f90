@@ -118,7 +118,23 @@
       allocate ( this%grainsize(this%tdim, this%ydim) )
 
       end subroutine
-      
+     
+      subroutine new(this,n,m)
+      type (modelfile) this
+      integer n,m
+
+      allocate ( this%velocity(n,m) )
+      allocate ( this%density(n,m) )
+      allocate ( this%heatproduction(n,m) )
+      allocate ( this%heatcapcity(n,m) )
+      allocate ( this%gtemp(n,m) )
+      allocate ( this%gqflux(n,m) )
+      allocate ( this%thermalconductivity(n,m) )
+      allocate ( this%bulkmodulus(n,m) )
+      allocate ( this%grainsize(n,m) )
+
+      end subroutine
+ 
       subroutine delete(this) 
       type (modelfile) this
       
@@ -133,5 +149,5 @@
       deallocate ( this%grainsize )
 
       end subroutine
-      
+     
       end module
