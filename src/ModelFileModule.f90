@@ -74,6 +74,21 @@
       READ(1,*) this%ydim, this%tdim
       this%negativedown = 0
 
+      do while (bool.EQ.1)
+        READ(1,*) modelfinput
+        if (modelfinput.EQ."Domain") then
+
+        else if (modelfinput.EQ."Mineral") then
+
+        else if (modelfinput.EQ."Output") then
+
+        else if (modelfinput(1).EQ."!") then
+          continue
+        else if (modelfinput.EQ."End") then
+          bool = 0
+        end if
+      enddo
+
       do while (bool .EQ. 1)
         READ(1,*) typinput, modelfinput
         if (typinput.EQ."E") then
