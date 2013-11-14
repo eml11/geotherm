@@ -137,17 +137,9 @@
       type (temperaturefield) tfield
       type (pressurefield) pfield
       type (mineralphase) minphase
-      
-      !character (len = *) :: filename
-      !double precision :: temp_ar(n,m)
-      !double precision :: density_ar(n,m)
-      !double precision :: pressure_ar(n,m)
-      !double precision :: ecologite_ar(n,m)
 
       integer :: ncid, tvarid, pvarid, dvarid, evarid, dimids(2)
       integer :: x_dimid, y_dimid
-      !integer :: negativedown
-      !integer :: n,m,retval
       
       call check( nf90_create(model%outfile, NF90_CLOBBER, ncid) )
 
@@ -155,8 +147,6 @@
       call check( nf90_def_dim(ncid, "y", tfield%m, y_dimid) )
       
       dimids =  (/ x_dimid, y_dimid /)
-
-      !change this to pass in derived type at some point
 
       call check( nf90_def_var &
       &(ncid, "Temperature", NF90_DOUBLE, dimids, tvarid) )
