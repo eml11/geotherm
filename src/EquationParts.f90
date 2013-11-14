@@ -126,12 +126,12 @@
       &model%thermalconductivity/(model%heatcapcity*pfield%density)
 
       call array_integral2d &
-      &((this%bderivative*model%velocity)/kappa_ar, &
+      &((this%bderivative*(model%velocity/10))/kappa_ar, &
       &v_tintegral,model%incriment(1),this%n,this%m)
       call array_integral2d &
       ((this%bderivative**2d0)/kappa_ar, &
       &b_tintegral,model%incriment(1),this%n,this%m)
-      call array_integral2dydim(model%velocity/kappa_ar, &
+      call array_integral2dydim((model%velocity/10.0)/kappa_ar, &
       &v_yintegral,model%incriment(2),this%n,this%m)
       call array_integral2dydim(this%bderivative/kappa_ar, &
       &b_yintegral,model%incriment(2),this%n,this%m) 

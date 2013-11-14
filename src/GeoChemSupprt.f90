@@ -39,7 +39,7 @@
       double precision :: eclogitephase(n,m)
       integer n,m
 
-      eclogitephase = 0d13*pressure - 97d5
+      eclogitephase = 0.13d0*pressure - 97.5d0
 
       end function 
 
