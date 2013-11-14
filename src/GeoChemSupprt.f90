@@ -28,7 +28,33 @@
       module geochem
       implicit none
 
+      type mineralphase
+      
+      integer n,m
+      double precision, allocateable :: mineralpart
+      double precision :: free_energy
+      double precision :: diffusion_coefficient
+      
+      end type
+
       contains
+      
+      subroutine NEW(this,n,m)
+      integer n,m
+      type (mineralphase) this
+      
+      this%n = n
+      this%m = m
+      allocate( mineralpart(n,m) )
+      
+      end subroutine
+  
+      subroutine DELETE(this)
+      type (mineralphase) this
+      
+      deallocate( mineralpart )
+      
+      end subroutine
   
       !> Returns Temperature of eclogite Clapeyron
       !! slope for a given pressure
