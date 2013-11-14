@@ -66,22 +66,57 @@
       subroutine READMDLF(this,filename)
       character (len = *) ::filename
       type (modelfile) this
-      integer :: bool = 1      
+      integer :: bool = 1
+      integer :: booltwo = 1
+      integer :: boolthree = 1      
       character (len = 1) :: typinput
       character (len = 256) :: modelfinput
+      integer ID
+      double precision part
 
       OPEN(1, file = filename)
       READ(1,*) this%ydim, this%tdim
       this%negativedown = 0
 
       do while (bool.EQ.1)
+        booltwo = 1
         READ(1,*) modelfinput
         if (modelfinput.EQ."Domain") then
-
+          do while (booltwo.EQ.1)
+            READ(1,*) modelfinput
+            if (modelfinput.EQ."File") then
+              READ(1,*) modelfinput
+            else if (modelfinput.EQ."Region") then
+              do while (boolthree.EQ.1)
+                READ(1,*) modelfinput
+                if () then
+                  READ(1,*) ID,part
+                else if (modelfinput.EQ."EndRegion") then
+                  boolthree = 0
+                end if
+              enddo
+            else if (modelfinput.EQ."EndDomain") then
+              booltwo = 0
+            end if
+          enddo
         else if (modelfinput.EQ."Mineral") then
+          do while (booltwo.EQ.1) then
+            READ(1,*) modelfinput
+            if () then
 
+            else if (modelfinput.EQ."EndMineral") then
+              booltwo = 0
+            end if
+          enddo
         else if (modelfinput.EQ."Output") then
+          do while (booltwo.EQ.1)
+            READ(1,*) modelfinput
+            if () then
 
+            else if (modelfinput.EQ."EndOutput") then
+              booltwo = 0
+            end if
+          enddo
         else if (modelfinput(1).EQ."!") then
           continue
         else if (modelfinput.EQ."End") then
