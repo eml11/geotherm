@@ -84,8 +84,6 @@
       !! total rock
       subroutine compute_reactionprogress &
       &(this,t_ar,tfield,model)
-      !&(t_ar,temperature,diffusion_coeficient,grain_size,free_energy, &
-      !&retrn_ar,n,m)
       use equationpartsmodule
       use module_modelfile
 
@@ -93,15 +91,9 @@
       type (modelfile) model
       type (temperaturefield) tfield
 
-      !double precision :: temperature(n,m)
-      !double precision :: diffusion_coeficient
-      !double precision :: grain_size(n,m)
-      !double precision :: free_energy
-      !double precision :: retrn_ar(n,m)
       double precision :: t_ar(this%n,this%m)
       double precision :: caracteristic_time_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 
-      !integer n,m
 
       caracteristic_time_ar = (model%grainsize**2) * &
       &DEXP(this%free_energy/(gas_const*tfield%temperature)) / &
@@ -122,7 +114,6 @@
       !! total rock
       subroutine compute_eclogite_content &
       &(this,t_ar,tfield,pfield,model)
-      !&(t_ar,temperature,pressure,grain_size,retrn_ar,n,m)
       use equationpartsmodule
       use module_modelfile
       use pressuresolver
@@ -132,19 +123,8 @@
       type (pressurefield) pfield
       type (temperaturefield) tfield
 
-      !double precision :: temperature(n,m)
-      !double precision :: pressure(n,m)
-      !double precision :: diffusion_coeficient
-      !double precision :: grain_size(n,m)
-      !double precision :: free_energy
-      !double precision :: retrn_ar(n,m)
       double precision :: t_ar(this%n,this%m)
-      !double precision :: caracteristic_time_ar(n,m)
       double precision, parameter :: gas_const = 8.3144621 !tempory
-      !integer n,m
-
-      !free_energy = 326352.0
-      !diffusion_coeficient = 0.00002
 
       call compute_reactionprogress(this,t_ar,tfield,model)
 
