@@ -3,6 +3,7 @@ SRCBNDFL=$(PWD)/src_boundryfiles
 RESULTS=$(PWD)/results
 GEOTHERM=$(PWD)/../bin/geotherm
 UNITTEST=$(PWD)/bin/unittests
+BIN=$(PWD)/bin
 
 test: test1 test2 test3 unittest
 
@@ -20,4 +21,6 @@ test3: $(GEOTHERM) exponent_heatproduct_tindipendent.txt
 
 clean:
 	rm -f $(RESULTS)/*.nc
+	#rm -f $(UNITTEST)
+	#rmdir $(BIN)
 	#rmdir results

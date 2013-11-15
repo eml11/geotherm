@@ -28,7 +28,8 @@
       program GEOTHERM
       use helpermodule
       use mathmodule
-      use module_modelfile, MODULEDELETE => DELETE
+      use module_modelfile, MODELDELETE => DELETE, &
+      & MINERALNEW => NEW
       implicit none
 
       type (modelfile) modelfile_inst
@@ -47,13 +48,14 @@
       call compute_geotherm &
       &(modelfile_inst,modelfile_inst%tdim,modelfile_inst%ydim)
 
-      call MODULEDELETE(modelfile_inst)
+      call MODELDELETE(modelfile_inst)
 
       end program
 
       subroutine compute_geotherm(modelfile_inst,n,m)
       use equationpartsmodule
-      use module_modelfile, MODULEDELETE => DELETE 
+      use module_modelfile, MODELDELETE => DELETE, &
+      MODELNEW => NEW 
       use mathmodule
       use helpermodule
       use pressuresolver, PRESSUREFIELDNEW => NEW, &
