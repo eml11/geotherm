@@ -21,6 +21,6 @@ test3: $(GEOTHERM) exponent_heatproduct_tindipendent.txt
 
 clean:
 	rm -f $(RESULTS)/*.nc
-	rm -f $(UNITTEST)
-	rmdir $(BIN)
+	#rm -f $(UNITTEST)
+	#rmdir $(BIN)
 	#rmdir results

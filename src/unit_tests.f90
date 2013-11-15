@@ -34,7 +34,7 @@
       &PRESSUREFIELDDELETE => DELETE
       use geochem, MINERALDELETE => DELETE, &
       & MINERALNEW => NEW
-      use module_modelfile, MODULEDELETE => DELETE, &
+      use module_modelfile, MODELDELETE => DELETE, &
       & MODELNEW => NEW 
       use mathmodule
       implicit none
