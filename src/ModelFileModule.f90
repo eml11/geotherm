@@ -44,15 +44,15 @@
         integer :: negativedown
         integer :: ydim, tdim
         double precision :: incriment(2)
-        double precision, allocatable :: velocity(:,:)
-        double precision, allocatable :: density(:,:)
-        double precision, allocatable :: heatproduction(:,:)
-        double precision, allocatable :: heatcapcity(:,:)
-        double precision, allocatable :: gtemp(:,:)
-        double precision, allocatable :: gqflux(:,:)
-        double precision, allocatable :: thermalconductivity(:,:)
-        double precision, allocatable :: bulkmodulus(:,:)
-        double precision, allocatable :: grainsize(:,:) 
+        double precision, allocatable :: velocity(:,:)!Domain
+        double precision, allocatable :: density(:,:)!mineral
+        double precision, allocatable :: heatproduction(:,:)!mineral
+        double precision, allocatable :: heatcapcity(:,:)!mineral
+        double precision, allocatable :: gtemp(:,:)!Domain
+        double precision, allocatable :: gqflux(:,:)!Domain
+        double precision, allocatable :: thermalconductivity(:,:)!mineral
+        double precision, allocatable :: bulkmodulus(:,:)!mineral
+        double precision, allocatable :: grainsize(:,:) !mineral
       end type
 
       contains 
@@ -71,7 +71,7 @@
       integer :: boolthree = 1      
       character (len = 1) :: typinput
       character (len = 256) :: modelfinput
-      integer ID
+      integer ID, num, i
       double precision part
 
       OPEN(1, file = filename)
@@ -86,14 +86,26 @@
             READ(1,*) modelfinput
             if (modelfinput.EQ."File") then
               READ(1,*) modelfinput
-            else if (modelfinput.EQ."Region") then
+            if (modelfinput.EQ."Velocity") then
+              READ(1,*) modelfinput
+            if (modelfinput.EQ."Boundry") then
+              boolthree = 1
               do while (boolthree.EQ.1)
                 READ(1,*) modelfinput
-                if () then
-                  READ(1,*) ID,part
-                else if (modelfinput.EQ."EndRegion") then
+                if (modelfinput.EQ."Temperature") then
+                  READ(1,*) modelfinput
+                else if (modelfinput.EQ."HeatFlux") then
+                  READ(1,*) modelfinput
+                else if (modelfinput.EQ."EndBoundry") then
                   boolthree = 0
                 end if
+              enddo
+            else if (modelfinput.EQ."Region") then
+              do while (boolthree.EQ.1)
+                READ(1,*) num
+                do i=1,num
+                  READ(1,*) ID,part
+                enddo
               enddo
             else if (modelfinput.EQ."EndDomain") then
               booltwo = 0
@@ -102,8 +114,38 @@
         else if (modelfinput.EQ."Mineral") then
           do while (booltwo.EQ.1) then
             READ(1,*) modelfinput
-            if () then
-
+            if (modelfinput.EQ."ID") then
+              READ(1,*) ID
+            else if (modelfinput.EQ."Density") then
+              READ(1,*) typinput, modelfinput
+              if (typinput.EQ."D") then
+                READ(modelfinput,*) part
+              end if
+            else if (modelfinput.EQ."HeatProduction") then
+              READ(1,*) typinput, modelfinput
+              if (typinput.EQ."D") then
+                READ(modelfinput,*) part
+              end if
+            else if (modelfinput.EQ."HeatCapcity") then
+              READ(1,*) typinput, modelfinput
+              if (typinput.EQ."D") then
+                READ(modelfinput,*) part
+              end if
+            else if (modelfinput.EQ."ThermalConductivity") then
+              READ(1,*) typinput, modelfinput
+              if (typinput.EQ."D") then
+                READ(modelfinput,*) part
+              end if
+            else if (modelfinput.EQ."BulkModulus") then
+              READ(1,*) typinput, modelfinput
+              if (typinput.EQ."D") then
+                READ(modelfinput,*) part
+              end if
+            else if (modelfinput.EQ."GrainSize") then
+              READ(1,*) typinput, modelfinput
+              if (typinput.EQ."D") then
+                READ(modelfinput,*) part
+              end if
             else if (modelfinput.EQ."EndMineral") then
               booltwo = 0
             end if
@@ -111,8 +153,10 @@
         else if (modelfinput.EQ."Output") then
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
-            if () then
-
+            if (modelfinput.EQ."File") then
+              READ(1,*) this%outfile
+            else if (modelfinput.EQ."NegativeDown") then 
+              this%negativedown = 1
             else if (modelfinput.EQ."EndOutput") then
               booltwo = 0
             end if
@@ -124,40 +168,6 @@
         end if
       enddo
 
-      do while (bool .EQ. 1)
-        READ(1,*) typinput, modelfinput
-        if (typinput.EQ."E") then
-          bool = 0
-        else if (typinput.EQ."V") then
-          this%velocitynetcdf = modelfinput
-        else if (typinput.EQ."D") then
-          this%densitynetcdf = modelfinput
-        else if (typinput.EQ."K") then
-          this%thermlconductnetcdf = modelfinput
-        else if (typinput.EQ."H") then
-          this%heatproductnetcdf = modelfinput
-        else if (typinput.EQ."C") then
-          this%heatcapcnetcdf = modelfinput
-        else if (typinput.EQ."T") then
-          this%gtempfile = modelfinput
-        else if (typinput.EQ."Q") then
-          this%gqfluxfile = modelfinput
-        else if (typinput.EQ."O") then
-          this%outfile = modelfinput
-        else if (typinput.EQ."B") then
-          this%incompresibilitynetcdf = modelfinput
-        else if (typinput.EQ."R") then
-          this%negativedown = 1
-        else if (typinput.EQ."G") then
-          this%grainsizenetcdf = modelfinput
-        else if (typinput.EQ."!") then
-          continue
-        else if (typinput.EQ."X") then
-          this%gqxfluxfile = modelfinput
-        end if
-      enddo
-
-      allocate ( this%velocity(this%tdim, this%ydim) )
       allocate ( this%density(this%tdim, this%ydim) )
       allocate ( this%heatproduction(this%tdim, this%ydim) )
       allocate ( this%heatcapcity(this%tdim, this%ydim) )
