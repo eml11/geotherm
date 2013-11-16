@@ -86,6 +86,8 @@
       allocate( minerals(nominerals) )
       !allocate( mineralstempar(nominerals) )
 
+      !for region use pointer to 2*n array
+
       do while (bool.EQ.1)
         booltwo = 1
         READ(1,*) modelfinput
@@ -105,22 +107,22 @@
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
                     where (1.EQ.1)
-                      minerals(nominerals)%gtemp = part
+                      domain%gtemp = part
                     end where
                   else
                     call get_netcdf1d(modelfinput, &
-                    &minerals(nominerals)%gtemp,this%ydim, this%tdim)
+                    &domain%gtemp,this%ydim, this%tdim)
                   end if
                 else if (modelfinput.EQ."HeatFlux") then
                   READ(1,*) modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
                     where (1.EQ.1)
-                      minerals(nominerals)%gqflux = part
+                      domain%gqflux = part
                     end where
                   else
                     call get_netcdf1d(modelfinput, &
-                    &minerals(nominerals)%gqflux,this%ydim, this%tdim)
+                    &domain%gqflux,this%ydim, this%tdim)
                   end if
                 else if (modelfinput.EQ."EndBoundry") then
                   boolthree = 0
