@@ -32,8 +32,14 @@
       
       integer n,m
       double precision, allocatable :: mineralpart(:,:)
-      double precision :: free_energy
-      double precision :: diffusion_coefficient      
+      double precision, allocatable :: free_energy
+      double precision, allocatable :: diffusion_coefficient      
+      double precision, allocatable :: density(:,:)
+      double precision, allocatable :: heatproduction(:,:) 
+      double precision, allocatable :: heatcapcity(:,:)
+      double precision, allocatable :: thermalconductivity(:,:)
+      double precision, allocatable :: bulkmodulus(:,:)
+      double precision, allocatable :: grainsize(:,:)
 
       end type
 
@@ -46,14 +52,26 @@
       this%n = n
       this%m = m
       allocate( this%mineralpart(n,m) )
-      
+      allocate( this%density(n,m) )      
+      allocate( this%heatproduction(n,m) )
+      allocate( this%heatcapcity(n,m) )
+      allocate( this%thermalconductivity(n,m) )
+      allocate( this%bulkmodulus(n,m) )
+      allocate( this%grainsize(n,m) )
+
       end subroutine
   
       subroutine DELETE(this)
       type (mineralphase) this
       
       deallocate( this%mineralpart )
-      
+      deallocate( this%density )  
+      deallocate( this%heatproduction )
+      deallocate( this%heatcapcity )
+      deallocate( this%thermalconductivity )
+      deallocate( this%bulkmodulus )
+      deallocate( this%grainsize )      
+
       end subroutine
   
       !> Returns Temperature of eclogite Clapeyron

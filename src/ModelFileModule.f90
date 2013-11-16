@@ -71,12 +71,20 @@
       integer :: boolthree = 1      
       character (len = 1) :: typinput
       character (len = 256) :: modelfinput
-      integer ID, num, i
+      integer ID, num, i, nominerals
       double precision part
 
       OPEN(1, file = filename)
       READ(1,*) this%ydim, this%tdim
       this%negativedown = 0
+
+      type (mineralphase), allocatable minerals(:)
+      type (mineralphase), allocatable mineralstempar(:)
+      
+      nominerals = 0
+
+      allocate( minerals(nominerals) )
+      !allocate( mineralstempar(nominerals) )
 
       do while (bool.EQ.1)
         booltwo = 1
@@ -94,8 +102,26 @@
                 READ(1,*) modelfinput
                 if (modelfinput.EQ."Temperature") then
                   READ(1,*) modelfinput
+                  if (typinput.EQ."D") then
+                    READ(modelfinput,*) part
+                    where (1.EQ.1)
+                      minerals(nominerals)%gtemp = part
+                    end where
+                  else
+                    call get_netcdf1d(modelfinput, &
+                    &minerals(nominerals)%gtemp,this%ydim, this%tdim)
+                  end if
                 else if (modelfinput.EQ."HeatFlux") then
                   READ(1,*) modelfinput
+                  if (typinput.EQ."D") then
+                    READ(modelfinput,*) part
+                    where (1.EQ.1)
+                      minerals(nominerals)%gqflux = part
+                    end where
+                  else
+                    call get_netcdf1d(modelfinput, &
+                    &minerals(nominerals)%gqflux,this%ydim, this%tdim)
+                  end if
                 else if (modelfinput.EQ."EndBoundry") then
                   boolthree = 0
                 end if
@@ -112,6 +138,12 @@
             end if
           enddo
         else if (modelfinput.EQ."Mineral") then
+          nominerals = nominerals + 1
+          allocate( mineralstempar(nominerals)  )          
+          mineralstempar(:nominerals-1) = minerals
+          deallocate( minerals )
+          allocate( minerals(nominerals)  )
+          minerals = mineralstempar
           do while (booltwo.EQ.1) then
             READ(1,*) modelfinput
             if (modelfinput.EQ."ID") then
@@ -119,32 +151,68 @@
             else if (modelfinput.EQ."Density") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
-                READ(modelfinput,*) part
+                READ(modelfinput,*) part 
+                where (1.EQ.1)
+                  minerals(nominerals)%density = part
+                end where
+              else
+                call get_netcdf(modelfinput, &
+                &minerals(nominerals)%density)
               end if
             else if (modelfinput.EQ."HeatProduction") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                where (1.EQ.1)
+                  minerals(nominerals)%heatproduction = part
+                end where
+              else
+                call get_netcdf(modelfinput, &
+                &minerals(nominerals)%heatproduction)
               end if
             else if (modelfinput.EQ."HeatCapcity") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                where (1.EQ.1) 
+                  minerals(nominerals)%heatcapcity = part
+                end where
+              else
+                call get_netcdf(modelfinput, &
+                &minerals(nominerals)%heatcapcity)
               end if
             else if (modelfinput.EQ."ThermalConductivity") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                where (1.EQ.1)
+                  minerals(nominerals)%thermalconductivity = part
+                end where
+              else
+                call get_netcdf(modelfinput, &
+                &minerals(nominerals)%thermalconductivity)
               end if
             else if (modelfinput.EQ."BulkModulus") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                where (1.EQ.1)
+                  minerals(nominerals)%bulkmodulus = part
+                where (1.EQ.1)
+              else
+                call get_netcdf(modelfinput, &
+                &minerals(nominerals)%bulkmodulus)
               end if
             else if (modelfinput.EQ."GrainSize") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                where (1.EQ.1)
+                  minerals(nominerals)%grainsize = part
+                end where
+              else
+                call get_netcdf(modelfinput, &
+                &minerals(nominerals)%grainsize)
               end if
             else if (modelfinput.EQ."EndMineral") then
               booltwo = 0
