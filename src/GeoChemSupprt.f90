@@ -30,16 +30,17 @@
 
       type mineralphase
       
-      integer n,m
-      double precision, allocatable :: mineralpart(:,:)
-      double precision, allocatable :: free_energy
-      double precision, allocatable :: diffusion_coefficient      
-      double precision, allocatable :: density(:,:)
-      double precision, allocatable :: heatproduction(:,:) 
-      double precision, allocatable :: heatcapcity(:,:)
-      double precision, allocatable :: thermalconductivity(:,:)
-      double precision, allocatable :: bulkmodulus(:,:)
-      double precision, allocatable :: grainsize(:,:)
+        integer n,m
+        integer ID
+        double precision, allocatable :: mineralpart(:,:)
+        double precision, allocatable :: free_energy
+        double precision, allocatable :: diffusion_coefficient      
+        double precision, allocatable :: density(:,:)
+        double precision, allocatable :: heatproduction(:,:) 
+        double precision, allocatable :: heatcapcity(:,:)
+        double precision, allocatable :: thermalconductivity(:,:)
+        double precision, allocatable :: bulkmodulus(:,:)
+        double precision, allocatable :: grainsize(:,:)
 
       end type
 

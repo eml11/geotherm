@@ -119,11 +119,9 @@
       double precision, dimension(this%n,this%m) :: b_tintegral
       double precision, dimension(this%n,this%m) :: v_yintegral
       double precision, dimension(this%n,this%m) :: b_yintegral     
-
-      !velocity_ar = velocity_ar/1.0
  
       kappa_ar = &
-      &model%thermalconductivity/(model%heatcapcity*pfield%density)
+      &model%thermalconductivity/(0.2*model%heatcapcity*pfield%density)
 
       call array_integral2d &
       &((this%bderivative*model%velocity)/kappa_ar, &

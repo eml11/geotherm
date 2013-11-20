@@ -28,16 +28,193 @@
 
       module modeldomainmodule
       !use netcdf
+      use geochem, MINERALDELETE => DELETE, &
+      & NEWMINERAL => NEW
       implicit none
+
+      !should have seperate module
+      type modelregion
+
+        integer ID
+        integer minerals
+        integer, allocatable :: mineralids(:)
+        double precision, allocatable :: mineralparts(:)
+
+        integer, private :: indxmn = 1
+
+      endtype
 
       type modeldomain
         integer :: negativedown
         integer :: n,m
+        integer :: regions
+        integer, allocatable :: geometry(:,:)
         !change to integer if possible
-        double precision, allocatable, target :: IDS
-        double precision, pointer, allocatable :: regionpointers(:,2)
+        double precision, allocatable :: gtemp(:,:)
+        double precision, allocatable :: gqflux(:,:)
+        double precision, allocatable :: velocity(:,:)
+        double precision, allocatable :: density(:,:)
+        double precision, allocatable :: heatproduction(:,:)
+        double precision, allocatable :: heatcapcity(:,:)
+        double precision, allocatable :: thermalconductivity(:,:)
+        double precision, allocatable :: bulkmodulus(:,:)
+        double precision, allocatable :: grainsize(:,:)
+        !double precision, allocatable, target :: IDS(:)
+        !double precision, pointer :: regionpointers(:,:)
+        type (modelregion), allocatable :: regionarray(:)      
+        type (mineralphase), allocatable :: mineralarray(:) 
+
+        integer, private :: indxrg = 1
+
       end type
 
       contains
       
+      subroutine NEW(this,regions,n,m)
+      type (modeldomain) this
+      integer regions
+      integer n,m      
+
+      this%regions = regions
+      allocate( this%geometry(n,m) )      
+
+      allocate( this%gtemp(n,m) ) 
+      allocate( this%gqflux(n,m) )
+
+      allocate( this%velocity(n,m) )
+      allocate( this%density(n,m) )
+      allocate( this%heatproduction(n,m) )
+      allocate( this%heatcapcity(n,m) )
+      allocate( this%thermalconductivity(n,m) )
+      allocate( this%bulkmodulus(n,m) )
+      allocate( this%grainsize(n,m) )
+
+      allocate( this%regionarray(regions) )
+
+      end subroutine
+
+      subroutine DELETE(this)
+      type (modeldomain) this
+      deallocate( this%gtemp )
+      deallocate( this%gqflux )
+
+      deallocate( this%velocity )
+      deallocate( this%density )
+      deallocate( this%heatproduction )
+      deallocate( this%heatcapcity )
+      deallocate( this%thermalconductivity )
+      deallocate( this%bulkmodulus )
+      deallocate( this%grainsize )
+
+      deallocate( this%regionarray )
+
+      end subroutine
+
+      subroutine NEWREGION(this,minerals)
+      type (modelregion) this
+      integer minerals      
+
+      this%minerals = minerals
+      allocate( this%mineralids(minerals) )
+      allocate( this%mineralparts(minerals) )
+
+      end subroutine
+
+      subroutine DELETEREGION(this)
+      type (modelregion) this
+
+      deallocate( this%mineralids )
+      deallocate( this%mineralparts )
+
+      end subroutine
+
+      subroutine addregion(this,inid,arraysize)
+      type (modeldomain) this
+      type (modelregion) region
+      integer, target :: inid
+      integer arraysize
+      
+      call NEWREGION(region,arraysize)
+      region%ID = inid
+      this%regionarray(this%indxrg) = region
+
+      this%indxrg=this%indxrg+1
+
+      end subroutine
+
+      subroutine addmineral(this,mineralid,part)
+      type (modeldomain) this
+      type (modelregion) region
+      integer mineralid
+      double precision part
+
+      region = this%regionarray(this%indxrg-1)
+
+      region%mineralids(region%indxmn) = mineralid
+      region%mineralparts(region%indxmn) = part
+
+      region%indxmn = &
+      region%indxmn + 1
+
+      end subroutine
+
+      subroutine setminerals(this,in_mineralarray)
+      type (modeldomain) this
+      type (mineralphase) in_mineralarray(:)
+      integer minerals
+       
+      minerals = SIZE(in_mineralarray)
+      allocate( this%mineralarray(minerals) )
+      this%mineralarray = in_mineralarray
+
+      end subroutine
+
+      subroutine UPDATE(this)
+      type (modeldomain) this
+      integer i,j   
+      integer minerals   
+      double precision, allocatable :: part(:)
+
+      minerals = SIZE(this%mineralarray)
+      allocate( part(minerals) )
+
+      this%density = this%geometry*0d0
+      this%heatproduction = this%geometry*0d0
+      this%heatcapcity = this%geometry*0d0
+      this%thermalconductivity = this%geometry*0d0
+      this%bulkmodulus = this%geometry*0d0
+      this%grainsize = this%geometry*0d0
+
+      !should really be done with pointers
+
+      do i=1,this%regions
+          do j=1,minerals
+            where &
+          &(this%mineralarray(j)%ID.EQ.this%regionarray(i)%mineralids)
+              part = this%regionarray(i)%mineralparts
+            elsewhere
+              part = 0d0
+            end where
+
+            where (this%geometry.EQ.this%regionarray(i)%ID)
+
+              this%density = this%density + &
+              &this%mineralarray(j)%density*part(1) 
+              this%heatproduction = this%density + &
+              &this%mineralarray(j)%density*part(1)
+              this%heatcapcity = this%density + &
+              &this%mineralarray(j)%density*part(1)
+              this%thermalconductivity = this%density + &
+              &this%mineralarray(j)%density*part(1)
+              this%bulkmodulus = this%density + &
+              &this%mineralarray(j)%density*part(1)
+              this%grainsize = this%density + &
+              &this%mineralarray(j)%density*part(1)
+
+            end where
+          enddo
+      enddo
+
+      end subroutine
+
       end module

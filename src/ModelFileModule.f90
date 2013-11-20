@@ -27,6 +27,11 @@
 
       module module_MODELFILE
       !use netcdf
+      use geochem, MINERALDELETE => DELETE, &
+      & NEWMINERAL => NEW 
+      use modeldomainmodule, NEWDOMAIN => NEW, &
+      & DELETEDOMAIN => DELETE
+
       implicit none
 
       type modelfile
@@ -44,15 +49,15 @@
         integer :: negativedown
         integer :: ydim, tdim
         double precision :: incriment(2)
-        double precision, allocatable :: velocity(:,:)!Domain
-        double precision, allocatable :: density(:,:)!mineral
-        double precision, allocatable :: heatproduction(:,:)!mineral
-        double precision, allocatable :: heatcapcity(:,:)!mineral
-        double precision, allocatable :: gtemp(:,:)!Domain
-        double precision, allocatable :: gqflux(:,:)!Domain
-        double precision, allocatable :: thermalconductivity(:,:)!mineral
-        double precision, allocatable :: bulkmodulus(:,:)!mineral
-        double precision, allocatable :: grainsize(:,:) !mineral
+       ! double precision, allocatable :: velocity(:,:)!Domain
+        !double precision, allocatable :: density(:,:)!mineral
+        !double precision, allocatable :: heatproduction(:,:)!mineral
+        !double precision, allocatable :: heatcapcity(:,:)!mineral
+        !double precision, allocatable :: gtemp(:,:)!Domain
+        !double precision, allocatable :: gqflux(:,:)!Domain
+        !double precision, allocatable :: thermalconductivity(:,:)!mineral
+        !double precision, allocatable :: bulkmodulus(:,:)!mineral
+        !double precision, allocatable :: grainsize(:,:) !mineral
       end type
 
       contains 
@@ -64,6 +69,7 @@
       !! @param filename name of file 
       !! specifying model parameters
       subroutine READMDLF(this,filename)
+      
       character (len = *) ::filename
       type (modelfile) this
       integer :: bool = 1
@@ -73,18 +79,19 @@
       character (len = 256) :: modelfinput
       integer ID, num, i, nominerals
       double precision part
+      type (mineralphase), allocatable :: minerals(:)
+      type (mineralphase), allocatable :: mineralstempar(:)
+      type (modeldomain) domain
 
       OPEN(1, file = filename)
       READ(1,*) this%ydim, this%tdim
-      this%negativedown = 0
+      this%negativedown = 0      
 
-      type (mineralphase), allocatable minerals(:)
-      type (mineralphase), allocatable mineralstempar(:)
-      
       nominerals = 0
 
       allocate( minerals(nominerals) )
       !allocate( mineralstempar(nominerals) )
+     ! NEWDOMAIN(domain,this%ydim,this%tdim)
 
       !for region use pointer to 2*n array
 
@@ -92,13 +99,15 @@
         booltwo = 1
         READ(1,*) modelfinput
         if (modelfinput.EQ."Domain") then
+          READ(1,*) ID
+          call NEWDOMAIN(domain,ID,this%ydim,this%tdim)
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
             if (modelfinput.EQ."File") then
               READ(1,*) modelfinput
-            if (modelfinput.EQ."Velocity") then
+            else if (modelfinput.EQ."Velocity") then
               READ(1,*) modelfinput
-            if (modelfinput.EQ."Boundry") then
+            else if (modelfinput.EQ."Boundry") then
               boolthree = 1
               do while (boolthree.EQ.1)
                 READ(1,*) modelfinput
@@ -106,9 +115,7 @@
                   READ(1,*) modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
-                    where (1.EQ.1)
                       domain%gtemp = part
-                    end where
                   else
                     call get_netcdf1d(modelfinput, &
                     &domain%gtemp,this%ydim, this%tdim)
@@ -117,9 +124,7 @@
                   READ(1,*) modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
-                    where (1.EQ.1)
                       domain%gqflux = part
-                    end where
                   else
                     call get_netcdf1d(modelfinput, &
                     &domain%gqflux,this%ydim, this%tdim)
@@ -129,10 +134,13 @@
                 end if
               enddo
             else if (modelfinput.EQ."Region") then
+              READ(1,*) ID
               do while (boolthree.EQ.1)
                 READ(1,*) num
+                call addregion(domain,ID,num)
                 do i=1,num
                   READ(1,*) ID,part
+                  call addmineral(domain,ID,part)
                 enddo
               enddo
             else if (modelfinput.EQ."EndDomain") then
@@ -146,17 +154,15 @@
           deallocate( minerals )
           allocate( minerals(nominerals)  )
           minerals = mineralstempar
-          do while (booltwo.EQ.1) then
+          do while (booltwo.EQ.1)
             READ(1,*) modelfinput
             if (modelfinput.EQ."ID") then
               READ(1,*) ID
             else if (modelfinput.EQ."Density") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
-                READ(modelfinput,*) part 
-                where (1.EQ.1)
-                  minerals(nominerals)%density = part
-                end where
+                READ(modelfinput,*) part
+                minerals(nominerals)%density = part
               else
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%density)
@@ -165,9 +171,7 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                where (1.EQ.1)
-                  minerals(nominerals)%heatproduction = part
-                end where
+                minerals(nominerals)%heatproduction = part
               else
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%heatproduction)
@@ -176,9 +180,7 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                where (1.EQ.1) 
                   minerals(nominerals)%heatcapcity = part
-                end where
               else
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%heatcapcity)
@@ -187,9 +189,7 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                where (1.EQ.1)
                   minerals(nominerals)%thermalconductivity = part
-                end where
               else
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%thermalconductivity)
@@ -198,9 +198,7 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                where (1.EQ.1)
                   minerals(nominerals)%bulkmodulus = part
-                where (1.EQ.1)
               else
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%bulkmodulus)
@@ -209,9 +207,7 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                where (1.EQ.1)
                   minerals(nominerals)%grainsize = part
-                end where
               else
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%grainsize)
@@ -231,53 +227,57 @@
               booltwo = 0
             end if
           enddo
-        else if (modelfinput(1).EQ."!") then
+        else if (modelfinput(1:2).EQ."!") then
           continue
         else if (modelfinput.EQ."End") then
           bool = 0
         end if
       enddo
 
-      allocate ( this%density(this%tdim, this%ydim) )
-      allocate ( this%heatproduction(this%tdim, this%ydim) )
-      allocate ( this%heatcapcity(this%tdim, this%ydim) )
-      allocate ( this%gtemp(this%tdim, this%ydim) )
-      allocate ( this%gqflux(this%tdim, this%ydim) )
-      allocate ( this%thermalconductivity(this%tdim, this%ydim) )
-      allocate ( this%bulkmodulus(this%tdim, this%ydim) )
-      allocate ( this%grainsize(this%tdim, this%ydim) )
+      call setminerals(domain,minerals)
+
+      !allocate ( this%density(this%tdim, this%ydim) )
+      !allocate ( this%heatproduction(this%tdim, this%ydim) )
+      !allocate ( this%heatcapcity(this%tdim, this%ydim) )
+      !allocate ( this%gtemp(this%tdim, this%ydim) )
+      !allocate ( this%gqflux(this%tdim, this%ydim) )
+      !allocate ( this%thermalconductivity(this%tdim, this%ydim) )
+      !allocate ( this%bulkmodulus(this%tdim, this%ydim) )
+      !allocate ( this%grainsize(this%tdim, this%ydim) )
 
       end subroutine
      
+      !end module
       subroutine new(this,n,m)
       type (modelfile) this
       integer n,m
 
-      allocate ( this%velocity(n,m) )
-      allocate ( this%density(n,m) )
-      allocate ( this%heatproduction(n,m) )
-      allocate ( this%heatcapcity(n,m) )
-      allocate ( this%gtemp(n,m) )
-      allocate ( this%gqflux(n,m) )
-      allocate ( this%thermalconductivity(n,m) )
-      allocate ( this%bulkmodulus(n,m) )
-      allocate ( this%grainsize(n,m) )
+      !allocate ( this%velocity(n,m) )
+      !allocate ( this%density(n,m) )
+      !allocate ( this%heatproduction(n,m) )
+      !allocate ( this%heatcapcity(n,m) )
+      !allocate ( this%gtemp(n,m) )
+      !allocate ( this%gqflux(n,m) )
+      !allocate ( this%thermalconductivity(n,m) )
+      !allocate ( this%bulkmodulus(n,m) )
+      !allocate ( this%grainsize(n,m) )
 
       end subroutine
- 
-      subroutine delete(this) 
+      !end module
+
+      subroutine delete(this)
       type (modelfile) this
       
-      deallocate ( this%velocity )
-      deallocate ( this%density )
-      deallocate ( this%heatproduction )
-      deallocate ( this%heatcapcity )
-      deallocate ( this%gtemp )
-      deallocate ( this%gqflux )
-      deallocate ( this%thermalconductivity )
-      deallocate ( this%bulkmodulus )
-      deallocate ( this%grainsize )
+      !deallocate ( this%velocity )
+      !deallocate ( this%density )
+      !deallocate ( this%heatproduction )
+      !deallocate ( this%heatcapcity )
+      !deallocate ( this%gtemp )
+      !deallocate ( this%gqflux )
+      !deallocate ( this%thermalconductivity )
+      !deallocate ( this%bulkmodulus )
+      !deallocate ( this%grainsize )
 
       end subroutine
      
-      end module
+      !end module
