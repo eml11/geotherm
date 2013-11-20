@@ -34,8 +34,9 @@
       &PRESSUREFIELDDELETE => DELETE
       use geochem, MINERALDELETE => DELETE, &
       & MINERALNEW => NEW
-      use module_modelfile, MODELDELETE => DELETE, &
-      & MODELNEW => NEW 
+      use module_modelfile
+      use modeldomainmodule, NEWDOMAIN => NEW, &
+      DELETEDOMAIN => DELETE  
       use mathmodule
       implicit none
 
@@ -54,6 +55,7 @@
       type (temperaturefield) tfield
       type (modelfile) model
       type (pressurefield) pfield
+      type (modeldomain) domain
 
       double precision :: incriment(2) = (/0.001,0.001/)
 
@@ -110,12 +112,11 @@
       print *, "test"
 
       call NEW( tfield,n,m )
-      call MODELNEW( model,n,m )
       call PRESSUREFIELDNEW( pfield,n,m ) 
 
-      model%gtemp = gaussian_nnorm(t_ar,y_ar*0,2d0,n,m)
-      model%gqflux = gaussian_nnorm(t_ar,y_ar*0,3d0,n,m)
-      model%thermalconductivity = gaussian_nnorm(t_ar,y_ar*0,5d0,n,m)
+      domain%gtemp = gaussian_nnorm(t_ar,y_ar*0,2d0,n,m)
+      domain%gqflux = gaussian_nnorm(t_ar,y_ar*0,3d0,n,m)
+      domain%thermalconductivity = gaussian_nnorm(t_ar,y_ar*0,5d0,n,m)
       wrk_ar4 = (-t_ar*wrk_ar1*wrk_ar3)/(wrk_ar2*2)
 
       !call compute_bdashval(tfield,model)
@@ -154,7 +155,6 @@
 
       !call test_output(wrk_ar5,wrk_ar6,n,m)
       call DELETE( tfield )
-      call MODELDELETE( model )
       call PRESSUREFIELDDELETE( pfield )
 
       end program
