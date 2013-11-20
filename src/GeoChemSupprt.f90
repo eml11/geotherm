@@ -102,20 +102,20 @@
       !! @return retrn_ar fraction of eclogite against
       !! total rock
       subroutine compute_reactionprogress &
-      &(this,t_ar,tfield,model)
-      use equationpartsmodule
-      use module_modelfile
+      &(this,t_ar,temperature)
 
       type (mineralphase) this
-      type (modelfile) model
-      type (temperaturefield) tfield
+      !type (temperaturefield) tfield
 
+      double precision :: temperature(:,:)
       double precision :: t_ar(this%n,this%m)
       double precision :: caracteristic_time_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 
 
-      caracteristic_time_ar = (model%grainsize**2) * &
-      &DEXP(this%free_energy/(gas_const*tfield%temperature)) / &
+      !need to change to import parent chemical species at some point
+      !recions will probably actually be called from Domain
+      caracteristic_time_ar = (this%grainsize**2) * &
+      &DEXP(this%free_energy/(gas_const*temperature)) / &
       &this%diffusion_coefficient
 
       this%mineralpart = 1d0 - DEXP(-t_ar/caracteristic_time_ar)
@@ -132,23 +132,22 @@
       !! @return retrn_ar fraction of eclogite against
       !! total rock
       subroutine compute_eclogite_content &
-      &(this,t_ar,tfield,pfield,model)
-      use equationpartsmodule
-      use module_modelfile
-      use pressuresolver
+      &(this,t_ar,temperature,pressure)
       
       type (mineralphase) this
-      type (modelfile) model
-      type (pressurefield) pfield
-      type (temperaturefield) tfield
+      !type (modelfile) model
+      !type (pressurefield) pfield
+      !type (temperaturefield) tfield
+      double precision :: temperature(:,:)
+      double precision :: pressure(:,:)
 
       double precision :: t_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 !tempory
 
-      call compute_reactionprogress(this,t_ar,tfield,model)
+      call compute_reactionprogress(this,t_ar,temperature)
 
-      where (tfield%temperature .LE. &
-      &eclogitephase(pfield%pressure,this%n,this%m))
+      where (temperature .LE. &
+      &eclogitephase(pressure,this%n,this%m))
         this%mineralpart = this%mineralpart
       elsewhere
         this%mineralpart = 0d0*this%mineralpart

@@ -27,6 +27,12 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       module equationpartsmodule
+      use modeldomainmodule, DOMAINNEW => NEW, &
+      & DOMAINDELETE => DELETE
+      use mathmodule
+      use pressuresolver, PRESSURENEW => NEW, &
+      PRESSUREDELETE => DELETE
+
       implicit none
 
       type temperaturefield
@@ -64,23 +70,20 @@
       !! @param tdata_ar ground temperature array
       !! @param qdata_ar ground heat flux array
       !! @return retrn_ar time derivative of b(t)
-      subroutine compute_bdashval(this,model)
-      use mathmodule
-      use module_modelfile
-      type (modelfile) model
+      subroutine compute_bdashval(this,domain)
+      type (modeldomain) domain
       type (temperaturefield) this
       double precision, dimension(this%n,this%m) :: difftdata_ar
 
-      call array_diff2d(model%gtemp, &
-      &difftdata_ar,model%incriment(1),this%n,this%m)
-      this%bderivative = model%thermalconductivity * &
-      &(difftdata_ar/model%gqflux)
+      call array_diff2d(domain%gtemp, &
+      &difftdata_ar,domain%incriment(1),this%n,this%m)
+      this%bderivative = domain%thermalconductivity * &
+      &(difftdata_ar/domain%gqflux)
 
       end subroutine
 
       subroutine compute_bdashval_fromqx &
       &(tdata_ar,qdata_ar,qxdata_ar,kconstant,retrn_ar,incriment,n,m)
-      use mathmodule
       double precision :: tdata_ar(n,m)
       double precision :: tfromqx_ar(n,m)
       double precision :: qdata_ar(n,m)
@@ -107,11 +110,8 @@
       !! perpendicular to y direction
       !! @param kappa_ar thermal diffusivity
       !! @return retrn_ar function in exponent
-      subroutine compute_exponentintegral(this,model,pfield)
-      use mathmodule
-      use module_modelfile
-      use pressuresolver
-      type (modelfile) model
+      subroutine compute_exponentintegral(this,domain,pfield)
+      type (modeldomain) domain
       type (temperaturefield) this
       type (pressurefield) pfield
       double precision :: kappa_ar(this%n,this%m)
@@ -121,18 +121,19 @@
       double precision, dimension(this%n,this%m) :: b_yintegral     
  
       kappa_ar = &
-      &model%thermalconductivity/(0.2*model%heatcapcity*pfield%density)
+      &domain%thermalconductivity/ &
+      &(0.2*domain%heatcapcity*pfield%density)
 
       call array_integral2d &
-      &((this%bderivative*model%velocity)/kappa_ar, &
-      &v_tintegral,model%incriment(1),this%n,this%m)
+      &((this%bderivative*domain%velocity)/kappa_ar, &
+      &v_tintegral,domain%incriment(1),this%n,this%m)
       call array_integral2d &
       ((this%bderivative**2d0)/kappa_ar, &
-      &b_tintegral,model%incriment(1),this%n,this%m)
-      call array_integral2dydim(model%velocity/kappa_ar, &
-      &v_yintegral,model%incriment(2),this%n,this%m)
+      &b_tintegral,domain%incriment(1),this%n,this%m)
+      call array_integral2dydim(domain%velocity/kappa_ar, &
+      &v_yintegral,domain%incriment(2),this%n,this%m)
       call array_integral2dydim(this%bderivative/kappa_ar, &
-      &b_yintegral,model%incriment(2),this%n,this%m) 
+      &b_yintegral,domain%incriment(2),this%n,this%m) 
 
       this%expterm = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
@@ -146,22 +147,20 @@
       !! @param A_ar 
       !! @param thermal_ar thermal conductivity
       !! @return retrn_ar first integration result
-      subroutine compute_init_inerintegral(this,model)
-      use mathmodule
-      use module_modelfile
-      type (modelfile) model
+      subroutine compute_init_inerintegral(this,domain)
+      type (modeldomain) domain
       type (temperaturefield) this
       double precision, dimension(this%n,this%m) :: integral_term
       double precision, dimension(this%n,this%m) :: t_integral
       double precision, dimension(this%n,this%m) :: y_integral
       
-      integral_term = -model%heatproduction*model%heatcapcity * &
-      &DEXP(-1*this%expterm)/model%thermalconductivity
+      integral_term = -domain%heatproduction*domain%heatcapcity * &
+      &DEXP(-1*this%expterm)/domain%thermalconductivity
       call array_integral2dydim &
-      &(integral_term,y_integral,model%incriment(2),this%n,this%m)
+      &(integral_term,y_integral,domain%incriment(2),this%n,this%m)
       call array_integral2d &
       &(integral_term*this%bderivative, &
-      &t_integral,model%incriment(1),this%n,this%m)
+      &t_integral,domain%incriment(1),this%n,this%m)
 
       this%innerintegral = y_integral - t_integral
 
@@ -177,17 +176,15 @@
       !! @param bdash_ar time derivative of b(t)
       !! @param thermal_ar thermal conductivity
       !! @return retrn_dbl first constant of integration
-      subroutine compute_inerintegralconstant(this,model)
-      use mathmodule
-      use module_modelfile
-      type (modelfile) model
+      subroutine compute_inerintegralconstant(this,domain)
+      type (modeldomain) domain
       type (temperaturefield) this
       double precision :: tdiff_ar(this%n,this%m)
       double precision :: tdata_diff_ar(this%n,this%m)
       double precision :: innerconstant(this%n)
 
-      call array_diff2d(model%gtemp,tdata_diff_ar, &
-      &model%incriment(1),this%n,this%m)
+      call array_diff2d(domain%gtemp,tdata_diff_ar, &
+      &domain%incriment(1),this%n,this%m)
 
       where (this%bderivative.EQ.0d0)
         tdiff_ar = 0d0
@@ -196,7 +193,7 @@
       end where
 
       innerconstant = &
-      &(-(model%gqflux(:,3)/model%thermalconductivity(:,3)) + &
+      &(-(domain%gqflux(:,3)/domain%thermalconductivity(:,3)) + &
       &tdiff_ar(:,3)) * &
       &EXP(-this%expterm(:,3)) - this%innerintegral(:,3)
 
@@ -210,10 +207,8 @@
       !! @param exintegral_ar function in exponent
       !! @param iner_dbl first constant of integration
       !! @return second integration result
-      subroutine compute_init_outerintegral(this,model)
-      use mathmodule
-      use module_modelfile
-      type (modelfile) model
+      subroutine compute_init_outerintegral(this,domain)
+      type (modeldomain) domain
       type (temperaturefield) this
       double precision, dimension(this%n,this%m) :: integral_term
       double precision, dimension(this%n,this%m) :: t_integral
@@ -223,9 +218,9 @@
       &EXP(this%expterm)*(this%innerintegral + this%innerconstant)
 
       call array_integral2dydim &
-      &(integral_term,y_integral,model%incriment(2),this%n,this%m)
+      &(integral_term,y_integral,domain%incriment(2),this%n,this%m)
       call array_integral2d(integral_term*this%bderivative, &
-      &t_integral,model%incriment(1),this%n,this%m)
+      &t_integral,domain%incriment(1),this%n,this%m)
 
       this%outerintegral = y_integral - t_integral
 
@@ -238,34 +233,30 @@
       !! @param outerintegral_ar second integration result
       !! @param tdata_ar ground temperature array
       !! @return retrn_dbl second constant of integration
-      subroutine compute_outerintegralconstant(this,model)
-      use module_modelfile
-      use mathmodule
-      type (modelfile) model
+      subroutine compute_outerintegralconstant(this,domain)
+      type (modeldomain) domain
       type (temperaturefield) this
       double precision :: outerintegral_ar(this%n,this%m)
       double precision :: tdata_ar(this%n,this%m)
       double precision outerconstant(this%n)
 
-      outerconstant = model%gtemp(:,1) - this%outerintegral(:,1)
+      outerconstant = domain%gtemp(:,1) - this%outerintegral(:,1)
 
       call extend_ardimension(outerconstant,this%outerconstant,this%m)
 
       end subroutine
 
-      subroutine compute_temp(this,model,pfield)
-      use module_modelfile
-      use pressuresolver
-      type (modelfile) model
+      subroutine compute_temp(this,domain,pfield)
+      type (modeldomain) domain
       type (temperaturefield) this
       type (pressurefield) pfield
    
-      call compute_bdashval(this,model) 
-      call compute_exponentintegral(this,model,pfield)
-      call compute_init_inerintegral(this,model)
-      call compute_inerintegralconstant(this,model)
-      call compute_init_outerintegral(this,model)
-      call compute_outerintegralconstant(this,model)
+      call compute_bdashval(this,domain) 
+      call compute_exponentintegral(this,domain,pfield)
+      call compute_init_inerintegral(this,domain)
+      call compute_inerintegralconstant(this,domain)
+      call compute_init_outerintegral(this,domain)
+      call compute_outerintegralconstant(this,domain)
 
       this%temperature = this%outerintegral + this%outerconstant
 

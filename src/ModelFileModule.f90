@@ -27,6 +27,7 @@
 
       module module_MODELFILE
       !use netcdf
+      use helpermodule
       use geochem, MINERALDELETE => DELETE, &
       & NEWMINERAL => NEW 
       use modeldomainmodule, NEWDOMAIN => NEW, &
@@ -68,7 +69,7 @@
       !! file output
       !! @param filename name of file 
       !! specifying model parameters
-      subroutine READMDLF(this,filename)
+      subroutine READMDLF(this,filename,domain)
       
       character (len = *) ::filename
       type (modelfile) this
@@ -100,7 +101,7 @@
         READ(1,*) modelfinput
         if (modelfinput.EQ."Domain") then
           READ(1,*) ID
-          call NEWDOMAIN(domain,ID,this%ydim,this%tdim)
+          call NEWDOMAIN(domain,ID,this%incriment,this%ydim,this%tdim)
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
             if (modelfinput.EQ."File") then
@@ -248,9 +249,9 @@
       end subroutine
      
       !end module
-      subroutine new(this,n,m)
-      type (modelfile) this
-      integer n,m
+      !subroutine new(this,n,m)
+      !type (modelfile) this
+      !integer n,m
 
       !allocate ( this%velocity(n,m) )
       !allocate ( this%density(n,m) )
@@ -262,11 +263,11 @@
       !allocate ( this%bulkmodulus(n,m) )
       !allocate ( this%grainsize(n,m) )
 
-      end subroutine
+      !end subroutine
       !end module
 
-      subroutine delete(this)
-      type (modelfile) this
+      !subroutine delete(this)
+      !type (modelfile) this
       
       !deallocate ( this%velocity )
       !deallocate ( this%density )
@@ -278,6 +279,6 @@
       !deallocate ( this%bulkmodulus )
       !deallocate ( this%grainsize )
 
-      end subroutine
+      !end subroutine
      
-      !end module
+      end module

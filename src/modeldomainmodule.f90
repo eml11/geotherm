@@ -49,7 +49,9 @@
         integer :: n,m
         integer :: regions
         integer, allocatable :: geometry(:,:)
-        !change to integer if possible
+
+        double precision :: incriment(2)
+
         double precision, allocatable :: gtemp(:,:)
         double precision, allocatable :: gqflux(:,:)
         double precision, allocatable :: velocity(:,:)
@@ -70,11 +72,13 @@
 
       contains
       
-      subroutine NEW(this,regions,n,m)
+      subroutine NEW(this,regions,incriment,n,m)
       type (modeldomain) this
       integer regions
       integer n,m      
-
+      double precision :: incriment(2)
+  
+      this%incriment = incriment
       this%regions = regions
       allocate( this%geometry(n,m) )      
 

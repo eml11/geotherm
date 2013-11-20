@@ -26,14 +26,26 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       program GEOTHERM
-      use helpermodule
+      use module_modelfile
+      use modeloutput
+      use equationpartsmodule
       use mathmodule
-      use module_modelfile, MODELDELETE => DELETE, &
+      use helpermodule
+      use pressuresolver, PRESSUREFIELDNEW => NEW, &
+      &PRESSUREFIELDDELETE => DELETE
+      use geochem, MINERALDELETE => DELETE, &
       & MINERALNEW => NEW
       implicit none
 
       type (modelfile) modelfile_inst
+      type (modeldomain) domain
       character (len = 256) :: filename
+      type (pressurefield) :: pressurefield_inst
+      type (temperaturefield) :: temperaturefield_inst
+      type (mineralphase) eclogite
+      double precision, allocatable :: eclogite_content(:,:)
+      double precision, allocatable :: t_ar(:,:)
+      integer n,m,i,j
 
       !gets the name of the file use to specify
       !model parameters, set as a sytem argument
@@ -42,62 +54,71 @@
       !reads the file used to specify model parameters
       !and stores these in the instace modelfile_inst
       ! of derived type modelfile
-      call READMDLF(modelfile_inst,filename)
+      call READMDLF(modelfile_inst,filename,domain)
       
       !main work subroutine
-      call compute_geotherm &
-      &(modelfile_inst,modelfile_inst%tdim,modelfile_inst%ydim)
+      !call compute_geotherm &
+      !&(modelfile_inst,domain,modelfile_inst%tdim,modelfile_inst%ydim)
 
-      call MODELDELETE(modelfile_inst)
+      n = modelfile_inst%tdim
+      m = modelfile_inst%ydim
 
-      end program
+      allocate( eclogite_content(n,m) )
+      allocate( t_ar(n,m) )
 
-      subroutine compute_geotherm(modelfile_inst,n,m)
-      use equationpartsmodule
-      use module_modelfile, MODELDELETE => DELETE, &
-      MODELNEW => NEW 
-      use mathmodule
-      use helpermodule
-      use pressuresolver, PRESSUREFIELDNEW => NEW, &
-      &PRESSUREFIELDDELETE => DELETE
-      use geochem, MINERALDELETE => DELETE, &
-      & MINERALNEW => NEW
-      type (modelfile), intent(in) :: modelfile_inst
-      type (pressurefield) :: pressurefield_inst
-      type (temperaturefield) :: temperaturefield_inst
-      type (mineralphase) eclogite
+      !call MODELDELETE(modelfile_inst)
+
+      !end program
+
+      !subroutine compute_geotherm(modelfile_inst,domain,n,m)
+      !use equationpartsmodule
+      !use module_modelfile, MODELDELETE => DELETE, &
+      !MODELNEW => NEW 
+      !use mathmodule
+      !use helpermodule
+      !use pressuresolver, PRESSUREFIELDNEW => NEW, &
+      !&PRESSUREFIELDDELETE => DELETE
+      !use geochem, MINERALDELETE => DELETE, &
+      !& MINERALNEW => NEW
+      !type (modelfile), intent(in) :: modelfile_inst
+      !type (pressurefield) :: pressurefield_inst
+      !type (temperaturefield) :: temperaturefield_inst
+      !type (mineralphase) eclogite
+      !type (modeldomain) domain
       !double precision :: eclogite_content(n,m)
-      double precision :: t_ar(n,m)
-      integer n,m,i,j
+      !double precision :: t_ar(n,m)
+      !integer n,m,i,j
 
       call MINERALNEW( eclogite,n,m )
       call PRESSUREFIELDNEW( pressurefield_inst,n,m )
       call NEW( temperaturefield_inst,n,m )
 
+      call UPDATE( domain )
+
       eclogite%free_energy = 326352.0
       eclogite%diffusion_coefficient = 0.00002
 
       !reading netcdfs from files sepcified in the modelfile
-      call get_netcdf1d(modelfile_inst%gtempfile, &
-      &modelfile_inst%gtemp,n,m)
-      call get_netcdf1d(modelfile_inst%gqfluxfile, &
-      &modelfile_inst%gqflux,n,m)
-      call get_netcdf_wincrmnt(modelfile_inst%velocitynetcdf, &
-      &modelfile_inst%velocity,modelfile_inst%incriment,n,m)
-      call get_netcdf(modelfile_inst%densitynetcdf, &
-      &modelfile_inst%density)
-      call get_netcdf(modelfile_inst%heatproductnetcdf, &
-      &modelfile_inst%heatproduction)
-      call get_netcdf(modelfile_inst%heatcapcnetcdf, &
-      &modelfile_inst%heatcapcity)
-      call get_netcdf &
-      &(modelfile_inst%thermlconductnetcdf, &
-      &modelfile_inst%thermalconductivity)
-      call get_netcdf &
-      &(modelfile_inst%incompresibilitynetcdf, &
-      &modelfile_inst%bulkmodulus)
-      call get_netcdf(modelfile_inst%grainsizenetcdf, &
-      &modelfile_inst%grainsize)
+      !call get_netcdf1d(modelfile_inst%gtempfile, &
+      !&modelfile_inst%gtemp,n,m)
+      !call get_netcdf1d(modelfile_inst%gqfluxfile, &
+      !&modelfile_inst%gqflux,n,m)
+      !call get_netcdf_wincrmnt(modelfile_inst%velocitynetcdf, &
+      !&modelfile_inst%velocity,modelfile_inst%incriment,n,m)
+      !call get_netcdf(modelfile_inst%densitynetcdf, &
+      !&modelfile_inst%density)
+      !call get_netcdf(modelfile_inst%heatproductnetcdf, &
+      !&modelfile_inst%heatproduction)
+      !call get_netcdf(modelfile_inst%heatcapcnetcdf, &
+      !&modelfile_inst%heatcapcity)
+      !call get_netcdf &
+      !&(modelfile_inst%thermlconductnetcdf, &
+      !&modelfile_inst%thermalconductivity)
+      !call get_netcdf &
+      !&(modelfile_inst%incompresibilitynetcdf, &
+      !&modelfile_inst%bulkmodulus)
+      !call get_netcdf(modelfile_inst%grainsizenetcdf, &
+      !&modelfile_inst%grainsize)
 
       !tempory
       !modelfile_inst%velocity = modelfile_inst%velocity/10.0
@@ -106,7 +127,7 @@
       
       call compute_pddensity(pressurefield_inst,modelfile_inst)
 
-      call compute_temp(temperaturefield_inst,modelfile_inst, &
+      call compute_temp(temperaturefield_inst,domain, &
       &pressurefield_inst)
 
       do j=1,m
@@ -114,7 +135,8 @@
       enddo
       
       call compute_eclogite_content(eclogite,t_ar, &
-      &temperaturefield_inst,pressurefield_inst,modelfile_inst)
+      &temperaturefield_inst%temperature, &
+      &pressurefield_inst%pressure)
       
       !writes output netcdf
       call write_netcdf &
@@ -125,4 +147,8 @@
       call PRESSUREFIELDDELETE(pressurefield_inst)
       call MINERALDELETE(eclogite)
 
-      end subroutine
+      !end subroutine
+
+      !call MODELDELETE(modelfile_inst)
+
+      end program

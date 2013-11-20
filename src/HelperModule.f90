@@ -27,6 +27,7 @@
 
       module HelperModule
       use netcdf
+      use mathmodule
       implicit none
 
       contains
@@ -55,7 +56,6 @@
       !! @param filename name of netcdf file
       !! @return data_ar z data of netcdf      
       subroutine get_netcdf1d(filename,retrn_ar,n,m)
-      use mathmodule
       character (len = *) :: filename
       double precision :: data_ar(n)
       double precision :: retrn_ar(:,:)
@@ -121,66 +121,8 @@
       OPEN(1, file = filename)
       READ(1) data_ar
 
-      end subroutine     
-
-      !> netcdf writing subroutine
-      !! @param filename name of netcdf file
-      !! @param data_ar z data of netcdf 
-      subroutine write_netcdf(model,tfield,pfield,minphase)
-      !&(filename,temp_ar,density_ar,pressure_ar,ecologite_ar, &
-      !&negativedown,n,m)
-      use equationpartsmodule
-      use module_modelfile
-      use pressuresolver
-      use geochem
-      type (modelfile) model
-      type (temperaturefield) tfield
-      type (pressurefield) pfield
-      type (mineralphase) minphase
-
-      integer :: ncid, tvarid, pvarid, dvarid, evarid, dimids(2)
-      integer :: x_dimid, y_dimid
-      
-      call check( nf90_create(model%outfile, NF90_CLOBBER, ncid) )
-
-      call check( nf90_def_dim(ncid, "x", tfield%n, x_dimid) )
-      call check( nf90_def_dim(ncid, "y", tfield%m, y_dimid) )
-      
-      dimids =  (/ x_dimid, y_dimid /)
-
-      call check( nf90_def_var &
-      &(ncid, "Temperature", NF90_DOUBLE, dimids, tvarid) )
-
-      call check( nf90_def_var &
-      &(ncid, "Pressure", NF90_DOUBLE, dimids, pvarid) )
-
-      call check( nf90_def_var &
-      &(ncid, "Density", NF90_DOUBLE, dimids, dvarid) )
-
-      call check ( nf90_def_var &
-      &(ncid, "EclogitePart", NF90_DOUBLE, dimids, evarid) )
-
-      call check( nf90_enddef(ncid) )
-
-      if (model%negativedown.EQ.0) then
-        call check( nf90_put_var(ncid, dvarid, pfield%density) )
-        call check( nf90_put_var(ncid, tvarid, tfield%temperature) )
-        call check( nf90_put_var(ncid, pvarid, pfield%pressure) )
-        call check( nf90_put_var(ncid, evarid, minphase%mineralpart) )
-      else
-        call check( &
-        &nf90_put_var(ncid, dvarid, pfield%density(:,tfield%m:1:-1)) )
-        call check( &
-        &nf90_put_var(ncid, tvarid,tfield%temperature(:,tfield%m:1:-1)))
-        call check( &
-        &nf90_put_var(ncid, pvarid, pfield%pressure(:,tfield%m:1:-1)) )
-        call check( &
-        &nf90_put_var(ncid,evarid, &
-        &minphase%mineralpart(:,tfield%m:1:-1)))
-      end if
-
-      end subroutine
-      
+      end subroutine 
+    
       !> netcdf error checking subroutine
       !! @param status return value of function
       !! from netcdf-fortran
