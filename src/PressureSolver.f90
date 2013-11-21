@@ -28,6 +28,8 @@
    
       module pressuresolver
       use mathmodule
+      use modeldomainmodule, NEWDOMAIN => NEW, &
+      & DELETEDOMAIN => DELETE
       implicit none
 
       type pressurefield
@@ -56,18 +58,17 @@
       !! @param incompresibility_ar bulk modulus
       !! of substance
       !! @return retrn_ar depth dependent Pressure
-      subroutine compute_pressure(this,model)
-      use module_modelfile
+      subroutine compute_pressure(this,domain)
       type (pressurefield) this
-      type (modelfile) model
+      type (modeldomain) domain
       double precision, parameter :: gravity_const = 9.81
       double precision :: y_integral(this%n,this%m)
 
-      call array_integral2dydim(model%density*gravity_const, & 
-      &y_integral,model%incriment(2),this%n,this%m)
+      call array_integral2dydim(domain%density*gravity_const, & 
+      &y_integral,domain%incriment(2),this%n,this%m)
 
-      this%pressure = -model%bulkmodulus * &
-      &DLOG(1+y_integral/model%bulkmodulus)
+      this%pressure = -domain%bulkmodulus * &
+      &DLOG(1+y_integral/domain%bulkmodulus)
 
       end subroutine
 
@@ -77,17 +78,16 @@
       !! @param incompresibility_ar bulk modulus
       !! of substance
       !! @return retrn_ar pressure dependent density
-      subroutine compute_pddensity(this,model)
-      use module_modelfile
+      subroutine compute_pddensity(this,domain)
       type (pressurefield) this
-      type (modelfile) model
+      type (modeldomain) domain
       double precision, parameter :: gravity_const = 9.81
       double precision :: y_integral(this%n,this%m)
 
-      call array_integral2dydim(model%density*gravity_const, & 
-      &y_integral,model%incriment(2),this%n,this%m)
+      call array_integral2dydim(domain%density*gravity_const, & 
+      &y_integral,domain%incriment(2),this%n,this%m)
 
-      this%density = (model%density)/(1+y_integral/model%bulkmodulus)
+      this%density = (domain%density)/(1+y_integral/domain%bulkmodulus)
 
       end subroutine
       

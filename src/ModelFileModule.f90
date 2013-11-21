@@ -88,11 +88,14 @@
         READ(1,*) modelfinput
         if (modelfinput.EQ."Domain") then
           READ(1,*) ID
-          call NEWDOMAIN(domain,ID,this%incriment,this%ydim,this%tdim)
+          call NEWDOMAIN(domain,ID,this%tdim,this%ydim)
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
             if (modelfinput.EQ."File") then
               READ(1,*) modelfinput
+              call get_idnetcdf(modelfinput, &
+              &domain%geometry,this%incriment,this%tdim,this%ydim)
+              domain%incriment = this%incriment 
             else if (modelfinput.EQ."Velocity") then
               READ(1,*) modelfinput
             else if (modelfinput.EQ."Boundry") then
@@ -100,22 +103,22 @@
               do while (boolthree.EQ.1)
                 READ(1,*) modelfinput
                 if (modelfinput.EQ."Temperature") then
-                  READ(1,*) modelfinput
+                  READ(1,*) typinput,modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
-                      domain%gtemp = part
+                    domain%gtemp = part
                   else
                     call get_netcdf1d(modelfinput, &
-                    &domain%gtemp,this%ydim, this%tdim)
+                    &domain%gtemp,this%tdim, this%ydim)
                   end if
                 else if (modelfinput.EQ."HeatFlux") then
-                  READ(1,*) modelfinput
+                  READ(1,*) typinput,modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
                       domain%gqflux = part
                   else
                     call get_netcdf1d(modelfinput, &
-                    &domain%gqflux,this%ydim, this%tdim)
+                    &domain%gqflux,this%tdim, this%ydim)
                   end if
                 else if (modelfinput.EQ."EndBoundry") then
                   boolthree = 0
@@ -123,13 +126,11 @@
               enddo
             else if (modelfinput.EQ."Region") then
               READ(1,*) ID
-              do while (boolthree.EQ.1)
-                READ(1,*) num
-                call addregion(domain,ID,num)
-                do i=1,num
-                  READ(1,*) ID,part
-                  call addmineral(domain,ID,part)
-                enddo
+              READ(1,*) num
+              call addregion(domain,ID,num)
+              do i=1,num
+                READ(1,*) ID,part
+                call addmineral(domain,ID,part)
               enddo
             else if (modelfinput.EQ."EndDomain") then
               booltwo = 0
@@ -138,14 +139,16 @@
         else if (modelfinput.EQ."Mineral") then
           nominerals = nominerals + 1
           allocate( mineralstempar(nominerals)  )          
-          mineralstempar(:nominerals-1) = minerals
+          mineralstempar(:nominerals) = minerals
           deallocate( minerals )
           allocate( minerals(nominerals)  )
           minerals = mineralstempar
+          call NEWMINERAL(minerals(nominerals),this%tdim,this%ydim)
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
             if (modelfinput.EQ."ID") then
               READ(1,*) ID
+              minerals(nominerals)%ID = ID
             else if (modelfinput.EQ."Density") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then

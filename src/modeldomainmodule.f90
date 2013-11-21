@@ -62,13 +62,11 @@
 
       contains
       
-      subroutine NEW(this,regions,incriment,n,m)
+      subroutine NEW(this,regions,n,m)
       type (modeldomain) this
       integer regions
       integer n,m      
-      double precision :: incriment(2)
-
-      this%incriment = incriment
+      
       this%regions = regions
       allocate( this%geometry(n,m) )      
 
@@ -107,6 +105,12 @@
       enddo
 
       deallocate( this%regionarray )
+
+      do i=1,SIZE(this%mineralarray)
+        call MINERALDELETE( this%mineralarray(i) )
+      enddo
+
+      deallocate( this%mineralarray )
 
       end subroutine
 

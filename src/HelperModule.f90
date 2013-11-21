@@ -51,6 +51,42 @@
 
       end subroutine
 
+      !> ID netcdf reading subrutine
+      !! @param filename name of netcdf file
+      !! @return data_ar z data of netcdf
+      subroutine get_idnetcdf(filename,data_ar,incriment,n,m)
+
+      character (len = *) :: filename
+      integer :: data_ar(:, :)
+      double precision :: incriment(2)
+      double precision, dimension(m) :: ydata
+      double precision, dimension(n) :: tdata
+
+      integer :: n,m
+      integer :: ncid, zvarid, xvarid, yvarid
+
+      integer :: retval
+
+      call check( nf90_open(filename, NF90_NOWRITE, ncid) )
+      call check( nf90_inq_varid(ncid, "z", zvarid) )
+      call check( nf90_inq_varid(ncid, "x", xvarid) )
+      call check( nf90_inq_varid(ncid, "y", yvarid) )
+      call check( nf90_get_var(ncid, zvarid, data_ar) )
+
+      call check( nf90_get_var(ncid, yvarid, ydata) )
+      call check( nf90_get_var(ncid, xvarid, tdata) )
+
+      incriment(1) = tdata(2) - tdata(1)
+      incriment(2) = ydata(2) - ydata(1)
+
+      !hack to fix netcdfs from gmt
+      incriment(2) = -incriment(2)
+
+      call check( nf90_close(ncid) )
+
+      end subroutine
+
+
       !> 1d netcdf reading subroutine used for
       !! boundry conditions
       !! @param filename name of netcdf file

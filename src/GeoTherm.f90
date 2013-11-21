@@ -123,9 +123,9 @@
       !tempory
       !modelfile_inst%velocity = modelfile_inst%velocity/10.0
       
-      call compute_pressure(pressurefield_inst,modelfile_inst)
+      call compute_pressure(pressurefield_inst,domain)
       
-      call compute_pddensity(pressurefield_inst,modelfile_inst)
+      call compute_pddensity(pressurefield_inst,domain)
 
       call compute_temp(temperaturefield_inst,domain, &
       &pressurefield_inst)
