@@ -70,6 +70,8 @@
       this%pressure = -domain%bulkmodulus * &
       &DLOG(1+y_integral/domain%bulkmodulus)
 
+      print *, this%pressure
+
       end subroutine
 
       !> computes pressure dependent density 

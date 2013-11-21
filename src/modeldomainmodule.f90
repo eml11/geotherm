@@ -180,16 +180,16 @@
 
               this%density = this%density + &
               &this%mineralarray(j)%density*part(1) 
-              this%heatproduction = this%density + &
-              &this%mineralarray(j)%density*part(1)
-              this%heatcapcity = this%density + &
-              &this%mineralarray(j)%density*part(1)
-              this%thermalconductivity = this%density + &
-              &this%mineralarray(j)%density*part(1)
-              this%bulkmodulus = this%density + &
-              &this%mineralarray(j)%density*part(1)
-              this%grainsize = this%density + &
-              &this%mineralarray(j)%density*part(1)
+              this%heatproduction = this%heatproduction + &
+              &this%mineralarray(j)%heatproduction*part(1)
+              this%heatcapcity = this%heatcapcity + &
+              &this%mineralarray(j)%heatcapcity*part(1)
+              this%thermalconductivity = this%thermalconductivity + &
+              &this%mineralarray(j)%thermalconductivity*part(1)
+              this%bulkmodulus = this%bulkmodulus + &
+              &this%mineralarray(j)%bulkmodulus*part(1)
+              this%grainsize = this%grainsize + &
+              &this%mineralarray(j)%grainsize*part(1)
 
             end where
           enddo
