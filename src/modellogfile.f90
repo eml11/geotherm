@@ -31,29 +31,37 @@
 
       type logfile
 
-      character :: filename(264)
+      character(len=264) :: filename
       integer :: tofile = 1
 
       end type
 
       contains
 
-      subroutine NEW(this,filename,tofile)
+      subroutine NEW(this,filename)
       type (logfile) this
-      character :: filename (264)
+      character(len=264) :: filename
       integer :: n
       
+      !for now ignoring logfilename
       n = len(filename)
-      this%filename = filename(:n-4) // "_logfile.log"
-      this%tofile = tofile
+      !print *, len(TRIM(filename))
+      !print *, filename(:len(TRIM(filename))-4) // "_logfile.log"
+      !this%filename = filename(:len(TRIM(filename))-4) // "_logfile.log"
+      this%filename = "./logfile.log"
+      !print *, this%filename
+      OPEN(2,FILE=this%filename)
 
       end subroutine
 
       subroutine writelog(this,string)
       type (logfile) this
-      character :: string(264)
+      character(len=*) :: string
 
-      if (this%tofile.EQ.1)
+      if (this%tofile.EQ.1) then
+
+        !OPEN(1, file = this%filename)
+        WRITE(2,*) string
 
       end if
       end subroutine

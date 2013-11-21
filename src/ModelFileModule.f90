@@ -32,6 +32,7 @@
       & NEWMINERAL => NEW 
       use modeldomainmodule, NEWDOMAIN => NEW, &
       & DELETEDOMAIN => DELETE
+      use modellogfile, LOGNEW => NEW
 
       implicit none
 
@@ -74,7 +75,12 @@
       type (mineralphase), allocatable :: minerals(:)
       type (mineralphase), allocatable :: mineralstempar(:)
       type (modeldomain) domain
+      type (logfile) lfile
 
+      call LOGNEW(lfile,filename)
+
+      call writelog(lfile,"geotherm logfile")
+      call writelog(lfile,"reading file: " // filename)
       OPEN(1, file = filename)
       READ(1,*) this%ydim, this%tdim
       this%negativedown = 0      
@@ -88,16 +94,24 @@
         READ(1,*) modelfinput
         if (modelfinput.EQ."Domain") then
           READ(1,*) ID
+          WRITE(modelfinput,*) ID
+          call writelog(lfile,"creating domain: " // modelfinput)
           call NEWDOMAIN(domain,ID,this%tdim,this%ydim)
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
             if (modelfinput.EQ."File") then
               READ(1,*) modelfinput
+              call writelog &
+              &(lfile,"reading geometry netcdf: " // modelfinput)
               call get_idnetcdf(modelfinput, &
               &domain%geometry,this%incriment,this%tdim,this%ydim)
               domain%incriment = this%incriment 
             else if (modelfinput.EQ."Velocity") then
               READ(1,*) modelfinput
+              call writelog &
+              &(lfile,"reading velocity netcdf: " // modelfinput)
+              call get_netcdf(modelfinput, &
+              &domain%velocity)
             else if (modelfinput.EQ."Boundry") then
               boolthree = 1
               do while (boolthree.EQ.1)
@@ -106,8 +120,13 @@
                   READ(1,*) typinput,modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
+                    WRITE(modelfinput,*) part
+                    call writelog &
+                    &(lfile,"setting gtemp to: " // modelfinput)
                     domain%gtemp = part
                   else
+                    call writelog &
+                    &(lfile,"reading gtemp netcdf: " // modelfinput)
                     call get_netcdf1d(modelfinput, &
                     &domain%gtemp,this%tdim, this%ydim)
                   end if
@@ -115,8 +134,10 @@
                   READ(1,*) typinput,modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
-                      domain%gqflux = part
+                    domain%gqflux = part
                   else
+                    call writelog &
+                    &(lfile,"reading gqflux netcdf: " // modelfinput)
                     call get_netcdf1d(modelfinput, &
                     &domain%gqflux,this%tdim, this%ydim)
                   end if
@@ -127,6 +148,8 @@
             else if (modelfinput.EQ."Region") then
               READ(1,*) ID
               READ(1,*) num
+              WRITE(modelfinput,*) ID 
+              call writelog(lfile,"creating region: " // modelfinput)
               call addregion(domain,ID,num)
               do i=1,num
                 READ(1,*) ID,part
@@ -143,11 +166,14 @@
           deallocate( minerals )
           allocate( minerals(nominerals)  )
           minerals = mineralstempar
+          call writelog(lfile,"creating new mineral")
           call NEWMINERAL(minerals(nominerals),this%tdim,this%ydim)
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
             if (modelfinput.EQ."ID") then
               READ(1,*) ID
+              WRITE(modelfinput,*) ID
+              call writelog(lfile,"ID: " // modelfinput)
               minerals(nominerals)%ID = ID
             else if (modelfinput.EQ."Density") then
               READ(1,*) typinput, modelfinput
@@ -155,6 +181,8 @@
                 READ(modelfinput,*) part
                 minerals(nominerals)%density = part
               else
+                call writelog &
+                &(lfile,"reading density netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%density)
               end if
@@ -164,6 +192,8 @@
                 READ(modelfinput,*) part
                 minerals(nominerals)%heatproduction = part
               else
+                call writelog &
+               &(lfile,"reading heatproduction netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%heatproduction)
               end if
@@ -171,8 +201,10 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                  minerals(nominerals)%heatcapcity = part
+                minerals(nominerals)%heatcapcity = part
               else
+                call writelog &
+                &(lfile,"reading heatcapcity netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%heatcapcity)
               end if
@@ -182,6 +214,8 @@
                 READ(modelfinput,*) part
                   minerals(nominerals)%thermalconductivity = part
               else
+                call writelog &
+          &(lfile,"reading thermalconductivity netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%thermalconductivity)
               end if
@@ -189,8 +223,10 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                  minerals(nominerals)%bulkmodulus = part
+                minerals(nominerals)%bulkmodulus = part
               else
+                call writelog &
+                &(lfile,"reading bulkmodulus netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%bulkmodulus)
               end if
@@ -198,8 +234,10 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                  minerals(nominerals)%grainsize = part
+                minerals(nominerals)%grainsize = part
               else
+                call writelog &
+                &(lfile,"reading grainsize netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%grainsize)
               end if
@@ -209,10 +247,13 @@
           enddo
         else if (modelfinput.EQ."Output") then
           do while (booltwo.EQ.1)
+            call writelog(lfile,"setting output")
             READ(1,*) modelfinput
             if (modelfinput.EQ."File") then
               READ(1,*) this%outfile
+              call writelog(lfile,"ouput to: " // this%outfile)
             else if (modelfinput.EQ."NegativeDown") then 
+              call writelog(lfile,"negative down true")
               this%negativedown = 1
             else if (modelfinput.EQ."EndOutput") then
               booltwo = 0
@@ -225,8 +266,9 @@
         end if
       enddo
 
+      call writelog(lfile,"associating minerals to domain")
       call setminerals(domain,minerals)
-
+      call writelog(lfile,"finished parsing: " // filename)
       end subroutine
      
       end module
