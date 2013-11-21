@@ -146,6 +146,7 @@
       call DELETE(temperaturefield_inst)
       call PRESSUREFIELDDELETE(pressurefield_inst)
       call MINERALDELETE(eclogite)
+      call DELETEDOMAIN( domain )
 
       !end subroutine
 

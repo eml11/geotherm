@@ -30,19 +30,9 @@
       !use netcdf
       use geochem, MINERALDELETE => DELETE, &
       & NEWMINERAL => NEW
+      use modelregionmodule, NEWREGION => NEW, &
+      & DELETEREGION => DELETE, regionaddmineral => addmineral
       implicit none
-
-      !should have seperate module
-      type modelregion
-
-        integer ID
-        integer minerals
-        integer, allocatable :: mineralids(:)
-        double precision, allocatable :: mineralparts(:)
-
-        integer, private :: indxmn = 1
-
-      endtype
 
       type modeldomain
         integer :: negativedown
@@ -77,7 +67,7 @@
       integer regions
       integer n,m      
       double precision :: incriment(2)
-  
+
       this%incriment = incriment
       this%regions = regions
       allocate( this%geometry(n,m) )      
@@ -99,6 +89,8 @@
 
       subroutine DELETE(this)
       type (modeldomain) this
+      integer i
+
       deallocate( this%gtemp )
       deallocate( this%gqflux )
 
@@ -110,25 +102,11 @@
       deallocate( this%bulkmodulus )
       deallocate( this%grainsize )
 
+      do i=1,this%regions
+        call DELETEREGION( this%regionarray(i) )
+      enddo
+
       deallocate( this%regionarray )
-
-      end subroutine
-
-      subroutine NEWREGION(this,minerals)
-      type (modelregion) this
-      integer minerals      
-
-      this%minerals = minerals
-      allocate( this%mineralids(minerals) )
-      allocate( this%mineralparts(minerals) )
-
-      end subroutine
-
-      subroutine DELETEREGION(this)
-      type (modelregion) this
-
-      deallocate( this%mineralids )
-      deallocate( this%mineralparts )
 
       end subroutine
 
@@ -148,17 +126,11 @@
 
       subroutine addmineral(this,mineralid,part)
       type (modeldomain) this
-      type (modelregion) region
       integer mineralid
       double precision part
-
-      region = this%regionarray(this%indxrg-1)
-
-      region%mineralids(region%indxmn) = mineralid
-      region%mineralparts(region%indxmn) = part
-
-      region%indxmn = &
-      region%indxmn + 1
+      
+      call &
+      &regionaddmineral(this%regionarray(this%indxrg-1),mineralid,part)
 
       end subroutine
 

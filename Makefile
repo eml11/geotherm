@@ -6,8 +6,8 @@ FC=gfortran
 LDFLAGS=-L/usr/local/lib -lnetcdff -L/opt/local/lib -lnetcdf
 FDFLAGS=-I/usr/local/include -I$(OBJECTDIR)
 OUT=geotherm
-OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/GeoChemSupprt.o $(OBJECTDIR)/modeldomainmodule.o $(OBJECTDIR)/modeloutput.o
-MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/modeldomainmodule.mod $(OBJECTDIR)/modeloutput.mod
+OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/GeoChemSupprt.o $(OBJECTDIR)/modeldomainmodule.o $(OBJECTDIR)/modeloutput.o $(OBJECTDIR)/modelregionmodule.o
+MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/modeldomainmodule.mod $(OBJECTDIR)/modeloutput.mod $(OBJECTDIR)/modelregionmodule.mod
 
 all: geotherm domaingen unittests
 
@@ -47,9 +47,13 @@ $(OBJECTDIR)/geochem.mod: $(SRC)/GeoChemSupprt.f90 $(OBJECTDIR)/pressuresolver.m
 	$(FC) -c $(FDFLAGS) $(SRC)/GeoChemSupprt.f90 $(OBJECTDIR)/pressuresolver.o
 	mkdir -p $(OBJECTDIR); mv geochem.mod GeoChemSupprt.o $(OBJECTDIR)
 
-$(OBJECTDIR)/modeldomainmodule.mod: $(SRC)/modeldomainmodule.f90 $(OBJECTDIR)/geochem.mod 
-	$(FC) -c $(FDFLAGS) -L$(OBJECTDIR) $(SRC)/modeldomainmodule.f90 $(OBJECTDIR)/GeoChemSupprt.o
+$(OBJECTDIR)/modeldomainmodule.mod: $(SRC)/modeldomainmodule.f90 $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/modelregionmodule.mod
+	$(FC) -c $(FDFLAGS) -L$(OBJECTDIR) $(SRC)/modeldomainmodule.f90 $(OBJECTDIR)/GeoChemSupprt.o $(OBJECTDIR)/modelregionmodule.o
 	mkdir -p $(OBJECTDIR); mv modeldomainmodule.o modeldomainmodule.mod $(OBJECTDIR)
+
+$(OBJECTDIR)/modelregionmodule.mod: $(SRC)/modelregionmodule.f90 $(OBJECTDIR)/geochem.mod 
+	$(FC) -c $(FDFLAGS) -L$(OBJECTDIR) $(SRC)/modelregionmodule.f90 $(OBJECTDIR)/GeoChemSupprt.o
+	mkdir -p $(OBJECTDIR); mv modelregionmodule.o modelregionmodule.mod $(OBJECTDIR)
 
 $(OBJECTDIR)/modeloutput.mod: $(SRC)/modeloutput.f90  $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/equationpartsmodule.mod
 	$(FC) -c $(FDFLAGS) -L$(OBJECTDIR) $(SRC)/modeloutput.f90 $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/GeoChemSupprt.o
