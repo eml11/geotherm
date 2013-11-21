@@ -135,6 +135,9 @@
                   READ(1,*) typinput,modelfinput
                   if (typinput.EQ."D") then
                     READ(modelfinput,*) part
+                    WRITE(modelfinput,*) part
+                    call writelog &
+                    &(lfile,"setting gqflux to: " // modelfinput)
                     domain%gqflux = part
                   else
                     call writelog &
@@ -180,6 +183,8 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                call writelog &
+                &(lfile,"setting density to: " // modelfinput)
                 minerals(nominerals)%density = part
               else
                 call writelog &
@@ -191,6 +196,8 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                call writelog &
+                &(lfile,"setting heatproduction to: " // modelfinput)
                 minerals(nominerals)%heatproduction = part
               else
                 call writelog &
@@ -202,6 +209,8 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                call writelog &
+                &(lfile,"setting heatcapcity to: " // modelfinput)
                 minerals(nominerals)%heatcapcity = part
               else
                 call writelog &
@@ -213,7 +222,9 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
-                  minerals(nominerals)%thermalconductivity = part
+                call writelog &
+                &(lfile,"setting thermalconductivity to: "//modelfinput)
+                minerals(nominerals)%thermalconductivity = part
               else
                 call writelog &
           &(lfile,"reading thermalconductivity netcdf: " // modelfinput)
@@ -224,6 +235,8 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                call writelog &
+                &(lfile,"setting bulkmodulus to: " // modelfinput)
                 minerals(nominerals)%bulkmodulus = part
               else
                 call writelog &
@@ -235,6 +248,8 @@
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
                 READ(modelfinput,*) part
+                call writelog &
+                &(lfile,"setting grainsize to: " // modelfinput)
                 minerals(nominerals)%grainsize = part
               else
                 call writelog &
