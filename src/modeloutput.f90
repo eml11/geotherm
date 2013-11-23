@@ -100,8 +100,8 @@
       subroutine wcheck(status)
       integer, intent ( in) :: status
     
-      if(status.NE.nf90_noerr) then 
-        print *, trim(nf90_strerror(status))
+      write(2,*) trim(nf90_strerror(status))
+      if(status.NE.nf90_noerr) then
         stop "Stopped"
       end if
       end subroutine

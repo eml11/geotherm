@@ -105,8 +105,7 @@
               &(lfile,"reading geometry netcdf: " // modelfinput)
               call get_idnetcdf(modelfinput, &
               &domain%geometry,this%incriment,this%tdim,this%ydim)
-              domain%incriment(1) = this%incriment(1)
-              domain%incriment(2) = -this%incriment(2) 
+              domain%incriment = this%incriment
             else if (modelfinput.EQ."Velocity") then
               READ(1,*) modelfinput
               call writelog &

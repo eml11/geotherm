@@ -122,7 +122,7 @@
  
       kappa_ar = &
       &domain%thermalconductivity/ &
-      &(0.2*domain%heatcapcity*pfield%density)
+      &(domain%heatcapcity*pfield%density)
 
       call array_integral2d &
       &((this%bderivative*domain%velocity)/kappa_ar, &
@@ -154,7 +154,7 @@
       double precision, dimension(this%n,this%m) :: t_integral
       double precision, dimension(this%n,this%m) :: y_integral
       
-      integral_term = -domain%heatproduction*domain%heatcapcity * &
+      integral_term = -domain%heatproduction*domain%density * &
       &DEXP(-1*this%expterm)/domain%thermalconductivity
       call array_integral2dydim &
       &(integral_term,y_integral,domain%incriment(2),this%n,this%m)
@@ -251,14 +251,22 @@
       type (temperaturefield) this
       type (pressurefield) pfield
    
-      call compute_bdashval(this,domain) 
+      write(2,*) "subroutine compute_bdashval"
+      call compute_bdashval(this,domain)
+      write(2,*) "subroutine compute_exponentintegral" 
       call compute_exponentintegral(this,domain,pfield)
+      write(2,*) "subroutine compute_init_inerintegral"
       call compute_init_inerintegral(this,domain)
+      write(2,*) "subroutine compute_inerintegralconstant"
       call compute_inerintegralconstant(this,domain)
+      write(2,*) "subroutine compute_init_outerintegral"
       call compute_init_outerintegral(this,domain)
+      write(2,*) "subroutine compute_outerintegralconstant"
       call compute_outerintegralconstant(this,domain)
 
       this%temperature = this%outerintegral + this%outerconstant
+
+      write(2,*) "finished computing temperature field"
 
       end subroutine
       

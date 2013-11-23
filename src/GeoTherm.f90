@@ -90,9 +90,11 @@
       !integer n,m,i,j
 
       call MINERALNEW( eclogite,n,m )
+      write(2,*) "setting up pressure field"
       call PRESSUREFIELDNEW( pressurefield_inst,n,m )
+      write(2,*) "setting up temperature field"
       call NEW( temperaturefield_inst,n,m )
-
+      write(2,*) "updating domain"
       call UPDATE( domain )
 
       eclogite%free_energy = 326352.0
@@ -123,10 +125,11 @@
       !tempory
       !modelfile_inst%velocity = modelfile_inst%velocity/10.0
       
+      write(2,*) "computing pressure"
       call compute_pressure(pressurefield_inst,domain)
-      
+      write(2,*) "computing density"
       call compute_pddensity(pressurefield_inst,domain)
-
+      write(2,*) "computing temperature"
       call compute_temp(temperaturefield_inst,domain, &
       &pressurefield_inst)
 
@@ -139,15 +142,19 @@
       &pressurefield_inst%pressure)
       
       !writes output netcdf
+      write(2,*) "writing to output"
       call write_netcdf &
       &(modelfile_inst,temperaturefield_inst, &
       &pressurefield_inst,eclogite)
 
+      write(2,*) "deleting temperature field"
       call DELETE(temperaturefield_inst)
+      write(2,*) "deleting pressure field"
       call PRESSUREFIELDDELETE(pressurefield_inst)
       call MINERALDELETE(eclogite)
+      write(2,*) "deleting domain"
       call DELETEDOMAIN( domain )
-
+      write(2,*) "done"
       !end subroutine
 
       !call MODELDELETE(modelfile_inst)

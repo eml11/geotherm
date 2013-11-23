@@ -41,7 +41,7 @@
         double precision, allocatable :: thermalconductivity(:,:)
         double precision, allocatable :: bulkmodulus(:,:)
         double precision, allocatable :: grainsize(:,:)
-
+        double precision, allocatable :: phaseline(:,:)
       end type
 
       contains
@@ -59,6 +59,7 @@
       allocate( this%thermalconductivity(n,m) )
       allocate( this%bulkmodulus(n,m) )
       allocate( this%grainsize(n,m) )
+      !allocate( this%phaseline(datapoints,2) )
 
       end subroutine
   
@@ -72,6 +73,7 @@
       deallocate( this%thermalconductivity )
       deallocate( this%bulkmodulus )
       deallocate( this%grainsize )      
+      !deallocate( this%phaseline )
 
       end subroutine
   
@@ -87,6 +89,14 @@
       eclogitephase = 0.13d0*pressure - 97.5d0
 
       end function 
+
+      function phaseline(this,pressure)
+      type (mineralphase) this
+      double precision pressure(:,:)
+      double precision, allocatable :: phaseline(:,:)
+
+      end function
+     
 
       !> Gives fraction of eclogite produced
       !! @param temperature computed temperature
