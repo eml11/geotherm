@@ -112,6 +112,10 @@
               &(lfile,"reading velocity netcdf: " // modelfinput)
               call get_netcdf(modelfinput, &
               &domain%velocity)
+            else if (modelfinput.EQ."RefranceFrame") then
+              READ(1,*) domain%frameofrefrance
+            else if (modelfinput.EQ."VelocityUnits") then
+              READ(1,*) domain%unitsvelocity
             else if (modelfinput.EQ."Boundry") then
               boolthree = 1
               do while (boolthree.EQ.1)

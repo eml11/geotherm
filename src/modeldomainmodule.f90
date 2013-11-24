@@ -55,6 +55,8 @@
         !double precision, pointer :: regionpointers(:,:)
         type (modelregion), allocatable :: regionarray(:)      
         type (mineralphase), allocatable :: mineralarray(:) 
+        character(len=4) :: unitsvelocity = "MPS"
+        double precision :: frameofrefrance = 0
 
         integer, private :: indxrg = 1
 
@@ -194,6 +196,57 @@
             end where
           enddo
       enddo
+
+      end subroutine
+
+      subroutine offsetgeometry( this )
+      type (modeldomain) this
+      integer mask(this%n,this%m)      
+      integer shift(this%n)
+      integer baseid(this%n,this%m)
+      double precision :: basevelo(this%n,this%m)
+      integer i      
+
+      where (this%geometry.EQ.0)
+        mask = 1
+      elsewhere
+        mask = 0
+      end where
+
+      shift = SUM(mask,2)
+      this%geometry = CSHIFT(this%geometry,shift,2)
+      this%velocity = CSHIFT(this%velocity,shift,2)
+      
+      mask = 1D0
+
+      
+      do i=1,this%m
+        baseid(:,i) = this%geometry(:,this%m)
+        basevelo(:,i) = this%velocity(:,this%m)
+      enddo
+
+      where (this%geometry.EQ.0)
+        this%geometry = baseid
+        this%velocity = basevelo
+      elsewhere
+        this%geometry = this%geometry
+        this%velocity = this%velocity
+      end where
+
+      end subroutine
+
+      subroutine rescale( this )
+      type (modeldomain) this
+      double precision :: conversion = 0.01/(365.24*24*3600)  
+
+      if (this%unitsvelocity.EQ."CMPA") then
+        this%velocity = this%velocity*conversion
+        this%frameofrefrance = this%frameofrefrance*conversion
+      end if  
+
+      if (this%frameofrefrance.NE.0D0) then
+        this%incriment(1) = this%incriment(1)/this%frameofrefrance
+      end if
 
       end subroutine
 

@@ -94,6 +94,10 @@
       call PRESSUREFIELDNEW( pressurefield_inst,n,m )
       write(2,*) "setting up temperature field"
       call NEW( temperaturefield_inst,n,m )
+      write(2,*) "offsetting geometry"
+      call offsetgeometry( domain )
+      write(2,*) "rescaling coordinates"
+      call rescale( domain )
       write(2,*) "updating domain"
       call UPDATE( domain )
 
