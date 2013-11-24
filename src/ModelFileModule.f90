@@ -76,13 +76,14 @@
       type (mineralphase), allocatable :: mineralstempar(:)
       type (modeldomain) domain
       type (logfile) lfile
+      character(len=10) :: netcdfx, netcdfy, netcdfz
 
       call LOGNEW(lfile,filename)
 
       call writelog(lfile,"geotherm logfile")
       call writelog(lfile,"reading file: " // filename)
       OPEN(1, file = filename)
-      READ(1,*) this%ydim, this%tdim
+      READ(1,*) this%tdim, this%ydim
       this%negativedown = 0      
 
       nominerals = 0
@@ -99,7 +100,13 @@
           call NEWDOMAIN(domain,ID,this%tdim,this%ydim)
           do while (booltwo.EQ.1)
             READ(1,*) modelfinput
-            if (modelfinput.EQ."File") then
+            if (modelfinput.EQ."FileNonXYZ") then
+              READ(1,*) netcdfx, netcdfy, netcdfz
+              READ(1,*) modelfinput
+              call get_varnetcdf(modelfinput, &
+              &domain%geometry, (/netcdfx, netcdfy, netcdfz/), &
+              &this%incriment,this%tdim,this%ydim)              
+            else if (modelfinput.EQ."File") then
               READ(1,*) modelfinput
               call writelog &
               &(lfile,"reading geometry netcdf: " // modelfinput)
@@ -168,11 +175,12 @@
           enddo
         else if (modelfinput.EQ."Mineral") then
           nominerals = nominerals + 1
-          allocate( mineralstempar(nominerals)  )          
-          mineralstempar(:nominerals) = minerals
+          allocate( mineralstempar(nominerals)  )         
+          mineralstempar(:nominerals-1) = minerals
           deallocate( minerals )
           allocate( minerals(nominerals)  )
           minerals = mineralstempar
+          deallocate(mineralstempar)
           call writelog(lfile,"creating new mineral")
           call NEWMINERAL(minerals(nominerals),this%tdim,this%ydim)
           do while (booltwo.EQ.1)
@@ -265,8 +273,8 @@
             end if
           enddo
         else if (modelfinput.EQ."Output") then
+          call writelog(lfile,"setting output")
           do while (booltwo.EQ.1)
-            call writelog(lfile,"setting output")
             READ(1,*) modelfinput
             if (modelfinput.EQ."File") then
               READ(1,*) this%outfile
@@ -287,7 +295,10 @@
 
       call writelog(lfile,"associating minerals to domain")
       call setminerals(domain,minerals)
-      call writelog(lfile,"finished parsing: " // filename)
+      WRITE(2,*) "finished parsing: "      
+
+      CLOSE(1) 
+
       end subroutine
-     
+
       end module

@@ -144,7 +144,7 @@
       type (modeldomain) this
       type (mineralphase) in_mineralarray(:)
       integer minerals
-       
+ 
       minerals = SIZE(in_mineralarray)
       allocate( this%mineralarray(minerals) )
       this%mineralarray = in_mineralarray
@@ -207,24 +207,25 @@
       double precision :: basevelo(this%n,this%m)
       integer i      
 
+      print *, SIZE(this%geometry)
+
       where (this%geometry.EQ.0)
         mask = 1
       elsewhere
         mask = 0
       end where
-
+      
       shift = SUM(mask,2)
       this%geometry = CSHIFT(this%geometry,shift,2)
       this%velocity = CSHIFT(this%velocity,shift,2)
       
       mask = 1D0
 
-      
       do i=1,this%m
         baseid(:,i) = this%geometry(:,this%m)
         basevelo(:,i) = this%velocity(:,this%m)
       enddo
-
+      print *, 18
       where (this%geometry.EQ.0)
         this%geometry = baseid
         this%velocity = basevelo
@@ -232,7 +233,7 @@
         this%geometry = this%geometry
         this%velocity = this%velocity
       end where
-
+      
       end subroutine
 
       subroutine rescale( this )

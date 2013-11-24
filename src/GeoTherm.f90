@@ -95,6 +95,7 @@
       write(2,*) "setting up temperature field"
       call NEW( temperaturefield_inst,n,m )
       write(2,*) "offsetting geometry"
+      print *, 1000
       call offsetgeometry( domain )
       write(2,*) "rescaling coordinates"
       call rescale( domain )
@@ -160,6 +161,7 @@
       call DELETEDOMAIN( domain )
       write(2,*) "done"
       !end subroutine
+      CLOSE(2)
 
       !call MODELDELETE(modelfile_inst)
 
