@@ -105,7 +105,8 @@
               READ(1,*) modelfinput
               call get_varnetcdf(modelfinput, &
               &domain%geometry, (/netcdfx, netcdfy, netcdfz/), &
-              &this%incriment,this%tdim,this%ydim)              
+              &this%incriment,this%tdim,this%ydim)
+              domain%incriment = this%incriment              
             else if (modelfinput.EQ."File") then
               READ(1,*) modelfinput
               call writelog &
@@ -190,6 +191,8 @@
               WRITE(modelfinput,*) ID
               call writelog(lfile,"ID: " // modelfinput)
               minerals(nominerals)%ID = ID
+            else if (modelfinput.EQ."Name") then
+              READ(1,*) minerals(nominerals)%mineralname 
             else if (modelfinput.EQ."Density") then
               READ(1,*) typinput, modelfinput
               if (typinput.EQ."D") then
@@ -237,8 +240,8 @@
                 &(lfile,"setting thermalconductivity to: "//modelfinput)
                 minerals(nominerals)%thermalconductivity = part
               else
-                !call writelog &
-          !&(lfile,"reading thermalconductivity netcdf: " // modelfinput)
+                call writelog &
+          &(lfile,"reading thermalconductivity netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%thermalconductivity)
               end if
@@ -268,6 +271,12 @@
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%grainsize)
               end if
+            else if (modelfinput.EQ."PhaseLines") then
+              WRITE(2,*) "setting phaseline"
+              READ(1,*) minerals(nominerals)%lowtemperaturephase(1), &
+              & minerals(nominerals)%lowtemperaturephase(2)
+              READ(1,*) minerals(nominerals)%lowpressurephase(1), &
+              & minerals(nominerals)%lowpressurephase(2)
             else if (modelfinput.EQ."EndMineral") then
               booltwo = 0
             end if

@@ -38,6 +38,7 @@
         integer :: negativedown
         integer :: n,m
         integer :: regions
+        integer minerals
         integer, allocatable :: geometry(:,:)
 
         double precision :: incriment(2)
@@ -68,7 +69,9 @@
       type (modeldomain) this
       integer regions
       integer n,m      
-      
+     
+      this%n = n
+      this%m = m 
       this%regions = regions
       allocate( this%geometry(n,m) )      
 
@@ -108,7 +111,7 @@
 
       deallocate( this%regionarray )
 
-      do i=1,SIZE(this%mineralarray)
+      do i=1,this%minerals
         call MINERALDELETE( this%mineralarray(i) )
       enddo
 
@@ -144,11 +147,24 @@
       subroutine setminerals(this,in_mineralarray)
       type (modeldomain) this
       type (mineralphase) in_mineralarray(:)
-      integer minerals
  
-      minerals = SIZE(in_mineralarray)
-      allocate( this%mineralarray(minerals) )
+      this%minerals = SIZE(in_mineralarray)
+      allocate( this%mineralarray(this%minerals) )
       this%mineralarray = in_mineralarray
+
+      end subroutine
+
+      subroutine computemineralparts( this,t_ar,temperature,pressure )
+      type (modeldomain) this
+      integer i,minerals
+      double precision :: t_ar(:,:)
+      double precision :: temperature(:,:)
+      double precision :: pressure(:,:)      
+
+      minerals = this%minerals
+      do i=1,minerals
+       call compute_part(this%mineralarray(i),t_ar,temperature,pressure)
+      enddo
 
       end subroutine
 
@@ -215,18 +231,16 @@
       end where
        
       shift = SUM(mask,2)
-      
-      this%geometry = CSHIFT(this%geometry,-shift,2)
-      this%velocity = CSHIFT(this%velocity,-shift,2)
-      
-      mask = 1D0
-
-      !print *, this%geometry(1,1)
-
+     
       do i=1,m
         baseid(:,i) = this%geometry(:,1)
         basevelo(:,i) = this%velocity(:,1)
       enddo
+
+      this%geometry = CSHIFT(this%geometry,-shift,2)
+      this%velocity = CSHIFT(this%velocity,-shift,2)
+      
+      mask = 1D0
       
       where (this%geometry.EQ.0)
         this%geometry = baseid
@@ -236,6 +250,9 @@
         this%velocity = this%velocity
       end where
       
+      this%geometry = this%geometry(:,m:1:-1)
+      this%velocity = this%velocity(:,m:1:-1)
+
       end subroutine
 
       subroutine rescale( this )

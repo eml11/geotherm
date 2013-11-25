@@ -42,19 +42,20 @@
       !> netcdf writing subroutine
       !! @param filename name of netcdf file
       !! @param data_ar z data of netcdf 
-      subroutine write_netcdf(model,tfield,pfield,geometry,minphase)
+      subroutine write_netcdf(model,tfield,pfield,domain)
       !&(filename,temp_ar,density_ar,pressure_ar,ecologite_ar, &
       !&negativedown,n,m)
       !type (modelfile) model
       type (modelfile) model
+      type (modeldomain) domain
       type (temperaturefield) tfield
       type (pressurefield) pfield
-      type (mineralphase) minphase
-      integer geometry(:,:)
 
-      integer :: ncid, tvarid, pvarid, dvarid, evarid, gvarid, dimids(2)
+      integer :: ncid, tvarid, pvarid, dvarid, gvarid, dimids(2)
+      integer :: mineralvarid(domain%minerals)
       integer :: x_dimid, y_dimid
-      
+      integer i      
+
       call wcheck( nf90_create(model%outfile, NF90_CLOBBER, ncid) )
 
       call wcheck( nf90_def_dim(ncid, "x", tfield%n, x_dimid) )
@@ -71,11 +72,17 @@
       call wcheck( nf90_def_var &
       &(ncid, "Density", NF90_DOUBLE, dimids, dvarid) )
 
-      call wcheck ( nf90_def_var &
-      &(ncid, "EclogitePart", NF90_DOUBLE, dimids, evarid) )
+      !call wcheck ( nf90_def_var &
+      !&(ncid, "EclogitePart", NF90_DOUBLE, dimids, evarid) )
 
       call wcheck ( nf90_def_var &
       &(ncid, "Geometry", NF90_DOUBLE, dimids, gvarid) )
+
+      do i=1,domain%minerals
+        call wcheck ( nf90_def_var &
+        &(ncid, domain%mineralarray(i)%mineralname, NF90_DOUBLE, &
+        &dimids, mineralvarid(i)) )
+      enddo
 
       call wcheck( nf90_enddef(ncid) )
 
@@ -83,20 +90,28 @@
         call wcheck( nf90_put_var(ncid, dvarid, pfield%density) )
         call wcheck( nf90_put_var(ncid, tvarid, tfield%temperature) )
         call wcheck( nf90_put_var(ncid, pvarid, pfield%pressure) )
-        call wcheck( nf90_put_var(ncid, evarid, minphase%mineralpart) )
-        call wcheck( nf90_put_var(ncid, gvarid, geometry) )
-      else
+        !call wcheck( nf90_put_var(ncid, evarid, minphase%mineralpart) )
+        call wcheck( nf90_put_var(ncid, gvarid, domain%geometry) )
+        do i=1,domain%minerals
+          call wcheck( nf90_put_var(ncid, mineralvarid(i), &
+          &domain%mineralarray(i)%mineralpart) )
+        enddo
+      else 
         call wcheck( &
         &nf90_put_var(ncid, dvarid, pfield%density(:,tfield%m:1:-1)) )
         call wcheck( &
         &nf90_put_var(ncid, tvarid,tfield%temperature(:,tfield%m:1:-1)))
         call wcheck( &
         &nf90_put_var(ncid, pvarid, pfield%pressure(:,tfield%m:1:-1)) )
+        !call wcheck( &
+        !&nf90_put_var(ncid,evarid, &
+        !&minphase%mineralpart(:,tfield%m:1:-1)))
         call wcheck( &
-        &nf90_put_var(ncid,evarid, &
-        &minphase%mineralpart(:,tfield%m:1:-1)))
-        call wcheck( &
-        &nf90_put_var(ncid, gvarid, geometry(:,tfield%m:1:-1)) )
+        &nf90_put_var(ncid, gvarid, domain%geometry(:,tfield%m:1:-1)) )
+        do i=1,domain%minerals
+          call wcheck( nf90_put_var(ncid, mineralvarid(i), &
+          &domain%mineralarray(i)%mineralpart(:,tfield%m:1:-1)) )
+        enddo
       end if
 
       end subroutine

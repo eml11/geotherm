@@ -32,6 +32,7 @@
       
         integer n,m
         integer ID
+        character(len=20) :: mineralname
         double precision, allocatable :: mineralpart(:,:)
         double precision, allocatable :: free_energy
         double precision, allocatable :: diffusion_coefficient      
@@ -42,6 +43,9 @@
         double precision, allocatable :: bulkmodulus(:,:)
         double precision, allocatable :: grainsize(:,:)
         double precision, allocatable :: phaseline(:,:)
+        double precision :: lowtemperaturephase(2) = (/0,0/)
+        double precision :: lowpressurephase(2) = (/0,0/)
+
       end type
 
       contains
@@ -90,13 +94,25 @@
 
       end function 
 
-      function phaseline(this,pressure)
+      function ltphaseline(this,pressure)
       type (mineralphase) this
-      double precision pressure(:,:)
-      double precision, allocatable :: phaseline(:,:)
+      double precision pressure(this%n,this%m)
+      double precision :: ltphaseline(this%n,this%m)
+
+      ltphaseline = this%lowtemperaturephase(1)*pressure + &
+      &this%lowtemperaturephase(2)
 
       end function
      
+      function lpphaseline(this,temperature)
+      type (mineralphase) this
+      double precision temperature(this%n,this%m)
+      double precision :: lpphaseline(this%n,this%m)
+           
+      lpphaseline = this%lowpressurephase(1)*temperature + &
+      &this%lowpressurephase(2)
+
+      end function
 
       !> Gives fraction of eclogite produced
       !! @param temperature computed temperature
@@ -141,7 +157,7 @@
       !! @param t_ar time variable
       !! @return retrn_ar fraction of eclogite against
       !! total rock
-      subroutine compute_eclogite_content &
+      subroutine compute_part &
       &(this,t_ar,temperature,pressure)
       
       type (mineralphase) this
@@ -156,11 +172,16 @@
 
       call compute_reactionprogress(this,t_ar,temperature)
 
-      where (temperature .LE. &
-      &eclogitephase(pressure,this%n,this%m))
-        this%mineralpart = this%mineralpart
+      where (temperature .GE. &
+      &ltphaseline(this,pressure))
+        where (pressure .GE. &
+        & lpphaseline(this,temperature))
+          this%mineralpart = this%mineralpart
+        elsewhere
+          this%mineralpart = 0d0
+        end where
       elsewhere
-        this%mineralpart = 0d0*this%mineralpart
+        this%mineralpart = 0d0
       end where
 
       end subroutine 
