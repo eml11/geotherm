@@ -66,37 +66,14 @@
       allocate( eclogite_content(n,m) )
       allocate( t_ar(n,m) )
 
-      !call MODELDELETE(modelfile_inst)
-
-      !end program
-
-      !subroutine compute_geotherm(modelfile_inst,domain,n,m)
-      !use equationpartsmodule
-      !use module_modelfile, MODELDELETE => DELETE, &
-      !MODELNEW => NEW 
-      !use mathmodule
-      !use helpermodule
-      !use pressuresolver, PRESSUREFIELDNEW => NEW, &
-      !&PRESSUREFIELDDELETE => DELETE
-      !use geochem, MINERALDELETE => DELETE, &
-      !& MINERALNEW => NEW
-      !type (modelfile), intent(in) :: modelfile_inst
-      !type (pressurefield) :: pressurefield_inst
-      !type (temperaturefield) :: temperaturefield_inst
-      !type (mineralphase) eclogite
-      !type (modeldomain) domain
-      !double precision :: eclogite_content(n,m)
-      !double precision :: t_ar(n,m)
-      !integer n,m,i,j
-
       call MINERALNEW( eclogite,n,m )
       write(2,*) "setting up pressure field"
       call PRESSUREFIELDNEW( pressurefield_inst,n,m )
       write(2,*) "setting up temperature field"
       call NEW( temperaturefield_inst,n,m )
       write(2,*) "offsetting geometry"
-      print *, 1000
-      call offsetgeometry( domain )
+      !this is buggered
+      call offsetgeometry( domain,n,m )
       write(2,*) "rescaling coordinates"
       call rescale( domain )
       write(2,*) "updating domain"
@@ -104,31 +81,6 @@
 
       eclogite%free_energy = 326352.0
       eclogite%diffusion_coefficient = 0.00002
-
-      !reading netcdfs from files sepcified in the modelfile
-      !call get_netcdf1d(modelfile_inst%gtempfile, &
-      !&modelfile_inst%gtemp,n,m)
-      !call get_netcdf1d(modelfile_inst%gqfluxfile, &
-      !&modelfile_inst%gqflux,n,m)
-      !call get_netcdf_wincrmnt(modelfile_inst%velocitynetcdf, &
-      !&modelfile_inst%velocity,modelfile_inst%incriment,n,m)
-      !call get_netcdf(modelfile_inst%densitynetcdf, &
-      !&modelfile_inst%density)
-      !call get_netcdf(modelfile_inst%heatproductnetcdf, &
-      !&modelfile_inst%heatproduction)
-      !call get_netcdf(modelfile_inst%heatcapcnetcdf, &
-      !&modelfile_inst%heatcapcity)
-      !call get_netcdf &
-      !&(modelfile_inst%thermlconductnetcdf, &
-      !&modelfile_inst%thermalconductivity)
-      !call get_netcdf &
-      !&(modelfile_inst%incompresibilitynetcdf, &
-      !&modelfile_inst%bulkmodulus)
-      !call get_netcdf(modelfile_inst%grainsizenetcdf, &
-      !&modelfile_inst%grainsize)
-
-      !tempory
-      !modelfile_inst%velocity = modelfile_inst%velocity/10.0
       
       write(2,*) "computing pressure"
       call compute_pressure(pressurefield_inst,domain)
@@ -150,7 +102,7 @@
       write(2,*) "writing to output"
       call write_netcdf &
       &(modelfile_inst,temperaturefield_inst, &
-      &pressurefield_inst,eclogite)
+      &pressurefield_inst,domain%geometry,eclogite)
 
       write(2,*) "deleting temperature field"
       call DELETE(temperaturefield_inst)

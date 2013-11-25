@@ -84,7 +84,7 @@
       call writelog(lfile,"reading file: " // filename)
       OPEN(1, file = filename)
       READ(1,*) this%tdim, this%ydim
-      this%negativedown = 0      
+      this%negativedown = 0     
 
       nominerals = 0
 
@@ -179,7 +179,7 @@
           mineralstempar(:nominerals-1) = minerals
           deallocate( minerals )
           allocate( minerals(nominerals)  )
-          minerals = mineralstempar
+          minerals(:nominerals-1) = mineralstempar(:nominerals-1)
           deallocate(mineralstempar)
           call writelog(lfile,"creating new mineral")
           call NEWMINERAL(minerals(nominerals),this%tdim,this%ydim)
@@ -237,8 +237,8 @@
                 &(lfile,"setting thermalconductivity to: "//modelfinput)
                 minerals(nominerals)%thermalconductivity = part
               else
-                call writelog &
-          &(lfile,"reading thermalconductivity netcdf: " // modelfinput)
+                !call writelog &
+          !&(lfile,"reading thermalconductivity netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%thermalconductivity)
               end if
@@ -295,9 +295,9 @@
 
       call writelog(lfile,"associating minerals to domain")
       call setminerals(domain,minerals)
-      WRITE(2,*) "finished parsing: "      
+      WRITE(2,*) "finished parsing: " // filename     
 
-      CLOSE(1) 
+      !CLOSE(1) 
 
       end subroutine
 

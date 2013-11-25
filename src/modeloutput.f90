@@ -42,7 +42,7 @@
       !> netcdf writing subroutine
       !! @param filename name of netcdf file
       !! @param data_ar z data of netcdf 
-      subroutine write_netcdf(model,tfield,pfield,minphase)
+      subroutine write_netcdf(model,tfield,pfield,geometry,minphase)
       !&(filename,temp_ar,density_ar,pressure_ar,ecologite_ar, &
       !&negativedown,n,m)
       !type (modelfile) model
@@ -50,8 +50,9 @@
       type (temperaturefield) tfield
       type (pressurefield) pfield
       type (mineralphase) minphase
+      integer geometry(:,:)
 
-      integer :: ncid, tvarid, pvarid, dvarid, evarid, dimids(2)
+      integer :: ncid, tvarid, pvarid, dvarid, evarid, gvarid, dimids(2)
       integer :: x_dimid, y_dimid
       
       call wcheck( nf90_create(model%outfile, NF90_CLOBBER, ncid) )
@@ -73,6 +74,9 @@
       call wcheck ( nf90_def_var &
       &(ncid, "EclogitePart", NF90_DOUBLE, dimids, evarid) )
 
+      call wcheck ( nf90_def_var &
+      &(ncid, "Geometry", NF90_DOUBLE, dimids, gvarid) )
+
       call wcheck( nf90_enddef(ncid) )
 
       if (model%negativedown.EQ.0) then
@@ -80,6 +84,7 @@
         call wcheck( nf90_put_var(ncid, tvarid, tfield%temperature) )
         call wcheck( nf90_put_var(ncid, pvarid, pfield%pressure) )
         call wcheck( nf90_put_var(ncid, evarid, minphase%mineralpart) )
+        call wcheck( nf90_put_var(ncid, gvarid, geometry) )
       else
         call wcheck( &
         &nf90_put_var(ncid, dvarid, pfield%density(:,tfield%m:1:-1)) )
@@ -90,6 +95,8 @@
         call wcheck( &
         &nf90_put_var(ncid,evarid, &
         &minphase%mineralpart(:,tfield%m:1:-1)))
+        call wcheck( &
+        &nf90_put_var(ncid, gvarid, geometry(:,tfield%m:1:-1)) )
       end if
 
       end subroutine

@@ -134,7 +134,8 @@
       type (modeldomain) this
       integer mineralid
       double precision part
-      
+     
+      !this is not getting called imediatly after region assignment so will have no meaning 
       call &
       &regionaddmineral(this%regionarray(this%indxrg-1),mineralid,part)
 
@@ -199,33 +200,34 @@
 
       end subroutine
 
-      subroutine offsetgeometry( this )
+      subroutine offsetgeometry( this,n,m )
       type (modeldomain) this
-      integer mask(this%n,this%m)      
-      integer shift(this%n)
-      integer baseid(this%n,this%m)
-      double precision :: basevelo(this%n,this%m)
-      integer i      
-
-      print *, SIZE(this%geometry)
-
+      integer mask(n,m)      
+      integer shift(n)
+      integer baseid(n,m)
+      double precision :: basevelo(n,m)
+      integer i,n,m      
+      !note domain should probably have it's own m,n
       where (this%geometry.EQ.0)
         mask = 1
       elsewhere
         mask = 0
       end where
-      
+       
       shift = SUM(mask,2)
-      this%geometry = CSHIFT(this%geometry,shift,2)
-      this%velocity = CSHIFT(this%velocity,shift,2)
+      
+      this%geometry = CSHIFT(this%geometry,-shift,2)
+      this%velocity = CSHIFT(this%velocity,-shift,2)
       
       mask = 1D0
 
-      do i=1,this%m
-        baseid(:,i) = this%geometry(:,this%m)
-        basevelo(:,i) = this%velocity(:,this%m)
+      !print *, this%geometry(1,1)
+
+      do i=1,m
+        baseid(:,i) = this%geometry(:,1)
+        basevelo(:,i) = this%velocity(:,1)
       enddo
-      print *, 18
+      
       where (this%geometry.EQ.0)
         this%geometry = baseid
         this%velocity = basevelo
