@@ -58,7 +58,7 @@
       !main work subroutine
       !call compute_geotherm &
       !&(modelfile_inst,domain,modelfile_inst%tdim,modelfile_inst%ydim)
-
+      print *,2
       n = modelfile_inst%tdim
       m = modelfile_inst%ydim
 
@@ -77,35 +77,39 @@
       call rescale( domain )
       write(2,*) "updating domain"
       call UPDATE( domain )
+      print *,12
+      call updateminerals( domain )
 
       !eclogite%free_energy = 326352.0
       !eclogite%diffusion_coefficient = 0.00002
-      
+      print *,11
       write(2,*) "computing pressure"
       call compute_pressure(pressurefield_inst,domain)
       write(2,*) "computing density"
+      print *, 21
       call compute_pddensity(pressurefield_inst,domain)
       write(2,*) "computing temperature"
+      print *, 22
       call compute_temp(temperaturefield_inst,domain, &
       &pressurefield_inst)
-
+      print *,10
       do j=1,m
         t_ar(:,j) = (/(i,i=1,n)/)*modelfile_inst%incriment(1)
       enddo
-      
+      print *,9
       !call compute_eclogite_content(eclogite,t_ar, &
       !&temperaturefield_inst%temperature, &
       !&pressurefield_inst%pressure)
       
       call computemineralparts( domain,t_ar, &
       &temperaturefield_inst%temperature,pressurefield_inst%pressure )
-
+      print *,1
       !writes output netcdf
       write(2,*) "writing to output"
       call write_netcdf &
       &(modelfile_inst,temperaturefield_inst, &
       &pressurefield_inst,domain)
-
+      
       write(2,*) "deleting temperature field"
       call DELETE(temperaturefield_inst)
       write(2,*) "deleting pressure field"

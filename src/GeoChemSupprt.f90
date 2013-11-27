@@ -33,9 +33,10 @@
         integer n,m
         integer ID
         character(len=20) :: mineralname
+        integer :: parent = 0
         double precision, allocatable :: mineralpart(:,:)
-        double precision, allocatable :: free_energy
-        double precision, allocatable :: diffusion_coefficient      
+        double precision :: free_energy = 0d0
+        double precision :: diffusion_coefficient = 1d0      
         double precision, allocatable :: density(:,:)
         double precision, allocatable :: heatproduction(:,:) 
         double precision, allocatable :: heatcapcity(:,:)
@@ -64,6 +65,8 @@
       allocate( this%bulkmodulus(n,m) )
       allocate( this%grainsize(n,m) )
       !allocate( this%phaseline(datapoints,2) )
+
+      this%mineralpart = 0D0
 
       end subroutine
   
@@ -128,24 +131,29 @@
       !! @return retrn_ar fraction of eclogite against
       !! total rock
       subroutine compute_reactionprogress &
-      &(this,t_ar,temperature)
+      &(this,parent,t_ar,temperature)
 
-      type (mineralphase) this
+      type (mineralphase) this, parent
       !type (temperaturefield) tfield
 
       double precision :: temperature(:,:)
       double precision :: t_ar(this%n,this%m)
       double precision :: caracteristic_time_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 
-
+      print *, 400
       !need to change to import parent chemical species at some point
       !recions will probably actually be called from Domain
       caracteristic_time_ar = (this%grainsize**2) * &
       &DEXP(this%free_energy/(gas_const*temperature)) / &
       &this%diffusion_coefficient
-
-      this%mineralpart = 1d0 - DEXP(-t_ar/caracteristic_time_ar)
-
+      print *, 410
+      ! note the 1-mineralpart will be replaced by parent mineral
+      this%mineralpart = this%mineralpart + &
+      &(1d0-parent%mineralpart* &
+      &DEXP(-t_ar/caracteristic_time_ar))
+      parent%mineralpart = parent%mineralpart* &
+      &DEXP(-t_ar/caracteristic_time_ar)
+      print *,420
       end subroutine
 
       !> combines reaction progress with
@@ -158,9 +166,9 @@
       !! @return retrn_ar fraction of eclogite against
       !! total rock
       subroutine compute_part &
-      &(this,t_ar,temperature,pressure)
+      &(this,parent,t_ar,temperature,pressure)
       
-      type (mineralphase) this
+      type (mineralphase) this, parent
       !type (modelfile) model
       !type (pressurefield) pfield
       !type (temperaturefield) tfield
@@ -169,21 +177,24 @@
 
       double precision :: t_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 !tempory
-
-      call compute_reactionprogress(this,t_ar,temperature)
-
+      print *, 300
+      if (this%parent.NE.0) then
+        call compute_reactionprogress(this,parent,t_ar,temperature)
+      end if
+      !print *, this%mineralpart
+      print *, 310
       where (temperature .GE. &
       &ltphaseline(this,pressure))
         where (pressure .GE. &
         & lpphaseline(this,temperature))
           this%mineralpart = this%mineralpart
         elsewhere
-          this%mineralpart = 0d0
+          this%mineralpart = 0D0
         end where
       elsewhere
-        this%mineralpart = 0d0
+        this%mineralpart = 0D0
       end where
-
+      print *, 320
       end subroutine 
 
       end module

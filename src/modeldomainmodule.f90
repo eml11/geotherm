@@ -156,26 +156,37 @@
 
       subroutine computemineralparts( this,t_ar,temperature,pressure )
       type (modeldomain) this
-      integer i,minerals
+      integer i,j,minerals
       double precision :: t_ar(:,:)
       double precision :: temperature(:,:)
       double precision :: pressure(:,:)      
 
-      minerals = this%minerals
-      do i=1,minerals
-       call compute_part(this%mineralarray(i),t_ar,temperature,pressure)
+      !need to add in section on parent
+
+      do i=1,this%minerals
+       if (this%mineralarray(i)%parent.EQ.0) then
+         call compute_part(this%mineralarray(i),this%mineralarray(i), &
+         &t_ar,temperature,pressure)
+       else
+       do j=1,this%minerals
+         if (j.EQ.i) then         
+         continue
+         end if
+         if (this%mineralarray(j)%ID.EQ.this%mineralarray(i)%parent) then
+         call compute_part(this%mineralarray(i),this%mineralarray(j), &
+         &t_ar,temperature,pressure)
+         exit
+         end if
+       enddo
+       end if
       enddo
 
       end subroutine
 
       subroutine UPDATE(this)
       type (modeldomain) this
-      integer i,j   
-      integer minerals   
-      double precision, allocatable :: part(:)
-
-      minerals = SIZE(this%mineralarray)
-      allocate( part(minerals) )
+      integer i,j     
+      double precision :: part
 
       this%density = this%geometry*0d0
       this%heatproduction = this%geometry*0d0
@@ -187,32 +198,97 @@
       !should really be done with pointers
 
       do i=1,this%regions
-          do j=1,minerals
-            where &
-          &(this%mineralarray(j)%ID.EQ.this%regionarray(i)%mineralids)
-              part = this%regionarray(i)%mineralparts
-            elsewhere
-              part = 0d0
-            end where
+          do j=1,this%minerals
+            !where &
+          !&(this%mineralarray(j)%ID.EQ.this%regionarray(i)%mineralids)
+              !part = this%regionarray(i)%mineralparts
+            !elsewhere
+            !  part = 0d0
+            !end where
+            if (ANY(this%mineralarray(j)%ID .EQ. &
+            &this%regionarray(i)%mineralids)) then
+              
+            !else
+
+            !endif
+            
+            part = MAXVAL(this%regionarray(i)%mineralparts,MASK = &
+            &this%mineralarray(j)%ID .EQ. &
+            &this%regionarray(i)%mineralids   )
+            else
+            part = 0
+            endif
+
+
+            !print *, "part ",part
 
             where (this%geometry.EQ.this%regionarray(i)%ID)
 
               this%density = this%density + &
-              &this%mineralarray(j)%density*part(1) 
+              &this%mineralarray(j)%density*part
               this%heatproduction = this%heatproduction + &
-              &this%mineralarray(j)%heatproduction*part(1)
+              &this%mineralarray(j)%heatproduction*part
               this%heatcapcity = this%heatcapcity + &
-              &this%mineralarray(j)%heatcapcity*part(1)
+              &this%mineralarray(j)%heatcapcity*part
               this%thermalconductivity = this%thermalconductivity + &
-              &this%mineralarray(j)%thermalconductivity*part(1)
+              &this%mineralarray(j)%thermalconductivity*part
               this%bulkmodulus = this%bulkmodulus + &
-              &this%mineralarray(j)%bulkmodulus*part(1)
+              &this%mineralarray(j)%bulkmodulus*part
               this%grainsize = this%grainsize + &
-              &this%mineralarray(j)%grainsize*part(1)
+              &this%mineralarray(j)%grainsize*part
 
             end where
           enddo
       enddo
+
+      end subroutine
+
+      subroutine updateminerals(this)
+      type (modeldomain) this
+      integer i,j      
+      double precision :: part
+
+      !allocate( part(this%minerals) )
+
+
+      !should really be done with pointers
+      !probably gets overwritten by GeoChem subroutines
+      do i=1,this%regions
+          do j=1,this%minerals
+            !where &
+          !&(this%mineralarray(j)%ID.EQ.this%regionarray(i)%mineralids)
+            !  part = this%regionarray(i)%mineralparts
+            !elsewhere
+            !  part = 0d0
+            !end where
+            !part = MAXVAL(this%regionarray(i)%mineralids,MASK = &
+            !&this%mineralarray(j)%ID .EQ. &
+            !&this%regionarray(i)%mineralids   )
+
+            if (ANY(this%mineralarray(j)%ID .EQ. &
+            &this%regionarray(i)%mineralids)) then
+
+            !else
+
+            !endif
+            
+            part = MAXVAL(this%regionarray(i)%mineralparts,MASK = &
+            &this%mineralarray(j)%ID .EQ. &
+            &this%regionarray(i)%mineralids   )
+            else
+            part = 0
+            endif
+            !print *, i"part ",part
+            
+            where (this%geometry.EQ.this%regionarray(i)%ID)
+              this%mineralarray(j)%mineralpart = &
+              &this%mineralarray(j)%mineralpart + part
+            !elsewhere
+            !  this%mineralarray(j)%mineralpart = 0D0
+            end where
+          enddo
+      enddo    
+
 
       end subroutine
 

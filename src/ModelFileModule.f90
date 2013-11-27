@@ -270,7 +270,13 @@
                 &(lfile,"reading grainsize netcdf: " // modelfinput)
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%grainsize)
-              end if
+               end if
+            else if (modelfinput.EQ."FreeEnergy") then
+              READ(1,*) minerals(nominerals)%free_energy
+            else if (modelfinput.EQ."DiffusionCoefficient") then
+              READ(1,*) minerals(nominerals)%diffusion_coefficient
+            else if (modelfinput.EQ."Parent") then
+              READ(1,*) minerals(nominerals)%parent
             else if (modelfinput.EQ."PhaseLines") then
               WRITE(2,*) "setting phaseline"
               READ(1,*) minerals(nominerals)%lowtemperaturephase(1), &
