@@ -140,20 +140,21 @@
       double precision :: t_ar(this%n,this%m)
       double precision :: caracteristic_time_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 
-      print *, 400
+      
       !need to change to import parent chemical species at some point
       !recions will probably actually be called from Domain
-      caracteristic_time_ar = (this%grainsize**2) * &
+      caracteristic_time_ar = (parent%grainsize**2) * &
       &DEXP(this%free_energy/(gas_const*temperature)) / &
-      &this%diffusion_coefficient
-      print *, 410
+      &parent%diffusion_coefficient
+      
       ! note the 1-mineralpart will be replaced by parent mineral
       this%mineralpart = this%mineralpart + &
-      &(1d0-parent%mineralpart* &
+      &(parent%mineralpart-parent%mineralpart* &
       &DEXP(-t_ar/caracteristic_time_ar))
+
       parent%mineralpart = parent%mineralpart* &
       &DEXP(-t_ar/caracteristic_time_ar)
-      print *,420
+
       end subroutine
 
       !> combines reaction progress with
@@ -177,12 +178,12 @@
 
       double precision :: t_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 !tempory
-      print *, 300
+      
       if (this%parent.NE.0) then
         call compute_reactionprogress(this,parent,t_ar,temperature)
       end if
       !print *, this%mineralpart
-      print *, 310
+      
       where (temperature .GE. &
       &ltphaseline(this,pressure))
         where (pressure .GE. &
@@ -194,7 +195,7 @@
       elsewhere
         this%mineralpart = 0D0
       end where
-      print *, 320
+
       end subroutine 
 
       end module

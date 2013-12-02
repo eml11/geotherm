@@ -9,7 +9,7 @@ OUT=geotherm
 OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/GeoChemSupprt.o $(OBJECTDIR)/modeldomainmodule.o $(OBJECTDIR)/modeloutput.o $(OBJECTDIR)/modelregionmodule.o $(OBJECTDIR)/modellogfile.o
 MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/modeldomainmodule.mod $(OBJECTDIR)/modeloutput.mod $(OBJECTDIR)/modelregionmodule.mod $(OBJECTDIR)/modellogfile.mod
 
-all: geotherm domaingen unittests
+all: geotherm domaingen unittests isostatics
 
 geotherm: $(SRC)/GeoTherm.f90 $(MODULES)
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o $(OUT) $(SRC)/GeoTherm.f90 $(OBJECTS)
@@ -19,13 +19,17 @@ unittests: $(SRC)/unit_tests.f90 $(MODULES)
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o unittests $(SRC)/unit_tests.f90 $(OBJECTS)
 	mkdir -p $(TESTS)/bin; mv unittests $(TESTS)/bin
 
+isostatics: $(SRC)/Isostatics.f90 $(MODULES) $(OBJECTDIR)/isostatichelper.mod
+	$(FC) $(LDFLAGS) $(FDFLAGS) -o isostatics $(SRC)/Isostatics.f90 $(OBJECTS) $(OBJECTDIR)/isostatichelper.o
+	mkdir -p $(BIN); mv isostatics $(BIN)
+
+$(OBJECTDIR)/isostatichelper.mod: $(SRC)/isostatichelper.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/modeldomainmodule.mod
+	$(FC) -c $(LDFLAGS) $(FDFLAGS) $(SRC)/isostatichelper.f90
+	mkdir -p $(OBJECTDIR); mv isostatichelper.mod isostatichelper.o $(OBJECTDIR)
+
 domaingen: $(SRC)/generate_domain.f90
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o domaingen $(SRC)/generate_domain.f90
 	mkdir -p $(BIN); mv domaingen $(BIN)
-
-$(OBJECTDIR)/mathmodule.mod: $(SRC)/MathModule.f90
-	$(FC) -c $(SRC)/MathModule.f90
-	mkdir -p $(OBJECTDIR); mv mathmodule.mod mathmodule.o $(OBJECTDIR)
 
 $(OBJECTDIR)/helpermodule.mod: $(SRC)/HelperModule.f90
 	$(FC) -c $(FDFLAGS) -L$(OBJECTDIR) $(SRC)/HelperModule.f90
@@ -39,12 +43,12 @@ $(OBJECTDIR)/equationpartsmodule.mod: $(SRC)/EquationParts.f90 $(OBJECTDIR)/math
 	$(FC) -c -I$(OBJECTDIR) -L$(OBJECTDIR) $(SRC)/EquationParts.f90 $(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/modeldomainmodule.o
 	mkdir -p $(OBJECTDIR); mv equationpartsmodule.mod EquationParts.o $(OBJECTDIR)
 
-$(OBJECTDIR)/pressuresolver.mod: $(SRC)/PressureSolver.f90 $(OBJECTDIR)/mathmodule.mod
+$(OBJECTDIR)/pressuresolver.mod: $(SRC)/PressureSolver.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/modeldomainmodule.mod
 	$(FC) -c $(FDFLAGS) $(SRC)/PressureSolver.f90 $(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/modeldomainmodule.o
 	mkdir -p $(OBJECTDIR); mv pressuresolver.mod pressuresolver.o $(OBJECTDIR)
 
-$(OBJECTDIR)/geochem.mod: $(SRC)/GeoChemSupprt.f90 $(OBJECTDIR)/pressuresolver.mod
-	$(FC) -c $(FDFLAGS) $(SRC)/GeoChemSupprt.f90 $(OBJECTDIR)/pressuresolver.o
+$(OBJECTDIR)/geochem.mod: $(SRC)/GeoChemSupprt.f90
+	$(FC) -c $(FDFLAGS) $(SRC)/GeoChemSupprt.f90
 	mkdir -p $(OBJECTDIR); mv geochem.mod GeoChemSupprt.o $(OBJECTDIR)
 
 $(OBJECTDIR)/modeldomainmodule.mod: $(SRC)/modeldomainmodule.f90 $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/modelregionmodule.mod
@@ -63,12 +67,16 @@ $(OBJECTDIR)/modellogfile.mod: $(SRC)/modellogfile.f90
 	$(FC) -c $(SRC)/modellogfile.f90
 	mkdir -p $(OBJECTDIR); mv modellogfile.mod modellogfile.o $(OBJECTDIR)
 
+$(OBJECTDIR)/mathmodule.mod: $(SRC)/MathModule.f90
+	$(FC) -c $(SRC)/MathModule.f90
+	mkdir -p $(OBJECTDIR); mv mathmodule.mod mathmodule.o $(OBJECTDIR)
+
 test: geotherm
 	cd $(TESTS); make clean
 	cd $(TESTS); make test
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(OBJECTS) $(OBJECTDIR)/isostatichelper.mod $(OBJECTDIR)/isostatichelper.o
 	rm -f $(MODULES)
 	rm -f $(BIN)/geotherm $(BIN)/domaingen
 	rmdir $(OBJECTDIR)

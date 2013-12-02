@@ -137,6 +137,9 @@
 
       this%expterm = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
+  
+      !test
+      this%expterm = -this%expterm
 
       end subroutine
 

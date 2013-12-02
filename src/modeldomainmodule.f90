@@ -180,7 +180,7 @@
        enddo
        end if
       enddo
-
+      
       end subroutine
 
       subroutine UPDATE(this)
@@ -249,7 +249,9 @@
       double precision :: part
 
       !allocate( part(this%minerals) )
-
+      do j=1,this%minerals
+        this%mineralarray(j)%mineralpart = 0D0
+      enddo
 
       !should really be done with pointers
       !probably gets overwritten by GeoChem subroutines
@@ -343,7 +345,7 @@
       if (this%frameofrefrance.NE.0D0) then
         this%incriment(1) = this%incriment(1)/this%frameofrefrance
       end if
-
+      
       end subroutine
 
       end module
