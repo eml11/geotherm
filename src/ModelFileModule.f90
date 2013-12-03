@@ -120,6 +120,12 @@
               &(lfile,"reading velocity netcdf: " // modelfinput)
               call get_netcdf(modelfinput, &
               &domain%velocity)
+            else if (modelfinput.EQ."VelocityNonXYZ") then
+              READ(1,*) netcdfz
+              READ(1,*) modelfinput
+              call get_vardoublenetcdf(modelfinput, &
+              &domain%velocity, netcdfz)
+              domain%velocity = domain%velocity(:,this%ydim:1:-1)
             else if (modelfinput.EQ."RefranceFrame") then
               READ(1,*) domain%frameofrefrance
             else if (modelfinput.EQ."VelocityUnits") then

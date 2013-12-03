@@ -124,6 +124,8 @@
       &domain%thermalconductivity/ &
       &(domain%heatcapcity*pfield%density)
 
+      print *, MAXVAL(kappa_ar)," ",MINVAL(kappa_ar)
+
       call array_integral2d &
       &((this%bderivative*domain%velocity)/kappa_ar, &
       &v_tintegral,domain%incriment(1),this%n,this%m)
@@ -139,7 +141,7 @@
       &v_yintegral - b_yintegral
   
       !test
-      this%expterm = -this%expterm
+      !this%expterm = -this%expterm
 
       end subroutine
 

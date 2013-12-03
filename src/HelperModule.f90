@@ -125,6 +125,29 @@
       end subroutine
 
 
+      !> ID netcdf reading subrutine
+      !! @param filename name of netcdf file
+      !! @return data_ar z data of netcdf
+      subroutine get_vardoublenetcdf &
+      &(filename,data_ar,variablenames)
+
+      character (len = *) :: filename
+      double precision :: data_ar(:, :)
+      character(len = 10) :: variablenames
+
+      integer :: n,m
+      integer :: ncid, zvarid
+
+      integer :: retval
+
+      call check( nf90_open(filename, NF90_NOWRITE, ncid) )
+      call check( nf90_inq_varid(ncid, variablenames, zvarid) )
+      call check( nf90_get_var(ncid, zvarid, data_ar) )
+
+      call check( nf90_close(ncid) )
+
+      end subroutine
+
       !> 1d netcdf reading subroutine used for
       !! boundry conditions
       !! @param filename name of netcdf file

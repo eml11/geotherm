@@ -51,7 +51,7 @@
       type (temperaturefield) tfield
       type (pressurefield) pfield
 
-      integer :: ncid, tvarid, pvarid, dvarid, gvarid, dimids(2)
+      integer :: ncid, vvarid,tvarid, pvarid, dvarid, gvarid, dimids(2)
       integer :: mineralvarid(domain%minerals)
       integer :: x_dimid, y_dimid
       integer i      
@@ -74,6 +74,9 @@
       call wcheck( nf90_def_var &
       &(ncid, "Density", NF90_DOUBLE, dimids, dvarid) )
 
+      call wcheck( nf90_def_var &
+      &(ncid, "Velocity", NF90_DOUBLE, dimids, vvarid) )
+
       !call wcheck ( nf90_def_var &
       !&(ncid, "EclogitePart", NF90_DOUBLE, dimids, evarid) )
 
@@ -94,6 +97,7 @@
         call wcheck( nf90_put_var(ncid, pvarid, pfield%pressure) )
         !call wcheck( nf90_put_var(ncid, evarid, minphase%mineralpart) )
         call wcheck( nf90_put_var(ncid, gvarid, domain%geometry) )
+        call wcheck( nf90_put_var(ncid, vvarid, domain%velocity) )
         do i=1,domain%minerals
           call wcheck( nf90_put_var(ncid, mineralvarid(i), &
           &domain%mineralarray(i)%mineralpart) )
@@ -110,6 +114,8 @@
         !&minphase%mineralpart(:,tfield%m:1:-1)))
         call wcheck( &
         &nf90_put_var(ncid, gvarid, domain%geometry(:,tfield%m:1:-1)) )
+        call wcheck( &
+        &nf90_put_var(ncid, vvarid, domain%velocity(:,tfield%m:1:-1)) )
         do i=1,domain%minerals
           call wcheck( nf90_put_var(ncid, mineralvarid(i), &
           &domain%mineralarray(i)%mineralpart(:,tfield%m:1:-1)) )

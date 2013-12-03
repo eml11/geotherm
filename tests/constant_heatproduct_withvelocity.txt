@@ -28,6 +28,8 @@ EndDomain
 
 Mineral
 !Region1 Parent
+Name
+Parent
 ID
 1
 Density
@@ -44,11 +46,38 @@ GrainSize
 D,0.001
 EndMineral
 
-
+Mineral
+Name
+Eclogite
+sediment
+ID
+7
+Parent
+1
+Density
+D,3300
+HeatProduction
+D,2.06D-12
+HeatCapcity
+D,1
+ThermalConductivity
+D,3.1
+BulkModulus
+D,1.29D+11
+GrainSize
+D,0.001
+FreeEnergy
+3.26352D5
+DiffusionCoefficient
+2D-5
+PhaseLines
+0,0
+7.6923,750
+EndMineral
 
 Output
 File
-"./results/constant_heatproduct_velocity.nc"
+"./results/constant_heatproduct_withvelocity.nc"
 NegativeDown
 EndOutput
 

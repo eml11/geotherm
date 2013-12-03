@@ -5,7 +5,7 @@ GEOTHERM=$(PWD)/../bin/geotherm
 UNITTEST=$(PWD)/bin/unittests
 BIN=$(PWD)/bin
 
-test: test1 test2 test3 unittest testvelocity
+test: test1 test2 unittest testvelocity
 
 unittest:
 	$(unittest)
