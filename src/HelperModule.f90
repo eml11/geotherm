@@ -219,7 +219,30 @@
       READ(1) data_ar
 
       end subroutine 
-    
+   
+      subroutine write_1dslice(filename,data_ar)
+      character(len=256) :: filename
+      double precision :: data_ar(:)
+
+      integer :: ncid, varid
+      integer :: x_dimid
+      integer :: n
+
+      n = SIZE(data_ar)
+
+      call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+
+      call check( nf90_def_dim(ncid, "x", n, x_dimid) )
+      call check( nf90_def_var &
+      &(ncid, "z", NF90_DOUBLE, x_dimid, varid) )
+
+      call check( nf90_enddef(ncid) )
+
+      call check( nf90_put_var(ncid, varid, data_ar) )
+      call check( nf90_close(ncid) )
+
+      end subroutine
+ 
       !> netcdf error checking subroutine
       !! @param status return value of function
       !! from netcdf-fortran

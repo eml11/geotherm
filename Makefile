@@ -9,7 +9,7 @@ OUT=geotherm
 OBJECTS=$(OBJECTDIR)/mathmodule.o $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/modelfilemodule.o $(OBJECTDIR)/EquationParts.o $(OBJECTDIR)/pressuresolver.o $(OBJECTDIR)/GeoChemSupprt.o $(OBJECTDIR)/modeldomainmodule.o $(OBJECTDIR)/modeloutput.o $(OBJECTDIR)/modelregionmodule.o $(OBJECTDIR)/modellogfile.o
 MODULES=$(OBJECTDIR)/equationpartsmodule.mod $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/module_modelfile.mod $(OBJECTDIR)/pressuresolver.mod $(OBJECTDIR)/geochem.mod $(OBJECTDIR)/modeldomainmodule.mod $(OBJECTDIR)/modeloutput.mod $(OBJECTDIR)/modelregionmodule.mod $(OBJECTDIR)/modellogfile.mod
 
-all: geotherm domaingen unittests isostatics
+all: geotherm domaingen unittests isostatics slicenetcdf
 
 geotherm: $(SRC)/GeoTherm.f90 $(MODULES)
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o $(OUT) $(SRC)/GeoTherm.f90 $(OBJECTS)
@@ -22,6 +22,10 @@ unittests: $(SRC)/unit_tests.f90 $(MODULES)
 isostatics: $(SRC)/Isostatics.f90 $(MODULES) $(OBJECTDIR)/isostatichelper.mod
 	$(FC) $(LDFLAGS) $(FDFLAGS) -o isostatics $(SRC)/Isostatics.f90 $(OBJECTS) $(OBJECTDIR)/isostatichelper.o
 	mkdir -p $(BIN); mv isostatics $(BIN)
+
+slicenetcdf: $(SRC)/SliceNetcdf.f90 $(OBJECTDIR)/helpermodule.mod $(OBJECTDIR)/mathmodule.mod
+	$(FC) $(LDFLAGS) $(FDFLAGS) -o slicenetcdf $(SRC)/SliceNetcdf.f90 $(OBJECTDIR)/helpermodule.o $(OBJECTDIR)/mathmodule.o
+	mkdir -p $(BIN); mv slicenetcdf $(BIN)
 
 $(OBJECTDIR)/isostatichelper.mod: $(SRC)/isostatichelper.f90 $(OBJECTDIR)/mathmodule.mod $(OBJECTDIR)/modeldomainmodule.mod
 	$(FC) -c $(LDFLAGS) $(FDFLAGS) $(SRC)/isostatichelper.f90

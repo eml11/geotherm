@@ -121,7 +121,7 @@
           &domain%mineralarray(i)%mineralpart(:,tfield%m:1:-1)) )
         enddo
       end if
-      print *,6
+      call wcheck( nf90_close(ncid) )
       end subroutine
       
       !> netcdf error checking subroutine

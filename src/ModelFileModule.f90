@@ -125,7 +125,7 @@
               READ(1,*) modelfinput
               call get_vardoublenetcdf(modelfinput, &
               &domain%velocity, netcdfz)
-              domain%velocity = domain%velocity(:,this%ydim:1:-1)
+              domain%velocity = -domain%velocity
             else if (modelfinput.EQ."RefranceFrame") then
               READ(1,*) domain%frameofrefrance
             else if (modelfinput.EQ."VelocityUnits") then
