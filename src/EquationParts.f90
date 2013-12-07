@@ -51,6 +51,10 @@
 
       contains
 
+
+      !> allocates memory for a new
+      !! temperature field
+      !! @param this temperature field instance
       subroutine new(this,n,m)
       type (temperaturefield) this
       integer n,m
@@ -82,6 +86,7 @@
 
       end subroutine
 
+      !> unused routine
       subroutine compute_bdashval_fromqx &
       &(tdata_ar,qdata_ar,qxdata_ar,kconstant,retrn_ar,incriment,n,m)
       double precision :: tdata_ar(n,m)
@@ -124,8 +129,6 @@
       &domain%thermalconductivity/ &
       &(domain%heatcapcity*pfield%density)
 
-      print *, MAXVAL(kappa_ar)," ",MINVAL(kappa_ar)
-
       call array_integral2d &
       &((this%bderivative*domain%velocity)/kappa_ar, &
       &v_tintegral,domain%incriment(1),this%n,this%m)
@@ -140,9 +143,6 @@
       this%expterm = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
   
-      !test
-      !this%expterm = -this%expterm
-
       end subroutine
 
       !> sets retrn_ar to the first integral wrt
@@ -251,6 +251,11 @@
 
       end subroutine
 
+      !> combines above routines to compute
+      !! temperature
+      !! @param this temperature field instance
+      !! @param domain domain instance of the model
+      !! @param pfield pressure field instance
       subroutine compute_temp(this,domain,pfield)
       type (modeldomain) domain
       type (temperaturefield) this
@@ -275,6 +280,9 @@
 
       end subroutine
       
+      !> deallocates memory for a new
+      !! temperature field
+      !! @param this temperature field instance
       subroutine delete(this)
       type (temperaturefield) this
       
