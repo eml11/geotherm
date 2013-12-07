@@ -232,15 +232,44 @@
 
       end subroutine
 
-      !> obsolete boundry condition file
+      !> reads QGIS .csv of a shapefile layer as
+      !! a boundry condition file linear interpolation
+      !! of missing data
       !! @param filename name of boundry file
-      !! @return data_ar data from file    
-      subroutine get_file(filename,data_ar)
+      !! @param records number of records in csv
+      !! @return retrn_ar data from file    
+      subroutine get_file(filename,retrn_ar,records,n,m)
       character (len = *) :: filename
-      double precision :: data_ar(:)
+      character (len = 256) dummychar
+      double precision :: retrn_ar(:,:)
+      double precision :: data_ar(n)
+      integer :: arange(n)
+      double precision, allocatable :: raw_data(:,:)
+      integer :: records,n,m
+      integer i, dummy1,dummy2
 
-      OPEN(1, file = filename)
-      READ(1) data_ar
+      OPEN(3, file = filename)
+      
+      allocate(raw_data(records,2) )
+      arange=(/(i,i=1,n)/)
+
+      READ(3,*) dummychar
+
+      do i=1,records
+        READ(3,*) dummy1,raw_data(i,1),dummy2,raw_data(i,2)
+      enddo
+
+      raw_data(:,1) = (raw_data(:,1)/raw_data(records,1))*n
+      do i=1,records-1
+        where (arange.GT.raw_data(i,1).AND.arange.LE.raw_data(i+1,1))
+          data_ar = ((raw_data(i+1,2)-raw_data(i,2)) / &
+          & (raw_data(i+1,1)-raw_data(i,1))) * &
+          & (arange - raw_data(i,1)) + raw_data(i,2)
+
+        end where
+      enddo
+
+      call extend_ardimension(data_ar,retrn_ar,m)
 
       end subroutine 
    

@@ -37,17 +37,7 @@
       implicit none
 
       type modelfile
-        character (len = 256) :: velocitynetcdf
-        character (len = 256) :: densitynetcdf
-        character (len = 256) :: heatproductnetcdf
-        character (len = 256) :: heatcapcnetcdf
-        character (len = 256) :: gtempfile
-        character (len = 256) :: gqfluxfile
-        character (len = 256) :: gqxfluxfile
-        character (len = 256) :: thermlconductnetcdf
         character (len = 256) :: outfile
-        character (len = 256) :: incompresibilitynetcdf
-        character (len = 256) :: grainsizenetcdf
         integer :: negativedown
         integer :: ydim, tdim
         double precision :: incriment(2)
@@ -125,7 +115,7 @@
               READ(1,*) modelfinput
               call get_vardoublenetcdf(modelfinput, &
               &domain%velocity, netcdfz)
-              domain%velocity = -domain%velocity
+              domain%velocity = -0.0*domain%velocity
             else if (modelfinput.EQ."RefranceFrame") then
               READ(1,*) domain%frameofrefrance
             else if (modelfinput.EQ."VelocityUnits") then
@@ -142,6 +132,12 @@
                     call writelog &
                     &(lfile,"setting gtemp to: " // modelfinput)
                     domain%gtemp = part
+                  else if (typinput.EQ."C") then
+                   READ(1,*) ID
+                   call writelog &
+                   &(lfile,"reading gtemp CSV: " // modelfinput)
+                   call get_file( modelfinput, &
+                   &domain%gtemp,ID ,this%tdim, this%ydim) 
                   else
                     call writelog &
                     &(lfile,"reading gtemp netcdf: " // modelfinput)
@@ -156,6 +152,12 @@
                     call writelog &
                     &(lfile,"setting gqflux to: " // modelfinput)
                     domain%gqflux = part
+                  else if (typinput.EQ."C") then
+                    READ(1,*) ID
+                    call writelog &
+                    &(lfile,"reading gqflux CSV: " // modelfinput)
+                    call get_file( modelfinput, &
+                    &domain%gqflux,ID ,this%tdim, this%ydim)
                   else
                     call writelog &
                     &(lfile,"reading gqflux netcdf: " // modelfinput)
