@@ -171,6 +171,30 @@
 
       end subroutine
 
+      !> 1d netcdf reading subroutine used for
+      !! boundry conditions
+      !! @param filename name of netcdf file
+      !! @return data_ar z data of netcdf      
+      subroutine get_varnetcdf1d(filename,retrn_ar,variablename,n,m)
+      character (len = *) :: filename
+      character (len = *) :: variablename
+      double precision :: data_ar(n)
+      double precision :: retrn_ar(:,:)
+
+      integer :: ncid, varid
+      integer :: n,m
+      integer :: retval
+
+      call check( nf90_open(filename, NF90_NOWRITE, ncid) )
+      call check( nf90_inq_varid(ncid, variablename, varid) )
+      call check( nf90_get_var(ncid, varid, data_ar) )
+
+      call check( nf90_close(ncid) )
+
+      call extend_ardimension(data_ar,retrn_ar,m)
+
+      end subroutine
+
       !> netcdf reading subroutine called initially
       !! in order to get incriment of y/t
       !! @param filename name of netcdf file
