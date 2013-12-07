@@ -51,6 +51,9 @@
 
       contains
       
+      !> allocates memory for a mineral
+      !! phase
+      !! @param this mineral phase instance
       subroutine NEW(this,n,m)
       integer n,m
       type (mineralphase) this
@@ -64,12 +67,14 @@
       allocate( this%thermalconductivity(n,m) )
       allocate( this%bulkmodulus(n,m) )
       allocate( this%grainsize(n,m) )
-      !allocate( this%phaseline(datapoints,2) )
 
       this%mineralpart = 0D0
 
       end subroutine
   
+      !> deallocates memory for a mineral
+      !! phase
+      !! @param this mineral phase instance
       subroutine DELETE(this)
       type (mineralphase) this
       
@@ -80,7 +85,6 @@
       deallocate( this%thermalconductivity )
       deallocate( this%bulkmodulus )
       deallocate( this%grainsize )      
-      !deallocate( this%phaseline )
 
       end subroutine
   
@@ -97,6 +101,10 @@
 
       end function 
 
+      !> Returns low temperature condition
+      !! for stability given a pressure
+      !! @param pressure input pressure array
+      !! @return ltphaseline temperature of Slope
       function ltphaseline(this,pressure)
       type (mineralphase) this
       double precision pressure(this%n,this%m)
@@ -107,6 +115,10 @@
 
       end function
      
+      !> Returns low pressure condition
+      !! for stability given a temperature
+      !! @param pressure input temperature array
+      !! @return lpphaseline pressure of Slope
       function lpphaseline(this,temperature)
       type (mineralphase) this
       double precision temperature(this%n,this%m)
@@ -117,37 +129,25 @@
 
       end function
 
-      !> Gives fraction of eclogite produced
+      !> Gives fraction of mineral phase produced
       !! @param temperature computed temperature
       !! array
-      !! @param diffusion_coeficient diffusion
-      !! coefficient of limiting chemical species
-      !! @param grain_size grain size of parent rock
-      !! @param free_energy Gibbs free energy of
-      !! reaction
+      !! @param this mineral phase instance
+      !! @param parent parent mineral phase instance
+      !! of this
       !! @param t_ar time variable
-      !! @param caracteristic_time_ar caracteristic
-      !! time for reaction to complete
-      !! @return retrn_ar fraction of eclogite against
-      !! total rock
       subroutine compute_reactionprogress &
       &(this,parent,t_ar,temperature)
-
       type (mineralphase) this, parent
-      !type (temperaturefield) tfield
-
       double precision :: temperature(:,:)
       double precision :: t_ar(this%n,this%m)
       double precision :: caracteristic_time_ar(this%n,this%m)
       double precision, parameter :: gas_const = 8.3144621 
       
-      !need to change to import parent chemical species at some point
-      !recions will probably actually be called from Domain
       caracteristic_time_ar = (parent%grainsize**2) * &
       &DEXP(this%free_energy/(gas_const*temperature)) / &
       &parent%diffusion_coefficient
-      
-      ! note the 1-mineralpart will be replaced by parent mineral
+
       this%mineralpart = this%mineralpart + &
       &(parent%mineralpart-parent%mineralpart* &
       &DEXP(-t_ar/caracteristic_time_ar))
@@ -162,17 +162,12 @@
       !! @param temperature computed temperature
       !! array
       !! @param pressure input pressure array
-      !! @param grain_size grain size of parent rock
-      !! @param t_ar time variable
-      !! @return retrn_ar fraction of eclogite against
-      !! total rock
+      !! @param this mineral phase instance
+      !! @param parent parent mineral phase instance
+      !! of this
       subroutine compute_part &
       &(this,parent,t_ar,temperature,pressure)
-      
       type (mineralphase) this, parent
-      !type (modelfile) model
-      !type (pressurefield) pfield
-      !type (temperaturefield) tfield
       double precision :: temperature(:,:)
       double precision :: pressure(:,:)
 
@@ -182,7 +177,6 @@
       if (this%parent.NE.0) then
         call compute_reactionprogress(this,parent,t_ar,temperature)
       end if
-      !print *, this%mineralpart
       
       where (temperature .GE. &
       &ltphaseline(this,pressure))
