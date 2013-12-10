@@ -194,6 +194,7 @@
       this%thermalconductivity = this%geometry*0d0
       this%bulkmodulus = this%geometry*0d0
       this%grainsize = this%geometry*0d0
+      this%velocity = this%velocity*0d0
 
       !should really be done with pointers
 
@@ -236,6 +237,8 @@
               &this%mineralarray(j)%bulkmodulus*part
               this%grainsize = this%grainsize + &
               &this%mineralarray(j)%grainsize*part
+              this%velocity = this%velocity + &
+              &this%mineralarray(j)%velocity*part
 
             end where
           enddo
@@ -343,9 +346,9 @@
       end if  
 
       if (this%frameofrefrance.NE.0D0) then
-        this%incriment(1) = this%incriment(1)/this%frameofrefrance
+        this%incriment(1) = this%incriment(1)/this%frameofrefrance     
       end if
-      
+
       end subroutine
 
       end module

@@ -137,7 +137,7 @@
                    call writelog &
                    &(lfile,"reading gtemp CSV: " // modelfinput)
                    call get_file( modelfinput, &
-                   &domain%gtemp,ID ,this%tdim, this%ydim) 
+                   &domain%gtemp,ID ,this%tdim, this%ydim)
                   else
                     call writelog &
                     &(lfile,"reading gtemp netcdf: " // modelfinput)
@@ -279,6 +279,19 @@
                 call get_netcdf(modelfinput, &
                 &minerals(nominerals)%grainsize)
                end if
+            else if (modelfinput.EQ."Velocity") then
+              READ(1,*) typinput, modelfinput
+              if (typinput.EQ."D") then
+                READ(modelfinput,*) part
+                call writelog &
+                &(lfile,"setting velocity to: " // modelfinput)
+                minerals(nominerals)%velocity = part
+              else
+                call writelog &
+                &(lfile,"reading velocity netcdf: " // modelfinput)
+                call get_netcdf(modelfinput, &
+                &minerals(nominerals)%velocity)
+              end if
             else if (modelfinput.EQ."FreeEnergy") then
               READ(1,*) minerals(nominerals)%free_energy
             else if (modelfinput.EQ."DiffusionCoefficient") then

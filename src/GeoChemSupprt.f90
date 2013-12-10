@@ -44,6 +44,7 @@
         double precision, allocatable :: bulkmodulus(:,:)
         double precision, allocatable :: grainsize(:,:)
         double precision, allocatable :: phaseline(:,:)
+        double precision, allocatable :: velocity(:,:)
         double precision :: lowtemperaturephase(2) = (/0,0/)
         double precision :: lowpressurephase(2) = (/0,0/)
 
@@ -64,6 +65,7 @@
       allocate( this%thermalconductivity(n,m) )
       allocate( this%bulkmodulus(n,m) )
       allocate( this%grainsize(n,m) )
+      allocate( this%velocity(n,m) )
       !allocate( this%phaseline(datapoints,2) )
 
       this%mineralpart = 0D0
@@ -79,7 +81,8 @@
       deallocate( this%heatcapcity )
       deallocate( this%thermalconductivity )
       deallocate( this%bulkmodulus )
-      deallocate( this%grainsize )      
+      deallocate( this%grainsize )
+      deallocate( this%velocity )      
       !deallocate( this%phaseline )
 
       end subroutine

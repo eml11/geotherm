@@ -119,30 +119,43 @@
       double precision, dimension(this%n,this%m) :: b_tintegral
       double precision, dimension(this%n,this%m) :: v_yintegral
       double precision, dimension(this%n,this%m) :: b_yintegral     
- 
+      double precision, dimension(this%n,this%m) :: argument
+
       kappa_ar = &
       &domain%thermalconductivity/ &
       &(domain%heatcapcity*pfield%density)
-
+      
       print *, MAXVAL(kappa_ar)," ",MINVAL(kappa_ar)
+      
+      !print *, domain%velocity
 
-      call array_integral2d &
-      &((this%bderivative*domain%velocity)/kappa_ar, &
+      argument = (this%bderivative*domain%velocity)/kappa_ar
+      call array_integral2d(argument, &
       &v_tintegral,domain%incriment(1),this%n,this%m)
-      call array_integral2d &
-      ((this%bderivative**2d0)/kappa_ar, &
+      !print *, domain%velocity
+      argument = (this%bderivative*this%bderivative)/kappa_ar
+      
+      call array_integral2d(argument, &
       &b_tintegral,domain%incriment(1),this%n,this%m)
-      call array_integral2dydim(domain%velocity/kappa_ar, &
+      
+      argument = domain%velocity/kappa_ar
+      
+      call array_integral2dydim(argument, &
       &v_yintegral,domain%incriment(2),this%n,this%m)
-      call array_integral2dydim(this%bderivative/kappa_ar, &
+      
+      argument = this%bderivative/kappa_ar
+      call array_integral2dydim(argument, &
       &b_yintegral,domain%incriment(2),this%n,this%m) 
 
       this%expterm = -v_tintegral + b_tintegral + &
       &v_yintegral - b_yintegral
-  
+      !argument = (this%bderivative*this%bderivative)/kappa_ar
+      
+      !probably sensible to take a constant out of this to force it to a reasonable value
+      !this%expterm =  this%expterm - MINVAL(this%expterm)
       !test
       !this%expterm = -this%expterm
-
+       
       end subroutine
 
       !> sets retrn_ar to the first integral wrt
@@ -163,12 +176,16 @@
       &DEXP(-1*this%expterm)/domain%thermalconductivity
       call array_integral2dydim &
       &(integral_term,y_integral,domain%incriment(2),this%n,this%m)
+      
+      integral_term = -domain%heatproduction*domain%density * &
+      &this%bderivative * &
+      &DEXP(-1*this%expterm)/domain%thermalconductivity
       call array_integral2d &
-      &(integral_term*this%bderivative, &
+      &(integral_term, &
       &t_integral,domain%incriment(1),this%n,this%m)
 
       this%innerintegral = y_integral - t_integral
-
+      !print *, this%innerintegral
       end subroutine
 
       !> computes constant of integration for integral
@@ -224,7 +241,10 @@
 
       call array_integral2dydim &
       &(integral_term,y_integral,domain%incriment(2),this%n,this%m)
-      call array_integral2d(integral_term*this%bderivative, &
+
+      integral_term = this%bderivative * &
+      &EXP(this%expterm)*(this%innerintegral + this%innerconstant)
+      call array_integral2d(integral_term, &
       &t_integral,domain%incriment(1),this%n,this%m)
 
       this%outerintegral = y_integral - t_integral

@@ -43,7 +43,7 @@
       double precision, dimension(n,m) :: back_ar
       double precision :: incriment
       double precision :: sumvl(m)
-      integer :: i,j,n,m
+      integer :: i,j,n,m      
 
       fowrd_ar(n,:) = data_ar(n,:)
       fowrd_ar(:n,:) = data_ar(2:,:)
@@ -55,11 +55,12 @@
       trap = incriment*(fowrd_ar+back_ar)/2
 
       sumvl = 0d0*midpnt(1,:)
+      
       do i=1,n
         sumvl = sumvl + (2d0/3d0)*midpnt(i,:) + (1d0/3d0)*trap(i,:)
         retrn_ar(i,:) = sumvl
       end do
-
+      
       end subroutine
 
       !> integrates data_ar along dimension 2
@@ -78,7 +79,6 @@
       integer :: i,j,n,m
 
       !using simsons!
-
       fowrd_ar(:,m) = data_ar(:,m)
       fowrd_ar(:,:m) = data_ar(:,2:)
 
