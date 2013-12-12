@@ -41,6 +41,9 @@
 
       contains
 
+      !> allocates memory for pressure
+      !! field
+      !! @param this pressurefield instance
       subroutine new(this,n,m)
       type (pressurefield) this
       integer n,m
@@ -63,13 +66,10 @@
       type (modeldomain) domain
       double precision, parameter :: gravity_const = 9.81
       double precision :: y_integral(this%n,this%m)
-      print *,100
       call array_integral2dydim(domain%density*gravity_const, & 
       &y_integral,domain%incriment(2),this%n,this%m)
-      print *,110
       this%pressure = -domain%bulkmodulus * &
       &DLOG(1+y_integral/domain%bulkmodulus)
-      print *, 120
       end subroutine
 
       !> computes pressure dependent density 
@@ -91,6 +91,9 @@
 
       end subroutine
       
+      !> deallocates memory for pressure
+      !! field
+      !! @param this pressurefield instance
       subroutine delete(this)
       type (pressurefield) this
       
