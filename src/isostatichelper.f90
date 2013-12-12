@@ -1,3 +1,31 @@
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  
+!  geotherm.
+!  
+!  Copyright (C) 2013 Elliot Lynch.
+!  
+!  Elliot M. Lynch, eml11@ic.ac.uk
+!  Department of Earth Science and Engineering
+!  Imperial College London
+!  
+!  This library is free software; you can redistribute it and/or
+!  modify it under the terms of the GNU Lesser General Public
+!  License as published by the Free Software Foundation,
+!  version 2.1 of the License.
+!  
+!  This library is distributed in the hope that it will be useful,
+!  but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+!  Lesser General Public License for more details.
+!  
+!  You should have received a copy of the GNU Lesser General Public
+!  License along with this library; if not, write to the Free Software
+!  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+!  USA
+!  
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
       module isostatichelper
       use netcdf
       use mathmodule
@@ -14,25 +42,18 @@
       
       density = 0D0
 
-      !print *, domain%minerals
-      !print *, domain%minerals
       retval = nf90_open(filename, NF90_NOWRITE, ncid)
       do i=1,domain%minerals
         retval = nf90_inq_varid(ncid, &
         &domain%mineralarray(i)%mineralname, varid)
         retval = nf90_get_var(ncid, varid, data_ar)
-        !print *, data_ar
-        !print *, data_ar
         where (data_ar.GT.1)
           data_ar=0
         elsewhere
           data_ar=data_ar
         end where
         density = density + data_ar*domain%mineralarray(i)%density
-        !print *, MAXVAL(domain%mineralarray(i)%density)
-        !print *, maxval(data_ar)
       enddo
-      !print *, density
       retval = nf90_close(ncid)
 
       end subroutine
