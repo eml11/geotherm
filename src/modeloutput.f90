@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -43,9 +42,6 @@
       !! @param filename name of netcdf file
       !! @param data_ar z data of netcdf 
       subroutine write_netcdf(model,tfield,pfield,domain)
-      !&(filename,temp_ar,density_ar,pressure_ar,ecologite_ar, &
-      !&negativedown,n,m)
-      !type (modelfile) model
       type (modelfile) model
       type (modeldomain) domain
       type (temperaturefield) tfield
@@ -56,15 +52,12 @@
       integer :: x_dimid, y_dimid
       integer i      
 
-      print *,2
-
       call wcheck( nf90_create(model%outfile, NF90_CLOBBER, ncid) )
 
       call wcheck( nf90_def_dim(ncid, "x", tfield%n, x_dimid) )
       call wcheck( nf90_def_dim(ncid, "y", tfield%m, y_dimid) )
       
       dimids =  (/ x_dimid, y_dimid /)
-      print *,3
       call wcheck( nf90_def_var &
       &(ncid, "Temperature", NF90_DOUBLE, dimids, tvarid) )
 
@@ -77,18 +70,15 @@
       call wcheck( nf90_def_var &
       &(ncid, "Velocity", NF90_DOUBLE, dimids, vvarid) )
 
-      !call wcheck ( nf90_def_var &
-      !&(ncid, "EclogitePart", NF90_DOUBLE, dimids, evarid) )
-
       call wcheck ( nf90_def_var &
       &(ncid, "Geometry", NF90_DOUBLE, dimids, gvarid) )
-      print *,4
+
       do i=1,domain%minerals
         call wcheck ( nf90_def_var &
         &(ncid, domain%mineralarray(i)%mineralname, NF90_DOUBLE, &
         &dimids, mineralvarid(i)) )
       enddo
-      print *,5
+
       call wcheck( nf90_enddef(ncid) )
 
       if (model%negativedown.EQ.0) then
