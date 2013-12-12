@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -26,6 +25,7 @@
 !  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+!write code for logfile, mostly not used
       module modellogfile
       implicit none
 
@@ -43,13 +43,9 @@
       character(len=264) :: filename
       integer :: n
       
-      !for now ignoring logfilename
       n = len(filename)
-      !print *, len(TRIM(filename))
-      !print *, filename(:len(TRIM(filename))-4) // "_logfile.log"
-      !this%filename = filename(:len(TRIM(filename))-4) // "_logfile.log"
       this%filename = "./logfile.log"
-      !print *, this%filename
+
       OPEN(2,FILE=this%filename)
 
       end subroutine
