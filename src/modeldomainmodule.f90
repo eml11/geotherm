@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -65,6 +64,11 @@
 
       contains
       
+      !> allocates memory for model
+      !! domain
+      !! @param this domain instance
+      !! @param regions number of regions
+      !! in domain
       subroutine NEW(this,regions,n,m)
       type (modeldomain) this
       integer regions
@@ -90,6 +94,9 @@
 
       end subroutine
 
+      !> deallocates memory for model
+      !! domain
+      !! @param this domain instance
       subroutine DELETE(this)
       type (modeldomain) this
       integer i
@@ -119,6 +126,12 @@
 
       end subroutine
 
+      !> Allocates memory for a
+      !! new region instance in regionarray
+      !! @param this domain instance
+      !! @param inid region ID
+      !! @param arraysize number of minerals
+      !! in region
       subroutine addregion(this,inid,arraysize)
       type (modeldomain) this
       type (modelregion) region
@@ -133,6 +146,11 @@
 
       end subroutine
 
+      !> Adds mineral data to the 
+      !! current Region in regionarray
+      !! @param this domain instance
+      !! @param mineralid Mineral ID
+      !! @param part molar fraction in region
       subroutine addmineral(this,mineralid,part)
       type (modeldomain) this
       integer mineralid
@@ -144,6 +162,11 @@
 
       end subroutine
 
+      !> Sets up the array of all mineral
+      !! intances in domain
+      !! @param this domain instance
+      !! @param in_mineralarray array of mineral
+      !! intances
       subroutine setminerals(this,in_mineralarray)
       type (modeldomain) this
       type (mineralphase) in_mineralarray(:)
@@ -154,14 +177,21 @@
 
       end subroutine
 
+      !> For each mineral in the domain calls
+      !! the mineral reaction subroutine with
+      !! the appropriate input
+      !! @param this domain instance
+      !! @param t_ar array of time variable
+      !! @param temperature computed temperature
+      !! in domain
+      !! @param pressure computed pressure in
+      !! domain
       subroutine computemineralparts( this,t_ar,temperature,pressure )
       type (modeldomain) this
       integer i,j,minerals
       double precision :: t_ar(:,:)
       double precision :: temperature(:,:)
       double precision :: pressure(:,:)      
-
-      !need to add in section on parent
 
       do i=1,this%minerals
        if (this%mineralarray(i)%parent.EQ.0) then
@@ -183,6 +213,10 @@
       
       end subroutine
 
+      !> calculates the physical
+      !! paramters in the domain based
+      !! on mineral content
+      !! @param this domain instance
       subroutine UPDATE(this)
       type (modeldomain) this
       integer i,j     
@@ -196,22 +230,10 @@
       this%grainsize = this%geometry*0d0
       this%velocity = this%velocity*0d0
 
-      !should really be done with pointers
-
       do i=1,this%regions
           do j=1,this%minerals
-            !where &
-          !&(this%mineralarray(j)%ID.EQ.this%regionarray(i)%mineralids)
-              !part = this%regionarray(i)%mineralparts
-            !elsewhere
-            !  part = 0d0
-            !end where
             if (ANY(this%mineralarray(j)%ID .EQ. &
             &this%regionarray(i)%mineralids)) then
-              
-            !else
-
-            !endif
             
             part = MAXVAL(this%regionarray(i)%mineralparts,MASK = &
             &this%mineralarray(j)%ID .EQ. &
@@ -219,9 +241,6 @@
             else
             part = 0
             endif
-
-
-            !print *, "part ",part
 
             where (this%geometry.EQ.this%regionarray(i)%ID)
 
@@ -246,36 +265,25 @@
 
       end subroutine
 
+      !> Assigns a value to the molar fraction
+      !! for each mineral in mineralarray
+      !! based on the mineral contents of the
+      !! domain regions
+      !! @param this domain instance
       subroutine updateminerals(this)
       type (modeldomain) this
       integer i,j      
       double precision :: part
 
-      !allocate( part(this%minerals) )
       do j=1,this%minerals
         this%mineralarray(j)%mineralpart = 0D0
       enddo
 
-      !should really be done with pointers
-      !probably gets overwritten by GeoChem subroutines
       do i=1,this%regions
           do j=1,this%minerals
-            !where &
-          !&(this%mineralarray(j)%ID.EQ.this%regionarray(i)%mineralids)
-            !  part = this%regionarray(i)%mineralparts
-            !elsewhere
-            !  part = 0d0
-            !end where
-            !part = MAXVAL(this%regionarray(i)%mineralids,MASK = &
-            !&this%mineralarray(j)%ID .EQ. &
-            !&this%regionarray(i)%mineralids   )
 
             if (ANY(this%mineralarray(j)%ID .EQ. &
             &this%regionarray(i)%mineralids)) then
-
-            !else
-
-            !endif
             
             part = MAXVAL(this%regionarray(i)%mineralparts,MASK = &
             &this%mineralarray(j)%ID .EQ. &
@@ -283,13 +291,10 @@
             else
             part = 0
             endif
-            !print *, i"part ",part
             
             where (this%geometry.EQ.this%regionarray(i)%ID)
               this%mineralarray(j)%mineralpart = &
               &this%mineralarray(j)%mineralpart + part
-            !elsewhere
-            !  this%mineralarray(j)%mineralpart = 0D0
             end where
           enddo
       enddo    
@@ -297,6 +302,9 @@
 
       end subroutine
 
+      !> removes null region in the domain
+      !! by shifting other regions to surface
+      !! @param this domain instance
       subroutine offsetgeometry( this,n,m )
       type (modeldomain) this
       integer mask(n,m)      
@@ -304,7 +312,7 @@
       integer baseid(n,m)
       double precision :: basevelo(n,m)
       integer i,n,m      
-      !note domain should probably have it's own m,n
+      
       where (this%geometry.EQ.0)
         mask = 1
       elsewhere
@@ -336,6 +344,10 @@
 
       end subroutine
 
+      !> rescales velocity and time domain acording
+      !! to the motion of the frame of refrance and
+      !! the velocity units
+      !! @param this domain instance
       subroutine rescale( this )
       type (modeldomain) this
       double precision :: conversion = 0.01/(365.24*24*3600)  
