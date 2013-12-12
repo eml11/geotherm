@@ -1,4 +1,3 @@
-
 !  
 !  geotherm.
 !  
@@ -83,14 +82,9 @@
       retval = nf90_get_var(ncid, varid, start_density)
       retval = nf90_close(ncid)
 
-      !print *, density 
-
-      !density = (start_density/domain%density)*density
       domain%density = density 
       call compute_pddensity(pressurefield_inst,domain)
       density = pressurefield_inst%density 
-      !print *, density
-      !print *, density
 
       call domaindensityintegral(start_density,domain,integral1)
       call mineraldensityintegral(density,domain,integral2)
