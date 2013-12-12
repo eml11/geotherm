@@ -42,30 +42,24 @@
       character (len = 256) :: filename
       type (pressurefield) :: pressurefield_inst
       type (temperaturefield) :: temperaturefield_inst
-      !type (mineralphase) eclogite
-      !double precision, allocatable :: eclogite_content(:,:)
       double precision, allocatable :: t_ar(:,:)
       integer n,m,i,j
 
       !gets the name of the file use to specify
-      !model parameters, set as a sytem argument
+      !model parameters, set as a system argument
       call GETARG(1,filename)
 
       !reads the file used to specify model parameters
       !and stores these in the instace modelfile_inst
       ! of derived type modelfile
       call READMDLF(modelfile_inst,filename,domain)      
-      !main work subroutine
-      !call compute_geotherm &
-      !&(modelfile_inst,domain,modelfile_inst%tdim,modelfile_inst%ydim)
-      print *,2
+
       n = modelfile_inst%tdim
       m = modelfile_inst%ydim
 
-      !allocate( eclogite_content(n,m) )
       allocate( t_ar(n,m) )
 
-      !call MINERALNEW( eclogite,n,m )
+      !allocates memory for derived types
       write(2,*) "setting up pressure field"
       call PRESSUREFIELDNEW( pressurefield_inst,n,m )
       write(2,*) "setting up temperature field"
@@ -80,47 +74,41 @@
       print *,12
       call updateminerals( domain )
 
-      !eclogite%free_energy = 326352.0
-      !eclogite%diffusion_coefficient = 0.00002
-      print *,11
+      !computes fields
       write(2,*) "computing pressure"
       call compute_pressure(pressurefield_inst,domain)
       write(2,*) "computing density"
-      print *, 21
+
       call compute_pddensity(pressurefield_inst,domain)
       write(2,*) "computing temperature"
-      print *, 22
+
       call compute_temp(temperaturefield_inst,domain, &
       &pressurefield_inst)
-      print *,10
+ 
+      !set up time array
       do j=1,m
         t_ar(:,j) = (/(i,i=1,n)/)*modelfile_inst%incriment(1)
       enddo
-      print *,9
-      !call compute_eclogite_content(eclogite,t_ar, &
-      !&temperaturefield_inst%temperature, &
-      !&pressurefield_inst%pressure)
       
+      !computes mineral reactions
       call computemineralparts( domain,t_ar, &
       &temperaturefield_inst%temperature,pressurefield_inst%pressure )
-      print *,1
+      
       !writes output netcdf
       write(2,*) "writing to output"
       call write_netcdf &
       &(modelfile_inst,temperaturefield_inst, &
       &pressurefield_inst,domain)
       
+      !deallocating memory for derived types
       write(2,*) "deleting temperature field"
       call DELETE(temperaturefield_inst)
       write(2,*) "deleting pressure field"
       call PRESSUREFIELDDELETE(pressurefield_inst)
-      !call MINERALDELETE(eclogite)
       write(2,*) "deleting domain"
       call DELETEDOMAIN( domain )
       write(2,*) "done"
-      !end subroutine
+      
       CLOSE(2)
-
-      !call MODELDELETE(modelfile_inst)
 
       end program
