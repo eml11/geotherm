@@ -333,8 +333,6 @@
       call setminerals(domain,minerals)
       WRITE(2,*) "finished parsing: " // filename     
 
-      !CLOSE(1) 
-
       end subroutine
 
       end module
