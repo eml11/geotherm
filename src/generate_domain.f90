@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -26,6 +25,7 @@
 !  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+!obsolete domain settup
       program generatedomain
 
       implicit none
@@ -45,9 +45,6 @@
       velocity = 1.58*(10**(-9.0))    
 
       incriment(1)=(n*incriment(2))/(m*velocity*DSIN(subduction_angle))
-
-      print *, incriment
-      print *, incriment(1)*n,incriment(2)*m
 
       call work_routine(filename,subduction_angle,incriment,n,m)
 
@@ -79,9 +76,6 @@
       subductLine = DTAN(subduction_angle)*t_ar * &
       &(incriment(2)/incriment(1))
 
-      !use this to get around problem with gmt at some point
-      !should really be ints for ids but concern as to
-      !how gmt will process this
       where (y_ar.LE.subductLine)
         where(y_ar.LE.landlith_thickness)
           region_ar = 1000d0
@@ -113,8 +107,6 @@
 
       call check(  nf90_enddef(ncid) )
 
-      !call check(  nf90_put_var(ncid, xvarid, t_ar(:,1)) )
-      !call check(  nf90_put_var(ncid, yvarid, y_ar(1,:)) )
       call check(  nf90_put_var(ncid, zvarid, region_ar) )
 
       end subroutine
