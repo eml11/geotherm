@@ -1,4 +1,3 @@
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
 !  geotherm.
@@ -27,7 +26,6 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       module modelregionmodule
-      !use netcdf
       use geochem, MINERALDELETE => DELETE, &
       & NEWMINERAL => NEW
       implicit none
@@ -45,6 +43,10 @@
 
       contains
 
+      !> allocate memory for region
+      !! @param this region instance
+      !! @param minerals number of minerals
+      !! in region
       subroutine NEW(this,minerals)
       type (modelregion) this
       integer minerals      
@@ -55,6 +57,8 @@
 
       end subroutine
 
+      !> deallocate memory for region
+      !! @param this region instance
       subroutine DELETE(this)
       type (modelregion) this
 
@@ -63,6 +67,12 @@
 
       end subroutine
 
+      !> Adds mineral id and molar fraction
+      !! to mineralids and mineralparts
+      !! @param this region instance
+      !! @param mineralid Mineral ID
+      !! @param part Mineral molar fraction
+      !! in region
       subroutine addmineral(this,mineralid,part)
       type (modelregion) this
       integer mineralid
