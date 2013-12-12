@@ -102,11 +102,6 @@
 
       call array_integral2dydim(wrk_ar1,wrk_ar3,incriment(1),n,m)
 
-      !do i=1,m
-      !  wrk_ar2(:,i) = wrk_ar2(:,i)-wrk_ar2(:,i)
-      !  wrk_ar3(:,i) = wrk_ar3(:,i)-wrk_ar3(:,i)
-      !enddo
-
       call test_output(wrk_ar2,wrk_ar3,n,m)
 
       print *, "test"
@@ -119,41 +114,16 @@
       domain%thermalconductivity = gaussian_nnorm(t_ar,y_ar*0,5d0,n,m)
       wrk_ar4 = (-t_ar*wrk_ar1*wrk_ar3)/(wrk_ar2*2)
 
-      !call compute_bdashval(tfield,model)
- 
-      !add test routine to each file
-
-      !call compute_bdashval &
-      !&(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
-
-      !call test_output(wrk_ar4,wrk_ar5,n,m)
-
       wrk_ar1 = DEXP(-2d0*t_ar)
       wrk_ar2 = DEXP(-3d0*t_ar-3d0*y_ar)
       wrk_ar3 = DEXP(-5d0*t_ar-5d0*y_ar)
       wrk_ar4 = DEXP(2*(t_ar+y_ar))/2d0 - t_ar*DEXP(2*y_ar) - &
       &DEXP(3*t_ar+5*y_ar)/5d0 + DEXP(t_ar+5*y_ar)
 
-      !call compute_exponentintegral &
-      !&(wrk_ar1,wrk_ar2,wrk_ar3,wrk_ar5,incriment,n,m)
-
-      !do i=1,n
-      !  wrk_ar4(i,:) = wrk_ar4(i,:)-wrk_ar4(3,:)
-      !  wrk_ar5(i,:) = wrk_ar5(i,:)-wrk_ar5(3,:)
-      !enddo
-
-      !call test_output(wrk_ar4,wrk_ar5,n,m)
-
-      !print *, ABS((wrk_ar4-wrk_ar5)/wrk_ar4)
-
       wrk_ar4 = gaussian_nnorm(t_ar,y_ar,7d0,n,m)
       wrk_ar5 = (wrk_ar2*wrk_ar3*wrk_ar4)/(y_ar*(-1/3.0-0.2-1/7.0)) + &
       &(wrk_ar1*wrk_ar2*wrk_ar3*wrk_ar4)/(t_ar*(-1/3.0-0.2-1/7.0-0.5))
 
-      !call compute_init_inerintegral &
-      !&(wrk_ar2,wrk_ar1,wrk_ar3,wrk_ar4,wrk_ar6,incriment,n,m)
-
-      !call test_output(wrk_ar5,wrk_ar6,n,m)
       call DELETE( tfield )
       call PRESSUREFIELDDELETE( pfield )
 
