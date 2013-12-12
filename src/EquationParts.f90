@@ -179,7 +179,6 @@
       &t_integral,domain%incriment(1),this%n,this%m)
 
       this%innerintegral = y_integral - t_integral
-      !print *, this%innerintegral
       end subroutine
 
       !> computes constant of integration for integral
